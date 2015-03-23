@@ -3,3 +3,8 @@
  *  this.ready();
  * });
  */
+
+
+Meteor.publish('images', function (/* args */) {
+  return Images.find();
+});
