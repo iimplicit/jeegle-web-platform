@@ -1,0 +1,78 @@
+<template name="Editor">
+<div class="container">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10">
+			<div class="row">
+				<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+					<div class="row">
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 FilterSetting">
+							<div id="Filters">
+								<div class="FilterSetting">
+									<div class="FilterName">
+										<p>brightness</p>
+									</div>
+									<input type="range" data-filter="brightness"
+									value="100"
+									min="0"
+									max="200"
+									step="1">
+								</div>
+								<div class="FilterSetting">
+									<div class="FilterName">
+										<p>contrast</p>
+									</div>
+									<input type="range" data-filter="contrast"
+									value="100"
+									min="0"
+									max="200"
+									step="1">
+								</div>
+								<div class="FilterSetting">
+									<div class="FilterName">
+										<p>blur</p>
+									</div>
+									<input type="range" data-filter="blur"
+									value="0"
+									min="0"
+									max="10"
+									step="1">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-9 col-sm-9 col-md-9 col-log-9">
+					<div class="row">
+						<div class="starter-template">
+							<!-- <canvas id="main-canvas"></canvas> -->
+							<img src="test.jpg" alt="" id="main-target">
+							<!-- <div id="main-content-text" contenteditable="false" data-main-content-text>
+									<p>
+											drag n resize n ckeditor
+									</p>
+							</div> -->
+							<div id="drag-me" class="draggable">
+								<p> Click or touch and drag this element around </p>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div id="PresetFilters">
+							<a data-preset="default">init</a>
+							<a data-preset="glowing-sun">glowing sun</a>
+							<a data-preset="vintage">vintage</a>
+							<a data-preset="jarques">jarques</a>
+							<a data-preset="clarity">Clarity</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+			<div class="row">
+				<button>마이스페이스</button>
+			</div>
+		</div>
+	</div>
+</div>
+</template>

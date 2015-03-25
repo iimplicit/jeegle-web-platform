@@ -5,6 +5,16 @@
 # but you can also edit it by hand.
 
 meteor-platform
-autopublish
-insecure
 iron:router
+jquery
+accounts-ui
+accounts-facebook
+aldeed:simple-schema
+aldeed:collection2
+nimble:restivus
+cfs:gridfs
+cfs:standard-packages
+service-configuration
+msavin:mongol
+mquandalle:bower
+mizzao:jquery-ui

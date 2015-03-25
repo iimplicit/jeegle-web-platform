@@ -2,6 +2,7 @@ HomeController = RouteController.extend({
   layoutTemplate: 'MasterLayout',
 
   subscriptions: function() {
+  	Meteor.subscribe("images");
   },
 
   action: function() {

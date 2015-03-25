@@ -1,3 +1,38 @@
 <template name="Home">
-  <h1>Find me in app/client/templates/home/home</h1>
+<div class="container">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<div name="mainImage" class="main-image" style="background-image:url(test.jpg)">
+				<section class="content bgcolor-4">
+					<span class="input input--chisato">
+						<input class="input__field input__field--chisato" type="text" id="input-13">
+						<label class="input__label input__label--chisato" for="input-13">
+							<span class="input__label-content input__label-content--chisato" data-content="First Name">First Name</span>
+						</label>
+					</span>
+				</section>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			
+		</div>
+	</div>
+	<!-- 기능 확인을 위한 임시 구현 -->
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<button name="moveToEditor">다음으로 넘어가기</button>
+			{{#if currentUser}}
+			<p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
+			{{else}}
+			{{#if logginIn}}
+			<a>Logging in...</a>
+			{{else}}
+			<a data-login>Facebook Login</a>
+			{{/if}}
+			{{/if}}
+		</div>
+	</div>
+</div>
 </template>
