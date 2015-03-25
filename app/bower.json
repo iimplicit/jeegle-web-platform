@@ -1,0 +1,19 @@
+{
+  "name": "jeegle-web-platform",
+  "version": "0.0.0",
+  "authors": [
+    "SungpilNam <iimplicit@gmail.com>"
+  ],
+  "description": "jeegle-web-platform",
+  "license": "N/A",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "interact": "1.2.4"
+  }
+}
