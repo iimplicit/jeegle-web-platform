@@ -10,3 +10,11 @@ Router.route('/', {
   action: 'action',
   where: 'client'
 });
+
+
+Router.route('editor', {
+  name: 'editor',
+  controller: 'EditorController',
+  action: 'action',
+  where: 'client'
+});

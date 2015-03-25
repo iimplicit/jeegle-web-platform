@@ -1,0 +1,13 @@
+/*****************************************************************************/
+/* Editor: Style */
+/*****************************************************************************/
+.editor {
+}
+
+.edited-image {
+	height: 700px !important;
+ 	width: 100% !important;
+ 	background-repeat: no-repeat !important;
+	background-position: center center !important;
+	background-size: cover !important;
+}
