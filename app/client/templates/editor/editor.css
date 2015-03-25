@@ -1,13 +1,34 @@
 /*****************************************************************************/
 /* Editor: Style */
 /*****************************************************************************/
-.editor {
+.editor
+{
 }
 
-.edited-image {
-	height: 700px !important;
- 	width: 100% !important;
- 	background-repeat: no-repeat !important;
-	background-position: center center !important;
-	background-size: cover !important;
+.edited-image
+{
+	height:700px!important;
+	width:100%!important;
+	background-repeat:no-repeat!important;
+	background-position:center center!important;
+	background-size:cover!important
+}
+
+#drag-me
+{
+	width:25%;
+	height:100%;
+	margin:10%;
+	background-color:#29e;
+	color:#fff;
+	border-radius:.75em;
+	padding:4%;
+	-webkit-transform:translate(0px,0px);
+	transform:translate(0px,0px)
+}
+
+#drag-me::before
+{
+	content:"#" attr(id);
+	font-weight:700
 }
