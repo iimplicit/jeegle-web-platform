@@ -310,9 +310,17 @@ Template.Editor.rendered = function() {
                 toolbar : [
                     { name: 'basicstyles', groups: [ 'basicstyles'], items: [ 'Bold', 'Italic', 'Underline'] },
                     { name: 'styles', items: [ 'Font', 'FontSize' ] },
-//                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
                     { name: 'colors', items: [ 'TextColor', 'BGColor' ] }
-                ]
+                ],
+
+//                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                docType : '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                font_defaultLabel : '굴림',
+                font_names : '굴림/Gulim;돋움/Dotum;바탕/Batang;궁서/GungSeo;한나/BM-HANNAStd;Arial/Arial;Comic Sans MS/Comic Sans MS;Courier New/Courier New;Georgia/Georgia;Lucida Sans Unicode/Lucida Sans Unicode;Tahoma/Tahoma;Times New Roman/Times New Roman;Trebuchet MS/Trebuchet MS;Verdana/Verdana',
+                fontSize_defaultLabel : '22px',
+                fontSize_sizes : '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;',
+                language : "ko",
+                resize_enabled : true
             });
 
             // Set up a destruction function that will occur

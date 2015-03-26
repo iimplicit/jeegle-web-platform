@@ -16,7 +16,7 @@
 
 #drag-me
 {
-	width:50%;
+	width:40%;
 	height:100%;
 	color:#fff;
     border-radius:.75em;
@@ -25,11 +25,12 @@
     transform:translate(0px,0px);
     border: 3px dashed #ddd;
     margin:10%;
+    font-size: 22px;
     /*background-color:#29e;*/
 }
 
 #drag-me::before
 {
-	content:"#" attr(id);
+	/*content:"#" attr(id);*/
 	font-weight:700
 }
