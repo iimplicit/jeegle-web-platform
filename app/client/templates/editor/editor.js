@@ -233,8 +233,8 @@ Template.Editor.rendered = function() {
             edges: {
                 left: true,
                 right: true,
-                bottom: false,
-                top: false
+                bottom: true,
+                top: true
             }
         })
         .on('resizemove', function(event) {
@@ -257,54 +257,11 @@ Template.Editor.rendered = function() {
         data: {},
 
         init: function() {
-            this.initCkeditor();
             this.addEventListener();
         },
 
         addEventListener: function() {
             this.setInlineEdiorDbclick();
-        },
-
-        initCkeditor: function() {
-            // This code is generally not necessary, but it is here to demonstrate
-            // how to customize specific editor instances on the fly. This fits well
-            // this demo because we have editable elements (like headers) that
-            // require less features.
-
-            // The "instanceCreated" event is fired for every editor instance created.
-            CKEDITOR.on('instanceCreated', function(event) {
-                var editor = event.editor,
-                    element = editor.element;
-
-                // Customize editors for headers and tag list.
-                // These editors don't need features like smileys, templates, iframes etc.
-                if (element.is('h1', 'h2', 'h3') || element.getAttribute('id') == 'taglist') {
-                    // Customize the editor configurations on "configLoaded" event,
-                    // which is fired after the configuration file loading and
-                    // execution. This makes it possible to change the
-                    // configurations before the editor initialization takes place.
-                    editor.on('configLoaded', function() {
-
-                        // Remove unnecessary plugins to make the editor simpler.
-                        editor.config.removePlugins = 'colorbutton,find,flash,font,' +
-                            'forms,iframe,image,newpage,removeformat,' +
-                            'smiley,specialchar,stylescombo,templates';
-
-                        // Rearrange the layout of the toolbar.
-                        editor.config.toolbarGroups = [{
-                            name: 'editing',
-                            groups: ['basicstyles', 'links']
-                        }, {
-                            name: 'undo'
-                        }, {
-                            name: 'clipboard',
-                            groups: ['selection', 'clipboard']
-                        }, {
-                            name: 'about'
-                        }];
-                    });
-                }
-            });
         },
 
         setInlineEdiorDbclick: function() {
@@ -353,7 +310,23 @@ Template.Editor.rendered = function() {
             activeEditorElement.setAttribute('contenteditable', 'true');
 
             // Create a new inline editor for this div
-            activeEditor = CKEDITOR.inline(targetId);
+            activeEditor = CKEDITOR.inline(targetId, {
+                skin : 'flat',
+                toolbar : [
+                    { name: 'basicstyles', groups: [ 'basicstyles'], items: [ 'Bold', 'Italic', 'Underline'] },
+                    { name: 'styles', items: [ 'Font', 'FontSize' ] },
+                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] }
+                ],
+
+//                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                docType : '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                font_defaultLabel : '굴림',
+                font_names : '굴림/Gulim;돋움/Dotum;바탕/Batang;궁서/GungSeo;한나/BM-HANNAStd;Arial/Arial;Comic Sans MS/Comic Sans MS;Courier New/Courier New;Georgia/Georgia;Lucida Sans Unicode/Lucida Sans Unicode;Tahoma/Tahoma;Times New Roman/Times New Roman;Trebuchet MS/Trebuchet MS;Verdana/Verdana',
+                fontSize_defaultLabel : '22px',
+                fontSize_sizes : '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;',
+                language : "ko",
+                resize_enabled : true
+            });
 
             // Set up a destruction function that will occur
             // when the user clicks out of the editable space
