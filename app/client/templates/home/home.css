@@ -24,10 +24,30 @@
 
 .main-image {
 	height: 700px !important;
-	background-repeat: no-repeat !important;
-	background-position: center center !important;
-	background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: cover !important;
 }
+
+.image-wrapper {
+    padding: 0 !important;
+}
+
+.image-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: cover !important;
+    height: 200px !important;
+    cursor: pointer !important;
+}
+
+.content {
+    padding-top: 40px;
+}
+
+/* Special Input */
 
 .input {
     position: relative;
@@ -43,13 +63,15 @@
     position: relative;
     display: block;
     float: right;
-    padding: 0.8em;
-    width: 60%;
+    padding: 1em;
     border: none;
     border-radius: 0;
-    background: #f0f0f0;
+    /*background: #f0f0f0;*/
     color: #aaa;
-    font-weight: 400;
+    font-weight: 700;
+    font-size: 40px;
+    height: 50px;
+    box-sizing: border-box;
     font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
     -webkit-appearance: none; /* for box shadows to show on iOS */
 }
@@ -79,8 +101,10 @@
 .input__label-content {
     position: relative;
     display: block;
-    padding: 1.6em 0;
+    padding: 0;
     width: 100%;
+    color: #fff;
+    font-size: 20px;
 }
 
 .graphic {
@@ -97,120 +121,64 @@
 
 /* Individual styles */
 
-/* Chisato */
-
-.input--chisato {
-    padding-top: 1em;
-}
-
-.input__field--chisato {
+/* Minoru */
+.input__field--minoru {
     width: 100%;
-    padding: 0.8em 0.5em;
+    /*background: #fff;*/
     background: transparent;
-    border: 2px solid;
-    color: #b5b5b5;
-    -webkit-transition: border-color 0.25s;
-    transition: border-color 0.25s;
+    box-shadow: 0px 0px 0px 2px transparent;
+    color: #fff;
+    border: 1px solid #fff;
+    -webkit-transition: box-shadow 0.3s;
+    transition: box-shadow 0.3s;
 }
 
-.input__label--chisato {
+.input__label--minoru {
+    padding: 0;
     width: 100%;
+    text-align: left;
+}
+
+.input__label--minoru::after {
+    content: '';
     position: absolute;
     top: 0;
-    text-align: left;
-    overflow: hidden;
-    padding: 0;
+    z-index: -1;
+    width: 100%;
+    height: 4em;
+    box-shadow: 0px 0px 0px 0px;
+    /*color: rgba(199,152,157, 0.6);*/
+    color: #fff;
+}
+
+.input__field--minoru:focus {
+    box-shadow: 0px 0px 0px 2px #fff;
+}
+
+.input__field--minoru:focus + .input__label--minoru {
     pointer-events: none;
-    -webkit-transform: translate3d(0, 3em, 0);
-    transform: translate3d(0, 3em, 0);
 }
 
-.input__label-content--chisato {
-    padding: 0 1em;
-    font-weight: 400;
-    color: #b5b5b5;
+.input__field--minoru:focus + .input__label--minoru::after {
+    -webkit-animation: anim-shadow 0.3s forwards;
+    animation: anim-shadow 0.3s forwards;
 }
 
-.input__label-content--chisato::after {
-    content: attr(data-content);
-    position: absolute;
-    top: -200%;
-    left: 0;
-    color: #da6484;
-    font-weight: 800;
-}
-
-.input__field--chisato:focus,
-.input--filled .input__field--chisato {
-    border-color: #da6484;
-}
-
-.input__field--chisato:focus + .input__label--chisato,
-.input--filled .input__label--chisato {
-    -webkit-animation: anim-chisato-1 0.25s forwards;
-    animation: anim-chisato-1 0.25s forwards;
-}
-
-.input__field--chisato:focus + .input__label--chisato .input__label-content--chisato,
-.input--filled .input__label-content--chisato {
-    -webkit-animation: anim-chisato-2 0.25s forwards ease-in;
-    animation: anim-chisato-2 0.25s forwards ease-in;
-}
-
-@-webkit-keyframes anim-chisato-1 {
-    0%, 70% {
-        -webkit-transform: translate3d(0, 3em, 0);
-        transform: translate3d(0, 3em, 0);
-    }
-    71%, 100% {
-        -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0);
-    }
-}
-
-@-webkit-keyframes anim-chisato-2 {
-    0% {
-        -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0);
-    }
-    70%, 71% {
-        -webkit-transform: translate3d(0, 125%, 0);
-        transform: translate3d(0, 125%, 0);
+@-webkit-keyframes anim-shadow {
+    to {
+        box-shadow: 0px 0px 100px 50px;
         opacity: 0;
-        -webkit-animation-timing-function: ease-out;
-    }
-    100% {
-        color: transparent;
-        -webkit-transform: translate3d(0, 200%, 0);
-        transform: translate3d(0, 200%, 0);
     }
 }
 
-@keyframes anim-chisato-1 {
-    0%, 70% {
-        -webkit-transform: translate3d(0, 3em, 0);
-        transform: translate3d(0, 3em, 0);
-    }
-    71%, 100% {
-        -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0);
-    }
-}
-
-@keyframes anim-chisato-2 {
-    0% {
-        -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0);
-    }
-    70%, 71% {
-        -webkit-transform: translate3d(0, 125%, 0);
-        transform: translate3d(0, 125%, 0);
+@keyframes anim-shadow {
+    to {
+        box-shadow: 0px 0px 100px 50px;
         opacity: 0;
-        -webkit-animation-timing-function: ease-out;
     }
-    100% {
-        color: transparent;
-        -webkit-transform: translate3d(0, 200%, 0);
-        transform: translate3d(0, 200%, 0);
-    }
+}
+
+.input__label-content--minoru {
+    text-indent: 4px;
+    /*padding: 0.75em 0.15em;*/
 }

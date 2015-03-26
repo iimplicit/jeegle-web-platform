@@ -6,7 +6,11 @@ Template.Editor.events({});
 /*****************************************************************************/
 /* Editor: Helpers */
 /*****************************************************************************/
-Template.Editor.helpers({});
+Template.Editor.helpers({
+    mainImage: function(){
+        return Session.get('mainImage');
+    }
+});
 
 /*****************************************************************************/
 /* Editor: Lifecycle Hooks */
@@ -14,6 +18,7 @@ Template.Editor.helpers({});
 Template.Editor.created = function() {};
 
 Template.Editor.rendered = function() {
+    Session.set('mainImage', this.data.url);
     //  참고..
     //            grayscale : 100 + '%', // 0~ 100
     //            blur: 0 + 'px', // 10
