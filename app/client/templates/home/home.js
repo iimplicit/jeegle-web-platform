@@ -35,6 +35,13 @@ Template.Home.events({
             }
         });
     },
+    "click [name=moveToEditor]": function() {
+        Router.go('editor',{},{
+            query: {
+                _url: Session.get('mainImage')
+            }
+        });
+    },
     "click [data-image-item]": function(e, tmpl) {
         var background = e.target.style.background;
         var url = background.slice(4, background.length - 1);
