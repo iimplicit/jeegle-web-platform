@@ -1,13 +1,31 @@
 /*****************************************************************************/
 /* Editor: Event Handlers */
 /*****************************************************************************/
-Template.Editor.events({});
+Template.Editor.events({
+    "click [data-render-image]": function() {
+        var element = document.getElementById("main-image");
+        html2canvas(element, {
+            logging: true
+        }).then(function(canvas) {
+            // html element 형식으로 canvas가 나옵니다. 아이디를 설정해주고 body에 붙여줍니다.
+            canvas.id = "download-image";
+            document.body.appendChild(canvas);
+            // 시험용 다운로드 링크를 생성합니다.
+            var downloadLink = document.createElement('a');
+            document.body.appendChild(downloadLink);
+            downloadLink.href = document.getElementById("download-image").toDataURL();
+            downloadLink.download = "test";
+            downloadLink.text = "랜더링한 이미지 다운로드";
+        });
+    }
+});
 
 /*****************************************************************************/
 /* Editor: Helpers */
 /*****************************************************************************/
 Template.Editor.helpers({
-    mainImage: function(){
+    mainImage: function() {
+
         return Session.get('mainImage');
     }
 });
@@ -18,7 +36,11 @@ Template.Editor.helpers({
 Template.Editor.created = function() {};
 
 Template.Editor.rendered = function() {
-    Session.set('mainImage', this.data.url);
+    // 외부 url로 이미지를 가져오지 못하는 오류를 방지하기 위해 base64형태로 이미지를 바꿔서 넣어줍니다.
+    convertImgToBase64(this.data.url, function(url) {
+        Session.set('mainImage', url);
+    });
+
     //  참고..
     //            grayscale : 100 + '%', // 0~ 100
     //            blur: 0 + 'px', // 10
@@ -250,7 +272,7 @@ Template.Editor.rendered = function() {
 
             target.style.transform = ('translate(' + offset.x + 'px,' + offset.y + 'px)');
 
-//            target.textContent = event.rect.width + '×' + event.rect.height;
+            //            target.textContent = event.rect.width + '×' + event.rect.height;
         });
 
     editorApp = {
@@ -311,21 +333,27 @@ Template.Editor.rendered = function() {
 
             // Create a new inline editor for this div
             activeEditor = CKEDITOR.inline(targetId, {
-                skin : 'flat',
-                toolbar : [
-                    { name: 'basicstyles', groups: [ 'basicstyles'], items: [ 'Bold', 'Italic', 'Underline'] },
-                    { name: 'styles', items: [ 'Font', 'FontSize' ] },
-                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] }
-                ],
+                skin: 'flat',
+                toolbar: [{
+                    name: 'basicstyles',
+                    groups: ['basicstyles'],
+                    items: ['Bold', 'Italic', 'Underline']
+                }, {
+                    name: 'styles',
+                    items: ['Font', 'FontSize']
+                }, {
+                    name: 'colors',
+                    items: ['TextColor', 'BGColor']
+                }],
 
-//                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-                docType : '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-                font_defaultLabel : '굴림',
-                font_names : '굴림/Gulim;돋움/Dotum;바탕/Batang;궁서/GungSeo;한나/BM-HANNAStd;Arial/Arial;Comic Sans MS/Comic Sans MS;Courier New/Courier New;Georgia/Georgia;Lucida Sans Unicode/Lucida Sans Unicode;Tahoma/Tahoma;Times New Roman/Times New Roman;Trebuchet MS/Trebuchet MS;Verdana/Verdana',
-                fontSize_defaultLabel : '22px',
-                fontSize_sizes : '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;',
-                language : "ko",
-                resize_enabled : true
+                //                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                docType: '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
+                font_defaultLabel: '굴림',
+                font_names: '굴림/Gulim;돋움/Dotum;바탕/Batang;궁서/GungSeo;한나/BM-HANNAStd;Arial/Arial;Comic Sans MS/Comic Sans MS;Courier New/Courier New;Georgia/Georgia;Lucida Sans Unicode/Lucida Sans Unicode;Tahoma/Tahoma;Times New Roman/Times New Roman;Trebuchet MS/Trebuchet MS;Verdana/Verdana',
+                fontSize_defaultLabel: '22px',
+                fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;',
+                language: "ko",
+                resize_enabled: true
             });
 
             // Set up a destruction function that will occur
@@ -355,14 +383,14 @@ Template.Editor.rendered = function() {
                         // call this function on every dragmove event
                         onmove: function(event) {
                             var target = event.target,
-                            // keep the dragged position in the data-x/data-y attributes
+                                // keep the dragged position in the data-x/data-y attributes
                                 x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
                                 y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
                             // translate the element
                             target.style.webkitTransform =
                                 target.style.transform =
-                                    'translate(' + x + 'px, ' + y + 'px)';
+                                'translate(' + x + 'px, ' + y + 'px)';
 
                             // update the posiion attributes
                             target.setAttribute('data-x', x);
@@ -384,14 +412,26 @@ Template.Editor.rendered = function() {
     }
 
     editorApp.init();
+
+
 };
 
 Template.Editor.destroyed = function() {};
 
-function getDifference(absoluteValue) {
-    var originalValue = Session.get("filter");
-    var difference = originalValue.brightness - absoluteValue;
-    originalValue.brightness = absoluteValue;
-    Session.set("filter", originalValue);
-    return difference *= -1;
+// 외부 url로 이미지를 불러왔을 경우 발생하는 에러를 방지하기 위해 미리 base64 형태로 이미지를 바꿔줍니다.
+function convertImgToBase64(url, callback, outputFormat) {
+    var canvas = document.createElement('CANVAS');
+    var ctx = canvas.getContext('2d');
+    var img = new Image;
+    img.crossOrigin = 'Anonymous';
+    img.onload = function() {
+        canvas.height = img.height;
+        canvas.width = img.width;
+        ctx.drawImage(img, 0, 0);
+        var dataURL = canvas.toDataURL(outputFormat || 'image/png');
+        callback.call(this, dataURL);
+        // Clean up
+        canvas = null;
+    };
+    img.src = url;
 }
