@@ -47,8 +47,20 @@ Images.attachSchema(new SimpleSchema({
         optional: true
     },
     tags: {
-        type: [String],
-        label: "an array of tags that are relevant to the image",
+        type: [Object],
+        label: "an array of tag objects that are relevant to the image",
+        optional: true
+    },
+    "tags.$.word": {
+        type: String,
+        optional: true
+    },
+    "tags.$.langType": {
+        type: String,
+        optional: true
+    },
+    "tags.$.score": {
+        type: Number,
         optional: true
     },
     alt: {
@@ -79,7 +91,36 @@ if (Meteor.isServer) {
         // Restivus에 Images와 관련된 서버사이드 라우터를 부착하는 부분
         // deleteAll 앤드포인트는 현재 사용이 금지되어 있다.
         Restivus.addCollection(Images, {
-            excludedEndpoints: ["deleteAll"]
+            excludedEndpoints: ["deleteAll"],
+            endpoints: {
+                put: {
+                    action: function() {
+                        var updatedItem = this.request.body;
+                        // {validate: false}
+                        // this.bodyParams 
+                        // maybe because of put and patch difference
+                        if (Images.update({
+                            _id: this.urlParams.id
+                        }, {
+                            $set: updatedItem
+                        })) {
+                            return {
+                                status: "success",
+                                data: {
+                                    message: "Item updated"
+                                }
+                            };
+                        }
+                        return {
+                            statusCode: 404,
+                            body: {
+                                status: "fail",
+                                message: "Item update not complete"
+                            }
+                        };
+                    }
+                }
+            }
         });
     });
 }

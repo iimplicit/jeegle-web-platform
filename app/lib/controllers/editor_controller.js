@@ -14,6 +14,9 @@ EditorController = RouteController.extend({
   data: function () {
     // return a global data context like this:
     // Items.findOne({_id: this.params._id});
+    return {
+      url: this.params.query._url
+    }
   },
 
   action: function () {
