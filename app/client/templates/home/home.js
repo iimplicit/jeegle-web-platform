@@ -69,6 +69,18 @@ Template.Home.created = function() {
 };
 
 Template.Home.rendered = function() {
+    // Auto focus when page is loaded
+    $('#input-15').focus();
+
+    document.onkeypress = function(e) {
+        // Auto focus when keyboard is pressed (except when login)
+        $('#input-15').focus();
+
+        if(e.keyCode==13){
+            // Enter key event
+        }
+    };
+
     Session.set("images", [{
         "_index": "jeegle",
         "_type": "Images",
