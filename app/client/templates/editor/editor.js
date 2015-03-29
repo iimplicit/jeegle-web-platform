@@ -334,14 +334,11 @@ Template.Editor.rendered = function() {
             // Create a new inline editor for this div
             activeEditor = CKEDITOR.inline(targetId, {
                 skin: 'flat',
-                toolbar: [{
-                    name: 'basicstyles',
-                    groups: ['basicstyles'],
-                    items: ['Bold', 'Italic', 'Underline']
-                }, {
-                    name: 'styles',
-                    items: ['Font', 'FontSize']
-                }, {
+                toolbar: [
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ] },
+                    { name: 'paragraph', groups: [ 'list', 'align',], items: [ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                    '/',
+                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] }, {
                     name: 'colors',
                     items: ['TextColor', 'BGColor']
                 }],
