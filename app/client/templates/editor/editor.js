@@ -2,7 +2,7 @@
 /* Editor: Event Handlers */
 /*****************************************************************************/
 Template.Editor.events({
-    "click [data-render-image]": function() {
+    "click [data-render-image]": function(e, tmpl) {
         var element = document.getElementById("main-image");
         html2canvas(element, {
             logging: true
@@ -17,6 +17,8 @@ Template.Editor.events({
             downloadLink.download = "test";
             downloadLink.text = "랜더링한 이미지 다운로드";
         });
+
+
     }
 });
 
@@ -26,7 +28,7 @@ Template.Editor.events({
 Template.Editor.helpers({
     mainImage: function() {
 
-        return Session.get('mainImage');
+        return Session.get("savedImageData");
     }
 });
 
@@ -37,9 +39,7 @@ Template.Editor.created = function() {};
 
 Template.Editor.rendered = function() {
     // 외부 url로 이미지를 가져오지 못하는 오류를 방지하기 위해 base64형태로 이미지를 바꿔서 넣어줍니다.
-    convertImgToBase64(this.data.url, function(url) {
-        Session.set('mainImage', url);
-    });
+    convertImgToBase64(this.data.url); 
 
     //  참고..
     //            grayscale : 100 + '%', // 0~ 100
@@ -410,25 +410,28 @@ Template.Editor.rendered = function() {
 
     editorApp.init();
 
-
 };
 
 Template.Editor.destroyed = function() {};
 
-// 외부 url로 이미지를 불러왔을 경우 발생하는 에러를 방지하기 위해 미리 base64 형태로 이미지를 바꿔줍니다.
-function convertImgToBase64(url, callback, outputFormat) {
-    var canvas = document.createElement('CANVAS');
-    var ctx = canvas.getContext('2d');
-    var img = new Image;
-    img.crossOrigin = 'Anonymous';
+function convertImgToBase64(url) {
+    var img = new Image,
+        canvas = document.createElement("canvas"),
+        ctx = canvas.getContext("2d"),
+        src = url; // insert image url here
+
+    img.crossOrigin = "Anonymous";
+
     img.onload = function() {
-        canvas.height = img.height;
         canvas.width = img.width;
+        canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
-        var dataURL = canvas.toDataURL(outputFormat || 'image/png');
-        callback.call(this, dataURL);
-        // Clean up
-        canvas = null;
-    };
-    img.src = url;
+        return Session.set( "savedImageData", canvas.toDataURL("image/png") );
+    }
+    img.src = src;
+    // make sure the load event fires for cached images too
+    if (img.complete || img.complete === undefined) {
+        img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+        img.src = src;
+    }
 }
