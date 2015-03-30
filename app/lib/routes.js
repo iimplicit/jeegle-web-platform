@@ -18,3 +18,10 @@ Router.route('editor', {
   action: 'action',
   where: 'client'
 });
+
+Router.route('share', {
+  name: 'share',
+  controller: 'ShareController',
+  action: 'action',
+  where: 'client'
+});
