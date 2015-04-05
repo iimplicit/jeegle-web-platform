@@ -16,27 +16,17 @@ Template.Home.events({
     "keyup input": function(e, tmpl) {
         e.preventDefault();
         var query = tmpl.find('input').value;
-        var basicQuery = {
-            query: {
-                match: {
-                    tags: query
-                }
-            }
-        };
-        $.ajax("http://128.199.249.209:9200/jeegle/Images/_search", {
-            type: "POST",
-            data: JSON.stringify(basicQuery),
-            success: function(data) {
-                Session.set("images", data.hits.hits);
-                console.dir(data.hits.hits);
-            },
-            error: function() {
 
+        Meteor.call('getImageArrayBySentence', query, function(error, result) {
+            if (!!error) {
+
+            } else {
+                Session.set("images", result);
             }
         });
     },
     "click [name=moveToEditor]": function() {
-        Router.go('editor',{},{
+        Router.go('editor', {}, {
             query: {
                 _url: Session.get('mainImage')
             }
@@ -76,7 +66,7 @@ Template.Home.rendered = function() {
         // Auto focus when keyboard is pressed (except when login)
         $('#input-15').focus();
 
-        if(e.keyCode==13){
+        if (e.keyCode == 13) {
             // Enter key event
         }
     };
