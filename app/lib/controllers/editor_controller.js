@@ -9,6 +9,7 @@ EditorController = RouteController.extend({
     // the subscription handle is added to a reactive list
     // and when all items in this list are ready, this.ready()
     // returns true in any of your route functions.
+    return [Meteor.subscribe("Images"), Meteor.subscribe("ImageFiles")];
   },
 
   data: function () {

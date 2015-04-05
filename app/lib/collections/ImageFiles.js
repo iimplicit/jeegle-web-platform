@@ -14,3 +14,22 @@ ImageFiles = new FS.Collection('ImageFiles', {
     // filter: // 저장시 image transform이 필요하면 여기에서 처리하면 됩니다. https://github.com/CollectionFS/Meteor-CollectionFS 참조.
 
 });
+
+if (Meteor.isServer) {
+    ImageFiles.allow({
+        insert: function(userId, doc) {
+            return true;
+        },
+
+        update: function(userId, doc, fieldNames, modifier) {
+            return true;
+        },
+
+        remove: function(userId, doc) {
+            return true;
+        },
+        download: function() {
+            return true;
+        }
+    });
+}

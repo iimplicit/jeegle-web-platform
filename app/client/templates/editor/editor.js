@@ -3,22 +3,69 @@
 /*****************************************************************************/
 Template.Editor.events({
     "click [data-render-image]": function(e, tmpl) {
-        var element = document.getElementById("main-image");
-        html2canvas(element, {
-            logging: true
-        }).then(function(canvas) {
-            // html element 형식으로 canvas가 나옵니다. 아이디를 설정해주고 body에 붙여줍니다.
-            canvas.id = "download-image";
-            document.body.appendChild(canvas);
-            // 시험용 다운로드 링크를 생성합니다.
-            var downloadLink = document.createElement('a');
-            document.body.appendChild(downloadLink);
-            downloadLink.href = document.getElementById("download-image").toDataURL();
-            downloadLink.download = "test";
-            downloadLink.text = "랜더링한 이미지 다운로드";
-        });
+        var $canvasWrapper = $('[data-canvas-wrapper]');
+        var innerHtml = $canvasWrapper.html();
+        var element = document.getElementById('main-canvas');
 
+        rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+            var url = getBase64Image(renderResult.image);
 
+            function _ImageFiles(url, callback) {
+                // client단에서 이미지를 넣어줍니다.
+                // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
+                // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
+                // 권장하고 있습니다.  
+                ImageFiles.insert(url, function(err, fileObj) {
+                    // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
+                    // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
+                    // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다. 
+                    // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
+                    // 에러 체크
+                    if (!err) {
+                        // setInterval을 find에 넣어줍니다. 
+                        var find = setInterval(function() {
+                            var url = fileObj.url();
+                            if (!!url) {
+                                // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
+                                // setInterval을 멈춰줍니다. 
+                                clearInterval(find);
+                                // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다. 
+                                return callback(url);
+                            }
+                        }, 100);
+                    } else {
+                        console.log('file insert error: ', err);
+                    }
+                });
+            }
+
+            // _ImageFiles를 callback과 함께 실행시켜줍니다. 
+            _ImageFiles(url, function(url) {
+                // 시범용 이미지를 보여줍니다. (추후 삭제 예정)
+                $('[data-rendered-image]').attr('src', url);
+
+                // Workpieces collection에 정보를 넣어줍니다.
+                // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
+
+                var workpiece = {
+                    imageUrl: url
+                }
+
+                Workpieces.insert(workpiece, function(err, result){
+                    if(!err) {
+                        // insert 시 반환되는 것은 inserted된 document의 _id값입니다. 
+                        var _id = result;
+                        Router.go('workpiece', {
+                            _id: _id
+                        });
+                    } else {
+                        console.log('workpiece insert error: ', err);  
+                    }
+                });
+            });
+        }, function error(err) {
+            console.log('rasterization failed: ', err);
+        });;
     }
 });
 
@@ -27,8 +74,10 @@ Template.Editor.events({
 /*****************************************************************************/
 Template.Editor.helpers({
     mainImage: function() {
-
         return Session.get("savedImageData");
+    },
+    imageFiles: function() {
+        return Session.get('imagesFiles');
     }
 });
 
@@ -39,7 +88,7 @@ Template.Editor.created = function() {};
 
 Template.Editor.rendered = function() {
     // 외부 url로 이미지를 가져오지 못하는 오류를 방지하기 위해 base64형태로 이미지를 바꿔서 넣어줍니다.
-    convertImgToBase64(this.data.url); 
+    convertImgToBase64(this.data.url);
 
     //  참고..
     //            grayscale : 100 + '%', // 0~ 100
@@ -334,14 +383,23 @@ Template.Editor.rendered = function() {
             // Create a new inline editor for this div
             activeEditor = CKEDITOR.inline(targetId, {
                 skin: 'flat',
-                toolbar: [
-                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ] },
-                    { name: 'paragraph', groups: [ 'list', 'align',], items: [ 'NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-                    '/',
-                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] }, {
-                    name: 'colors',
-                    items: ['TextColor', 'BGColor']
-                }],
+                toolbar: [{
+                        name: 'basicstyles',
+                        groups: ['basicstyles', 'cleanup'],
+                        items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]
+                    }, {
+                        name: 'paragraph',
+                        groups: ['list', 'align', ],
+                        items: ['NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']
+                    },
+                    '/', {
+                        name: 'styles',
+                        items: ['Styles', 'Format', 'Font', 'FontSize']
+                    }, {
+                        name: 'colors',
+                        items: ['TextColor', 'BGColor']
+                    }
+                ],
 
                 //                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
                 docType: '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
@@ -410,28 +468,28 @@ Template.Editor.rendered = function() {
 
     editorApp.init();
 
+    var canvas = document.getElementById("main-canvas");
+    // rasterizeHTML.drawHTML('<img src="test.jpg" alt="" id="main-target" style="height: 150px; min-width: 100%; -webkit-filter: grayscale(0%) blur(1px) brightness(62%) contrast(141%) hue-rotate(0deg) opacity(100%) invert(0%) saturate(100%) sepia(0%);">', canvas);
 };
 
 Template.Editor.destroyed = function() {};
 
-function convertImgToBase64(url) {
-    var img = new Image,
-        canvas = document.createElement("canvas"),
-        ctx = canvas.getContext("2d"),
-        src = url; // insert image url here
+function getBase64Image(img) {
+    // Create an empty canvas element
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
 
-    img.crossOrigin = "Anonymous";
+    // Copy the image contents to the canvas
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
 
-    img.onload = function() {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
-        return Session.set( "savedImageData", canvas.toDataURL("image/png") );
-    }
-    img.src = src;
-    // make sure the load event fires for cached images too
-    if (img.complete || img.complete === undefined) {
-        img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-        img.src = src;
-    }
+    // Get the data-URL formatted image
+    // Firefox supports PNG and JPEG. You could check img.src to
+    // guess the original format, but be aware the using "image/jpg"
+    // will re-encode the image.
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL;
+    // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
 }
