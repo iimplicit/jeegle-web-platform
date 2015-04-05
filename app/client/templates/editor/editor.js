@@ -73,12 +73,6 @@ Template.Editor.events({
 /* Editor: Helpers */
 /*****************************************************************************/
 Template.Editor.helpers({
-    mainImage: function() {
-        return Session.get("savedImageData");
-    },
-    imageFiles: function() {
-        return Session.get('imagesFiles');
-    }
 });
 
 /*****************************************************************************/
@@ -87,9 +81,6 @@ Template.Editor.helpers({
 Template.Editor.created = function() {};
 
 Template.Editor.rendered = function() {
-    // 외부 url로 이미지를 가져오지 못하는 오류를 방지하기 위해 base64형태로 이미지를 바꿔서 넣어줍니다.
-    convertImgToBase64(this.data.url);
-
     //  참고..
     //            grayscale : 100 + '%', // 0~ 100
     //            blur: 0 + 'px', // 10
