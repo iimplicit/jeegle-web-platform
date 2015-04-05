@@ -1,12 +1,3 @@
-Meteor.startup(function () {
-	var proxy =  Meteor.npmRequire('html2canvas-proxy');
-	var express =  Meteor.npmRequire('express');
-
-    var app = express();
-    app.use('/', proxy());
-});
-
-
 ServiceConfiguration.configurations.remove({
     service: 'facebook'
 });
