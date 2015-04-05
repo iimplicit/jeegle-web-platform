@@ -19,6 +19,9 @@ Router.route('editor', {
   where: 'client'
 });
 
+Router.route('workpiece/:_id', {
+  name: 'workpiece',
+  controller: 'WorkpieceController',
   action: 'action',
   where: 'client'
 });
