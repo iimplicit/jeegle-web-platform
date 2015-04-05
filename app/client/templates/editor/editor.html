@@ -39,20 +39,15 @@
 								</div>
 							</div>
 						</div>
+						
 					</div>
 				</div>
 				<div class="col-xs-9 col-sm-9 col-md-9 col-log-9">
 					<div class="row">
-						<div class="starter-template" id="main-image">
-							<!-- <canvas id="main-canvas"></canvas> -->
+						<div class="starter-template" data-canvas-wrapper>
 							<img src="test.jpg" alt="" id="main-target">
-							<!-- <div id="main-content-text" contenteditable="false" data-main-content-text>
-									<p>
-											drag n resize n ckeditor
-									</p>
-							</div> -->
-							<div id="drag-me" class="draggable">
-								<p> 졸린척~ .. 절대 졸린거 아님.. </p>
+							<div id="drag-me" style="width: 600px; color: #fff; border-radius: .75em; -webkit-transform: translate(0px,0px); transform: translate(0px,0px); border: 3px dashed #ddd; font-size: 22px; position: absolute; top: 100px; left: 100px;" class="draggable">
+								<p>드래그 가능한 오브젝트</p>
 							</div>
 						</div>
 					</div>
@@ -63,6 +58,7 @@
 							<a data-preset="vintage">vintage</a>
 							<a data-preset="jarques">jarques</a>
 							<a data-preset="clarity">Clarity</a>
+							<img src="" alt="" data-rendered-image>
 						</div>
 					</div>
 				</div>
@@ -71,7 +67,6 @@
 		<div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
 			<div class="row">
 				<button data-render-image>이미지로 랜더링</button>
-				<button>마이스페이스</button>
 			</div>
 		</div>
 	</div>

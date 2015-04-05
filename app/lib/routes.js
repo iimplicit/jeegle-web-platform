@@ -19,9 +19,9 @@ Router.route('editor', {
   where: 'client'
 });
 
-Router.route('share', {
-  name: 'share',
-  controller: 'ShareController',
+Router.route('workpiece/:_id', {
+  name: 'workpiece',
+  controller: 'WorkpieceController',
   action: 'action',
   where: 'client'
 });
