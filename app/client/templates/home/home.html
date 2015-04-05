@@ -45,7 +45,8 @@
 	<div class="row">
 		{{#each images}}
 		<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 image-wrapper" data-image-item>
-			<div class="image-item" name="image-item" style="background-image:url({{ _source.thumbnailImageUrl }})"></div>
+			<!-- <div class="image-item" name="image-item" style="background-image:url({{ _source.thumbnailImageUrl }})"></div> -->
+			<div class="image-item" name="image-item" style="background-image:url({{ thumbnailImageUrl }})"></div>
 		</div>
 		{{/each}}
 	</div>
