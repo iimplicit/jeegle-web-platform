@@ -1,23 +1,23 @@
 /*****************************************************************************/
-/* Share: Event Handlers */
+/* Workpiece: Event Handlers */
 /*****************************************************************************/
-Template.Share.events({
+Template.Workpiece.events({
 });
 
 /*****************************************************************************/
-/* Share: Helpers */
+/* Workpiece: Helpers */
 /*****************************************************************************/
-Template.Share.helpers({
+Template.Workpiece.helpers({
 });
 
 /*****************************************************************************/
-/* Share: Lifecycle Hooks */
+/* Workpiece: Lifecycle Hooks */
 /*****************************************************************************/
-Template.Share.created = function () {
+Template.Workpiece.created = function () {
 };
 
-Template.Share.rendered = function () {
+Template.Workpiece.rendered = function () {
 };
 
-Template.Share.destroyed = function () {
+Template.Workpiece.destroyed = function () {
 };
