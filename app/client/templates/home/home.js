@@ -35,7 +35,15 @@ Template.Home.events({
     "click [data-image-item]": function(e, tmpl) {
         var background = e.target.style.background;
         var url = background.slice(4, background.length - 1);
-        Session.set("mainImage", url);
+
+        Sketches._collection.update({
+            _id: Session.get("currentId")
+        }, {
+            $set: {
+                updatedAt: new Date,
+                'content.0.url': url
+            }
+        });
     }
 });
 
@@ -47,7 +55,9 @@ Template.Home.helpers({
         return Session.get("images");
     },
     mainImage: function() {
-        return Session.get("mainImage");
+        return Sketches.findOne({
+            _id: Session.get("currentId")
+        }).content[0].url;
     }
 });
 
@@ -55,7 +65,27 @@ Template.Home.helpers({
 /* Home: Lifecycle Hooks */
 /*****************************************************************************/
 Template.Home.created = function() {
+    var firstSketch = {
+        createdAt: new Date,
+        updatedAt: new Date,
+        createdBy: Meteor.userId() || "Anonymous",
+        content: [{
+            type: "image",
+            url: "http://static.pexels.com/wp-content/uploads/2014/06/fallen-trees-forest-stack-1045-821x550.jpg"
+        }, {
+            type: "textbox",
+            innerText: ""
+        }]
+    }
 
+    Sketches._collection.insert(firstSketch, function(err, result) {
+        if (!err) {
+            // 저장 후 나온 아이디값을 currentIndex session에 저장합니다.
+            Session.set("currentId", result);
+        } else {
+            console.log('sketch insert error: ', err);
+        }
+    });
 };
 
 Template.Home.rendered = function() {
