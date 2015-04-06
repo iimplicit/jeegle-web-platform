@@ -39,11 +39,19 @@ Template.Home.events({
         }else{
             // 문장 형태소 분석 후 검색
             // 기획에 맞춰 다시 로직 및 화면 설계가 필요함
-            Meteor.call('getImageArrayBySentence', query, function(error, result) {
+            Meteor.call('getNounArrayBySentence', query, function(error, result) {
                 if (!!error) {
 
                 } else {
-                    Session.set("images", result);
+                    // 기획이 확정되면 더 디테일하게 개발합니다. 일단 현재는 분석 태그 중 가장 첫번째에 대한 이미지만 받아옵니다.
+                    console.dir(result);
+                    for(i=0;i<result.length;i++){
+                       Meteor.neo4j.call('searchImagesForTag', {tagWord:result[i], edgeScope:5, NodesLimit:20}, function(err,data){
+                            Images = data.i;
+                            console.dir(Images);
+                            Session.set("images", Images);
+                        })   
+                    }
                 }
             });
         }
