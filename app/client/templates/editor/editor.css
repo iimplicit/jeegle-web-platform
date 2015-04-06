@@ -1,4 +1,17 @@
 /*****************************************************************************/
+/* Import Google WebFont
+/*****************************************************************************/
+@import url(http://fonts.googleapis.com/earlyaccess/hanna.css);
+@import url(http://fonts.googleapis.com/earlyaccess/jejugothic.css);
+@import url(http://fonts.googleapis.com/earlyaccess/jejuhallasan.css);
+@import url(http://fonts.googleapis.com/earlyaccess/jejumyeongjo.css);
+@import url(http://fonts.googleapis.com/earlyaccess/kopubbatang.css);
+@import url(http://fonts.googleapis.com/earlyaccess/nanumbrushscript.css);
+@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
+@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);
+@import url(http://fonts.googleapis.com/earlyaccess/nanumpenscript.css);
+
+/*****************************************************************************/
 /* Editor: Style */
 /*****************************************************************************/
 .editor
@@ -16,9 +29,8 @@
 
 #drag-me
 {
-	width:600px;
+	width:500px;
 	color:#fff;
-    border-radius:.75em;
     -webkit-transform:translate(0px,0px);
     transform:translate(0px,0px);
     border: 3px dashed #ddd;
@@ -26,7 +38,7 @@
 
     position: absolute;
     top: 100px;
-    left: 100px;
+    left: 70px;
 }
 
 #drag-me::before
@@ -34,3 +46,69 @@
 	/*content:"#" attr(id);*/
 	font-weight:700
 }
+
+
+.left-side-item {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.text-editor-theme-item {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.black-bg {
+    border: 1px solid #000000;
+    background-color: #000;
+    color: #fff;
+}
+
+.no-bg {
+    border: 1px solid #000000;
+}
+
+.text-editor-typography-item {
+    border: 1px solid #000000;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.hanna {
+    font-family: 'Hanna', serif;
+}
+
+.jeju-gothic {
+    font-family: 'Jeju Gothic', serif;
+}
+
+.jeju-hallasan {
+    font-family: 'Jeju Hallasan', serif;
+}
+
+.jeju-myeongjo {
+    font-family: 'Jeju Myeongjo', serif;
+}
+
+.kopub {
+    font-family: 'KoPub Batang', serif;
+}
+
+.nanum-brush {
+    font-family: 'Nanum -Brush Script', serif;
+}
+
+.nanum-gothic {
+    font-family: 'Nanum Gothic', serif;
+}
+.nanum-myeongjo {
+    font-family: 'Nanum Myeongjo', serif;
+}
+
+.nanum-pen {
+    font-family: 'Nanum Pen Script', serif;
+}
+
+
