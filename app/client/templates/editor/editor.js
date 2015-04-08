@@ -3,11 +3,25 @@
 /*****************************************************************************/
 Template.Editor.events({
     "click [data-render-image]": function(e, tmpl) {
+        var styleProps = $('#drag-me').css([
+            "width", "height", "position", "top", "left", "color", "background-color"
+        ]);
+
+        $.each(styleProps, function(prop, value) {
+            $('#drag-me').css(prop, value);
+        });
+
         var $canvasWrapper = $('[data-canvas-wrapper]');
         var innerHtml = $canvasWrapper.html();
-        var element = document.getElementById('main-canvas');
+
+        innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: Hanna; src: url(BM-HANNA.woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top;   }</style></head><body>" + innerHtml + '</body></html>';
+        var element = document.getElementById('canvas');
+
+        // htmlToCanvas(innerHtml);
 
         rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+            console.dir(renderResult);
+            console.dir(renderResult.svg);
             var url = getBase64Image(renderResult.image);
 
             function _ImageFiles(url, callback) {
@@ -51,15 +65,15 @@ Template.Editor.events({
                     imageUrl: url
                 }
 
-                Workpieces.insert(workpiece, function(err, result){
-                    if(!err) {
+                Workpieces.insert(workpiece, function(err, result) {
+                    if (!err) {
                         // insert 시 반환되는 것은 inserted된 document의 _id값입니다. 
                         var _id = result;
-                        Router.go('workpiece', {
-                            _id: _id
-                        });
+                        // Router.go('workpiece', {
+                        //     _id: _id
+                        // });
                     } else {
-                        console.log('workpiece insert error: ', err);  
+                        console.log('workpiece insert error: ', err);
                     }
                 });
             });
@@ -72,8 +86,7 @@ Template.Editor.events({
 /*****************************************************************************/
 /* Editor: Helpers */
 /*****************************************************************************/
-Template.Editor.helpers({
-});
+Template.Editor.helpers({});
 
 /*****************************************************************************/
 /* Editor: Lifecycle Hooks */
@@ -95,6 +108,10 @@ Template.Editor.rendered = function() {
 
     imageApp.prototype = {
         targetImage: $('#main-target'),
+
+        textConfig: {
+            fontsize: 22
+        },
 
         imageFilterConfig: {
             type: 'default',
@@ -160,6 +177,30 @@ Template.Editor.rendered = function() {
 
         addEventListener: function() {
             this.setImageFilterType();
+            this.setTypography();
+            this.setEditorStyle();
+        },
+
+        setEditorStyle: function() {
+            $('[data-event-change-div-style]').on('click', function() {
+                $('#drag-me').toggleClass('black-bg no-bg');
+            });
+        },
+
+        setTypography: function() {
+            $('[data-event-change-typography]').on('click', function() {
+                var selectedValue = $(this).attr('data-event-change-typography');
+
+                var prevClassName = $('#drag-me').attr('class');
+                var prevClassArray = prevClassName.split(' ');
+                for (var i = 0; i < prevClassArray.length; i++) {
+                    if (prevClassArray[i] != 'black-bg' && prevClassArray[i] != 'no-bg' && prevClassArray[i] != 'draggable') {
+                        $('#drag-me').removeClass(prevClassArray[i]);
+                    }
+                }
+
+                $('#drag-me').addClass(selectedValue);
+            });
         },
 
         setImageFilterType: function() {
@@ -219,7 +260,6 @@ Template.Editor.rendered = function() {
                 var filter, value;
                 filter = $(this).data('filter');
                 value = $(this).val() - 0;
-                console.log(filter, value);
                 self.imageFilterConfig[filter] = value;
                 self.setImageFilter();
             });
@@ -278,6 +318,7 @@ Template.Editor.rendered = function() {
                 // update the posiion attributes
                 target.setAttribute('data-x', x);
                 target.setAttribute('data-y', y);
+
             },
             // call this function on every dragend event
             onend: function(event) {
@@ -375,27 +416,21 @@ Template.Editor.rendered = function() {
             activeEditor = CKEDITOR.inline(targetId, {
                 skin: 'flat',
                 toolbar: [{
-                        name: 'basicstyles',
-                        groups: ['basicstyles', 'cleanup'],
-                        items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', ]
-                    }, {
-                        name: 'paragraph',
-                        groups: ['list', 'align', ],
-                        items: ['NumberedList', 'BulletedList', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']
-                    },
-                    '/', {
-                        name: 'styles',
-                        items: ['Styles', 'Format', 'Font', 'FontSize']
-                    }, {
-                        name: 'colors',
-                        items: ['TextColor', 'BGColor']
-                    }
-                ],
+                    name: 'basicstyles',
+                    groups: ['basicstyles'],
+                    items: ['Bold', 'Italic', 'Underline', 'Strike']
+                }, {
+                    name: 'paragraph',
+                    groups: ['align'],
+                    items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']
+                }, {
+                    name: 'styles',
+                    items: ['FontSize']
+                }, {
+                    name: 'colors',
+                    items: ['TextColor', 'BGColor']
+                }],
 
-                //                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-                docType: '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">',
-                font_defaultLabel: '굴림',
-                font_names: '굴림/Gulim;돋움/Dotum;바탕/Batang;궁서/GungSeo;한나/BM-HANNAStd;Arial/Arial;Comic Sans MS/Comic Sans MS;Courier New/Courier New;Georgia/Georgia;Lucida Sans Unicode/Lucida Sans Unicode;Tahoma/Tahoma;Times New Roman/Times New Roman;Trebuchet MS/Trebuchet MS;Verdana/Verdana',
                 fontSize_defaultLabel: '22px',
                 fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;',
                 language: "ko",
@@ -413,40 +448,11 @@ Template.Editor.rendered = function() {
                 interact('.draggable')
                     .draggable({
                         // enable inertial throwing
-                        inertia: true,
+                        inertia: true
                         // keep the element within the area of it's parent
-                        restrict: {
-                            restriction: "parent",
-                            endOnly: true,
-                            elementRect: {
-                                top: 0,
-                                left: 0,
-                                bottom: 1,
-                                right: 1
-                            }
-                        },
-
-                        // call this function on every dragmove event
-                        onmove: function(event) {
-                            var target = event.target,
-                                // keep the dragged position in the data-x/data-y attributes
-                                x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-                                y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-                            // translate the element
-                            target.style.webkitTransform =
-                                target.style.transform =
-                                'translate(' + x + 'px, ' + y + 'px)';
-
-                            // update the posiion attributes
-                            target.setAttribute('data-x', x);
-                            target.setAttribute('data-y', y);
-                        },
-                        // call this function on every dragend event
-                        onend: function(event) {
-
-                        }
                     });
+
+                var fontsize = $('.cke_combo__fontsize').text();
 
                 this.destroy();
             });
@@ -483,4 +489,30 @@ function getBase64Image(img) {
 
     return dataURL;
     // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
+
+function htmlToCanvas(innerHtml) {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
+        '<foreignObject width="100%" height="100%" externalResourcesRequired="true">' +
+        innerHtml +
+        '</foreignObject>' +
+        '</svg>';
+
+    var DOMURL = window.URL || window.webkitURL || window;
+
+    var img = new Image();
+    var svg = new Blob([data], {
+        type: 'image/svg+xml;charset=utf-8'
+    });
+    var url = DOMURL.createObjectURL(svg);
+
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        DOMURL.revokeObjectURL(url);
+    }
+
+    img.src = url;
 }
