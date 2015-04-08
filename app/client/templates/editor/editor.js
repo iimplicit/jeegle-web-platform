@@ -4,18 +4,24 @@
 Template.Editor.events({
     "click [data-render-image]": function(e, tmpl) {
         var styleProps = $('#drag-me').css([
-            "width", "height", "font-family", "position", "top", "left", "color", "background-color"
+            "width", "height", "position", "top", "left", "color", "background-color"
         ]);
 
-        $.each( styleProps, function( prop, value ) {
-            $('#drag-me').css( prop , value );
+        $.each(styleProps, function(prop, value) {
+            $('#drag-me').css(prop, value);
         });
 
         var $canvasWrapper = $('[data-canvas-wrapper]');
         var innerHtml = $canvasWrapper.html();
-        var element = document.getElementById('main-canvas');
+
+        innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: Hanna; src: url(BM-HANNA.woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top;   }</style></head><body>" + innerHtml + '</body></html>';
+        var element = document.getElementById('canvas');
+
+        // htmlToCanvas(innerHtml);
 
         rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+            console.dir(renderResult);
+            console.dir(renderResult.svg);
             var url = getBase64Image(renderResult.image);
 
             function _ImageFiles(url, callback) {
@@ -59,15 +65,15 @@ Template.Editor.events({
                     imageUrl: url
                 }
 
-                Workpieces.insert(workpiece, function(err, result){
-                    if(!err) {
+                Workpieces.insert(workpiece, function(err, result) {
+                    if (!err) {
                         // insert 시 반환되는 것은 inserted된 document의 _id값입니다. 
                         var _id = result;
-                        Router.go('workpiece', {
-                            _id: _id
-                        });
+                        // Router.go('workpiece', {
+                        //     _id: _id
+                        // });
                     } else {
-                        console.log('workpiece insert error: ', err);  
+                        console.log('workpiece insert error: ', err);
                     }
                 });
             });
@@ -80,8 +86,7 @@ Template.Editor.events({
 /*****************************************************************************/
 /* Editor: Helpers */
 /*****************************************************************************/
-Template.Editor.helpers({
-});
+Template.Editor.helpers({});
 
 /*****************************************************************************/
 /* Editor: Lifecycle Hooks */
@@ -177,19 +182,19 @@ Template.Editor.rendered = function() {
         },
 
         setEditorStyle: function() {
-            $('[data-event-change-div-style]').on('click', function () {
+            $('[data-event-change-div-style]').on('click', function() {
                 $('#drag-me').toggleClass('black-bg no-bg');
             });
         },
 
         setTypography: function() {
-            $('[data-event-change-typography]').on('click', function () {
+            $('[data-event-change-typography]').on('click', function() {
                 var selectedValue = $(this).attr('data-event-change-typography');
 
                 var prevClassName = $('#drag-me').attr('class');
                 var prevClassArray = prevClassName.split(' ');
-                for(var i = 0 ; i < prevClassArray.length ; i++ ) {
-                    if(prevClassArray[i] != 'black-bg' && prevClassArray[i] != 'no-bg' && prevClassArray[i] != 'draggable') {
+                for (var i = 0; i < prevClassArray.length; i++) {
+                    if (prevClassArray[i] != 'black-bg' && prevClassArray[i] != 'no-bg' && prevClassArray[i] != 'draggable') {
                         $('#drag-me').removeClass(prevClassArray[i]);
                     }
                 }
@@ -410,12 +415,21 @@ Template.Editor.rendered = function() {
             // Create a new inline editor for this div
             activeEditor = CKEDITOR.inline(targetId, {
                 skin: 'flat',
-                toolbar: [
-                    { name: 'basicstyles', groups: [ 'basicstyles'], items: [ 'Bold', 'Italic', 'Underline', 'Strike'] },
-                    { name: 'paragraph', groups: [ 'align'], items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
-                    { name: 'styles', items: [ 'FontSize' ] },
-                    { name: 'colors', items: ['TextColor', 'BGColor'] }
-                ],
+                toolbar: [{
+                    name: 'basicstyles',
+                    groups: ['basicstyles'],
+                    items: ['Bold', 'Italic', 'Underline', 'Strike']
+                }, {
+                    name: 'paragraph',
+                    groups: ['align'],
+                    items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']
+                }, {
+                    name: 'styles',
+                    items: ['FontSize']
+                }, {
+                    name: 'colors',
+                    items: ['TextColor', 'BGColor']
+                }],
 
                 fontSize_defaultLabel: '22px',
                 fontSize_sizes: '8/8px;9/9px;10/10px;11/11px;12/12px;14/14px;16/16px;18/18px;20/20px;22/22px;24/24px;26/26px;28/28px;36/36px;48/48px;',
@@ -475,4 +489,30 @@ function getBase64Image(img) {
 
     return dataURL;
     // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
+
+function htmlToCanvas(innerHtml) {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    var data = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">' +
+        '<foreignObject width="100%" height="100%" externalResourcesRequired="true">' +
+        innerHtml +
+        '</foreignObject>' +
+        '</svg>';
+
+    var DOMURL = window.URL || window.webkitURL || window;
+
+    var img = new Image();
+    var svg = new Blob([data], {
+        type: 'image/svg+xml;charset=utf-8'
+    });
+    var url = DOMURL.createObjectURL(svg);
+
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        DOMURL.revokeObjectURL(url);
+    }
+
+    img.src = url;
 }
