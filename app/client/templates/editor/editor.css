@@ -1,15 +1,35 @@
 /*****************************************************************************/
-/* Import Google WebFont
+/* Import Local WebFont
 /*****************************************************************************/
-@import url(http://fonts.googleapis.com/earlyaccess/hanna.css);
-@import url(http://fonts.googleapis.com/earlyaccess/jejugothic.css);
-@import url(http://fonts.googleapis.com/earlyaccess/jejuhallasan.css);
-@import url(http://fonts.googleapis.com/earlyaccess/jejumyeongjo.css);
-@import url(http://fonts.googleapis.com/earlyaccess/kopubbatang.css);
-@import url(http://fonts.googleapis.com/earlyaccess/nanumbrushscript.css);
-@import url(http://fonts.googleapis.com/earlyaccess/nanumgothic.css);
-@import url(http://fonts.googleapis.com/earlyaccess/nanummyeongjo.css);
-@import url(http://fonts.googleapis.com/earlyaccess/nanumpenscript.css);
+@font-face{
+    font-family: Jua;
+    src: url('/font/Jua.woff') format('woff');
+}
+
+@font-face{
+    font-family: Hanna;
+    src: url('/font/Hanna.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Brush Script;
+    src: url('/font/BrushScript.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Gothic;
+    src: url('/font/Gothic.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Myeongjo;
+    src: url('/font/Myeongjo.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Pen Script;
+    src: url('/font/PenScript.woff') format('woff');
+}
 
 /*****************************************************************************/
 /* Editor: Style */
@@ -76,39 +96,27 @@
     margin-bottom: 5px;
 }
 
-.hanna {
-    font-family: 'Hanna', serif;
+.Jua {
+    font-family: 'Jua';
 }
 
-.jeju-gothic {
-    font-family: 'Jeju Gothic', serif;
+.Hanna {
+    font-family: 'Hanna';
 }
 
-.jeju-hallasan {
-    font-family: 'Jeju Hallasan', serif;
+.BrushScript {
+    font-family: 'Nanum Brush Script';
 }
 
-.jeju-myeongjo {
-    font-family: 'Jeju Myeongjo', serif;
+.Gothic {
+    font-family: 'Nanum Gothic';
 }
 
-.kopub {
-    font-family: 'KoPub Batang', serif;
+.Myeongjo {
+    font-family: 'Nanum Myeongjo';
 }
 
-.nanum-brush {
-    font-family: 'Nanum -Brush Script', serif;
+.PenScript {
+    font-family: 'Nanum Pen Script';
 }
-
-.nanum-gothic {
-    font-family: 'Nanum Gothic', serif;
-}
-.nanum-myeongjo {
-    font-family: 'Nanum Myeongjo', serif;
-}
-
-.nanum-pen {
-    font-family: 'Nanum Pen Script', serif;
-}
-
 

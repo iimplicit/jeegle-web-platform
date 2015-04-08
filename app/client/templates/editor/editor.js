@@ -2,85 +2,7 @@
 /* Editor: Event Handlers */
 /*****************************************************************************/
 Template.Editor.events({
-    "click [data-render-image]": function(e, tmpl) {
-        var styleProps = $('#drag-me').css([
-            "width", "height", "position", "top", "left", "color", "background-color"
-        ]);
 
-        $.each(styleProps, function(prop, value) {
-            $('#drag-me').css(prop, value);
-        });
-
-        var $canvasWrapper = $('[data-canvas-wrapper]');
-        var innerHtml = $canvasWrapper.html();
-
-        innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: Hanna; src: url(BM-HANNA.woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top;   }</style></head><body>" + innerHtml + '</body></html>';
-        var element = document.getElementById('canvas');
-
-        // htmlToCanvas(innerHtml);
-
-        rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
-            console.dir(renderResult);
-            console.dir(renderResult.svg);
-            var url = getBase64Image(renderResult.image);
-
-            function _ImageFiles(url, callback) {
-                // client단에서 이미지를 넣어줍니다.
-                // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
-                // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
-                // 권장하고 있습니다.  
-                ImageFiles.insert(url, function(err, fileObj) {
-                    // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
-                    // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
-                    // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다. 
-                    // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
-                    // 에러 체크
-                    if (!err) {
-                        // setInterval을 find에 넣어줍니다. 
-                        var find = setInterval(function() {
-                            var url = fileObj.url();
-                            if (!!url) {
-                                // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
-                                // setInterval을 멈춰줍니다. 
-                                clearInterval(find);
-                                // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다. 
-                                return callback(url);
-                            }
-                        }, 100);
-                    } else {
-                        console.log('file insert error: ', err);
-                    }
-                });
-            }
-
-            // _ImageFiles를 callback과 함께 실행시켜줍니다. 
-            _ImageFiles(url, function(url) {
-                // 시범용 이미지를 보여줍니다. (추후 삭제 예정)
-                $('[data-rendered-image]').attr('src', url);
-
-                // Workpieces collection에 정보를 넣어줍니다.
-                // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
-
-                var workpiece = {
-                    imageUrl: url
-                }
-
-                Workpieces.insert(workpiece, function(err, result) {
-                    if (!err) {
-                        // insert 시 반환되는 것은 inserted된 document의 _id값입니다. 
-                        var _id = result;
-                        // Router.go('workpiece', {
-                        //     _id: _id
-                        // });
-                    } else {
-                        console.log('workpiece insert error: ', err);
-                    }
-                });
-            });
-        }, function error(err) {
-            console.log('rasterization failed: ', err);
-        });;
-    }
 });
 
 /*****************************************************************************/
@@ -94,7 +16,7 @@ Template.Editor.helpers({});
 Template.Editor.created = function() {};
 
 Template.Editor.rendered = function() {
-    //  참고..
+    //  참고.. image effect range
     //            grayscale : 100 + '%', // 0~ 100
     //            blur: 0 + 'px', // 10
     //            brightness: 100 + '%', // 200
@@ -104,13 +26,19 @@ Template.Editor.rendered = function() {
     //            invert: 0 + '%', // 0 ~ 100
     //            saturate: 100 + '%', // 0 ~ 500
     //            sepia: 0 + '%' // 0 ~ 100
+
+    /*****************************************************************************/
+    /* Image 관련 기능*/
+    /*****************************************************************************/
     function imageApp() {}
 
     imageApp.prototype = {
         targetImage: $('#main-target'),
 
         textConfig: {
-            fontsize: 22
+            fontsize: 22,
+            fontype: 'Hanna',
+            fontfamily: 'Hanna'
         },
 
         imageFilterConfig: {
@@ -179,17 +107,122 @@ Template.Editor.rendered = function() {
             this.setImageFilterType();
             this.setTypography();
             this.setEditorStyle();
+            this.setRenderImage();
+        },
+
+        setRenderImage: function() {
+            $('[data-render-image]').on('click', function(){
+                imageApp.setCssInlineStylePropsForTextEditorDiv();
+                imageApp.actionRasterizeHTML();
+
+            });
+        },
+
+        setCssInlineStylePropsForTextEditorDiv: function() {
+            var styleProps = $('#drag-me').css([
+                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family"
+            ]);
+
+            $.each(styleProps, function(prop, value) {
+                $('#drag-me').css(prop, value);
+            });
+        },
+
+        actionRasterizeHTML: function() {
+            console.log('font type : ' + imageApp.textConfig.fontype + ", font family: " + imageApp.textConfig.fontfamily)
+
+            var $canvasWrapper = $('[data-canvas-wrapper]');
+            var innerHtml = $canvasWrapper.html();
+
+            innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: "
+                + imageApp.textConfig.fontfamily
+                + "; src: url(/font/"
+                + imageApp.textConfig.fontype
+                + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top; }</style></head><body>"
+                + innerHtml + '</body></html>';
+            var element = document.getElementById('canvas');
+
+            // htmlToCanvas(innerHtml);
+
+            rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+                console.dir(renderResult);
+                console.dir(renderResult.svg);
+                var url = getBase64Image(renderResult.image);
+
+                function _ImageFiles(url, callback) {
+                    // client단에서 이미지를 넣어줍니다.
+                    // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
+                    // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
+                    // 권장하고 있습니다.
+                    ImageFiles.insert(url, function(err, fileObj) {
+                        // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
+                        // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
+                        // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
+                        // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
+                        // 에러 체크
+                        if (!err) {
+                            // setInterval을 find에 넣어줍니다.
+                            var find = setInterval(function() {
+                                var url = fileObj.url();
+                                if (!!url) {
+                                    // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
+                                    // setInterval을 멈춰줍니다.
+                                    clearInterval(find);
+                                    // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
+                                    return callback(url);
+                                }
+                            }, 100);
+                        } else {
+                            console.log('file insert error: ', err);
+                        }
+                    });
+                }
+
+                // _ImageFiles를 callback과 함께 실행시켜줍니다.
+                _ImageFiles(url, function(url) {
+                    // 시범용 이미지를 보여줍니다. (추후 삭제 예정)
+                    $('[data-rendered-image]').attr('src', url);
+
+                    // Workpieces collection에 정보를 넣어줍니다.
+                    // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
+
+                    var workpiece = {
+                        imageUrl: url
+                    }
+
+                    Workpieces.insert(workpiece, function(err, result) {
+                        if (!err) {
+                            // insert 시 반환되는 것은 inserted된 document의 _id값입니다.
+                            var _id = result;
+                            // Router.go('workpiece', {
+                            //     _id: _id
+                            // });
+                        } else {
+                            console.log('workpiece insert error: ', err);
+                        }
+                    });
+                });
+            }, function error(err) {
+                console.log('rasterization failed: ', err);
+            });
         },
 
         setEditorStyle: function() {
             $('[data-event-change-div-style]').on('click', function() {
                 $('#drag-me').toggleClass('black-bg no-bg');
+
+                if($('#drag-me').hasClass('black-bg')) {
+                    $('#drag-me').css('background-color', '#000000');
+                } else {
+                    $('#drag-me').css('background-color', '');
+                }
             });
         },
 
         setTypography: function() {
             $('[data-event-change-typography]').on('click', function() {
-                var selectedValue = $(this).attr('data-event-change-typography');
+                var selectedFontType = $(this).attr('data-event-change-typography');
+                var selectedFontFamily = $(this).attr('data-font-family');
 
                 var prevClassName = $('#drag-me').attr('class');
                 var prevClassArray = prevClassName.split(' ');
@@ -199,7 +232,11 @@ Template.Editor.rendered = function() {
                     }
                 }
 
-                $('#drag-me').addClass(selectedValue);
+                $('#drag-me').addClass(selectedFontType);
+                $('#drag-me').css('font-family', selectedFontFamily);
+
+                imageApp.textConfig.fontype = selectedFontType;
+                imageApp.textConfig.fontfamily = selectedFontFamily;
             });
         },
 
@@ -236,15 +273,15 @@ Template.Editor.rendered = function() {
             );
 
             this.targetImage.css("-webkit-filter",
-                'grayscale(' + (this.imageFilterConfig.grayscale + this.imageFilterType[selectedFilterType].grayscale) + '%)' +
-                'blur(' + (this.imageFilterConfig.blur + this.imageFilterType[selectedFilterType].blur) + 'px)' +
-                'brightness(' + (this.imageFilterConfig.brightness + this.imageFilterType[selectedFilterType].brightness) + '%)' +
-                'contrast(' + (this.imageFilterConfig.contrast + this.imageFilterType[selectedFilterType].contrast) + '%)' +
-                'hue-rotate(' + (this.imageFilterConfig.hue_rotate + this.imageFilterType[selectedFilterType].hue_rotate) + 'deg)' +
-                'opacity(' + (this.imageFilterConfig.opacity + this.imageFilterType[selectedFilterType].opacity) + '%)' +
-                'invert(' + (this.imageFilterConfig.invert + this.imageFilterType[selectedFilterType].invert) + '%)' +
-                'saturate(' + (this.imageFilterConfig.saturate + this.imageFilterType[selectedFilterType].saturate) + '%)' +
-                'sepia(' + (this.imageFilterConfig.sepia + this.imageFilterType[selectedFilterType].sepia) + '%)'
+                    'grayscale(' + (this.imageFilterConfig.grayscale + this.imageFilterType[selectedFilterType].grayscale) + '%)' +
+                    'blur(' + (this.imageFilterConfig.blur + this.imageFilterType[selectedFilterType].blur) + 'px)' +
+                    'brightness(' + (this.imageFilterConfig.brightness + this.imageFilterType[selectedFilterType].brightness) + '%)' +
+                    'contrast(' + (this.imageFilterConfig.contrast + this.imageFilterType[selectedFilterType].contrast) + '%)' +
+                    'hue-rotate(' + (this.imageFilterConfig.hue_rotate + this.imageFilterType[selectedFilterType].hue_rotate) + 'deg)' +
+                    'opacity(' + (this.imageFilterConfig.opacity + this.imageFilterType[selectedFilterType].opacity) + '%)' +
+                    'invert(' + (this.imageFilterConfig.invert + this.imageFilterType[selectedFilterType].invert) + '%)' +
+                    'saturate(' + (this.imageFilterConfig.saturate + this.imageFilterType[selectedFilterType].saturate) + '%)' +
+                    'sepia(' + (this.imageFilterConfig.sepia + this.imageFilterType[selectedFilterType].sepia) + '%)'
             );
         },
 
@@ -285,77 +322,9 @@ Template.Editor.rendered = function() {
         }
     }
 
-    var app = new imageApp();
-    app.init();
-
-    // target elements with the "draggable" class
-    interact('.draggable')
-        .draggable({
-            // enable inertial throwing
-            inertia: true,
-            // keep the element within the area of it's parent
-            restrict: {
-                restriction: "parent",
-                endOnly: true,
-                elementRect: {
-                    top: 0,
-                    left: 0,
-                    bottom: 1,
-                    right: 1
-                }
-            },
-
-            // call this function on every dragmove event
-            onmove: function(event) {
-                var target = event.target,
-                    // keep the dragged position in the data-x/data-y attributes
-                    x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-                    y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-                // translate the element
-                target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-
-                // update the posiion attributes
-                target.setAttribute('data-x', x);
-                target.setAttribute('data-y', y);
-
-            },
-            // call this function on every dragend event
-            onend: function(event) {
-
-            }
-        });
-
-    var offset = {
-        x: 0,
-        y: 0
-    };
-
-    interact('.draggable')
-        .resizable({
-            edges: {
-                left: true,
-                right: true,
-                bottom: true,
-                top: true
-            }
-        })
-        .on('resizemove', function(event) {
-            var target = event.target;
-
-            // update the element's style
-            target.style.width = event.rect.width + 'px';
-            target.style.height = event.rect.height + 'px';
-
-            // translate when resizing from top or left edges
-            offset.x += event.deltaRect.left;
-            offset.y += event.deltaRect.top;
-
-            target.style.transform = ('translate(' + offset.x + 'px,' + offset.y + 'px)');
-
-            //            target.textContent = event.rect.width + '×' + event.rect.height;
-        });
-
+    /*****************************************************************************/
+    /* TextEditor 관련 기능*/
+    /*****************************************************************************/
     editorApp = {
         data: {},
 
@@ -463,10 +432,84 @@ Template.Editor.rendered = function() {
         }
     }
 
+    /*****************************************************************************/
+    /* interact.js setting part
+    /*****************************************************************************/
+    // target elements with the "draggable" class
+    interact('.draggable')
+        .draggable({
+            // enable inertial throwing
+            inertia: true,
+            // keep the element within the area of it's parent
+            restrict: {
+                restriction: "parent",
+                endOnly: true,
+                elementRect: {
+                    top: 0,
+                    left: 0,
+                    bottom: 1,
+                    right: 1
+                }
+            },
+
+            // call this function on every dragmove event
+            onmove: function(event) {
+                var target = event.target,
+                // keep the dragged position in the data-x/data-y attributes
+                    x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+                    y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                // translate the element
+                target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+                // update the posiion attributes
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
+
+            },
+            // call this function on every dragend event
+            onend: function(event) {
+
+            }
+        });
+
+    var offset = {
+        x: 0,
+        y: 0
+    };
+
+    interact('.draggable')
+        .resizable({
+            edges: {
+                left: true,
+                right: true,
+                bottom: true,
+                top: true
+            }
+        })
+        .on('resizemove', function(event) {
+            var target = event.target;
+
+            // update the element's style
+            target.style.width = event.rect.width + 'px';
+            target.style.height = event.rect.height + 'px';
+
+            // translate when resizing from top or left edges
+            offset.x += event.deltaRect.left;
+            offset.y += event.deltaRect.top;
+
+            target.style.transform = ('translate(' + offset.x + 'px,' + offset.y + 'px)');
+
+            //            target.textContent = event.rect.width + '×' + event.rect.height;
+        });
+
+    /*****************************************************************************/
+    /* application init method
+    /*****************************************************************************/
+    var imageApp = new imageApp();
+    imageApp.init();
     editorApp.init();
 
-    var canvas = document.getElementById("main-canvas");
-    // rasterizeHTML.drawHTML('<img src="test.jpg" alt="" id="main-target" style="height: 150px; min-width: 100%; -webkit-filter: grayscale(0%) blur(1px) brightness(62%) contrast(141%) hue-rotate(0deg) opacity(100%) invert(0%) saturate(100%) sepia(0%);">', canvas);
 };
 
 Template.Editor.destroyed = function() {};
