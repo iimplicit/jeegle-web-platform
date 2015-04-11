@@ -109,14 +109,14 @@ Template.Home.created = function() {
         }]
     }
 
-    // TempWorkpieces.insert(firstSketch, function(err, result) {
-    //     if (!err) {
-    //         // 저장 후 나온 아이디값을 currentIndex session에 저장합니다.
-    //         Session.set("currentId", result);
-    //     } else {
-    //         console.log('sketch insert error: ', err);
-    //     }
-    // });
+    TempWorkpieces.insert(firstSketch, function(err, result) {
+        if (!err) {
+            // 저장 후 나온 아이디값을 currentIndex session에 저장합니다.
+            Session.set("currentId", result);
+        } else {
+            console.log('sketch insert error: ', err);
+        }
+    });
 };
 
 Template.Home.rendered = function() {
