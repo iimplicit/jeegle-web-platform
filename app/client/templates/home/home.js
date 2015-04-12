@@ -67,7 +67,7 @@ Template.Home.events({
         var background = e.target.style.background;
         var url = background.slice(4, background.length - 1);
 
-        Sketches._collection.update({
+        TempWorkpieces.update({
             _id: Session.get("currentId")
         }, {
             $set: {
@@ -86,7 +86,7 @@ Template.Home.helpers({
         return Session.get("images");
     },
     mainImage: function() {
-        return Sketches.findOne({
+        return TempWorkpieces.findOne({
             _id: Session.get("currentId")
         }).content[0].url;
     }
@@ -109,7 +109,7 @@ Template.Home.created = function() {
         }]
     }
 
-    Sketches._collection.insert(firstSketch, function(err, result) {
+    TempWorkpieces.insert(firstSketch, function(err, result) {
         if (!err) {
             // 저장 후 나온 아이디값을 currentIndex session에 저장합니다.
             Session.set("currentId", result);
