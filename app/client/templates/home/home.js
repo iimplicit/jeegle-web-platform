@@ -154,14 +154,14 @@ Template.Home.events({
 /* Home: Helpers */
 /*****************************************************************************/
 Template.Home.helpers({
-  images: function() {
-    return Session.get("images");
-  },
-  mainImage: function() {
-    return Sketches.findOne({
-      _id: Session.get("currentId")
-    }).content[0].url;
-  }
+    images: function() {
+        return Session.get("images");
+    },
+    mainImage: function() {
+        return TempWorkpieces.findOne({
+            _id: Session.get("currentId")
+        }).content[0].url;
+    }
 });
 
 /*****************************************************************************/
@@ -181,14 +181,14 @@ Template.Home.created = function() {
     }]
   }
 
-  Sketches._collection.insert(firstSketch, function(err, result) {
-    if (!err) {
-      // 저장 후 나온 아이디값을 currentIndex session에 저장합니다.
-      Session.set("currentId", result);
-    } else {
-      console.log('sketch insert error: ', err);
-    }
-  });
+    TempWorkpieces.insert(firstSketch, function(err, result) {
+        if (!err) {
+            // 저장 후 나온 아이디값을 currentIndex session에 저장합니다.
+            Session.set("currentId", result);
+        } else {
+            console.log('sketch insert error: ', err);
+        }
+    });
 };
 
 Template.Home.rendered = function() {
