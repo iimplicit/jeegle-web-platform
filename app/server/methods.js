@@ -56,7 +56,7 @@ Meteor.methods({
 Meteor.neo4j.methods({
   'setDefaultImages': function(){
       console.log('Get default images');
-      return 'MATCH (i:Image)-[r]-(t:Tag) WITH distinct(i) as i, sum(r.score) as total RETURN i, total ORDER BY total LIMIT {NumImages}';
+      return 'MATCH (i:Image)-[r]-(t:Tag) WITH distinct(i) as i, t, sum(r.score) as total RETURN i, t, total ORDER BY total LIMIT {NumImages}';
     },
   'searchImagesForTag': function(){
       console.log('Searching tag matching images');

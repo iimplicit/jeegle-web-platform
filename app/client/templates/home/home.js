@@ -2,7 +2,7 @@
 tagCounter = new TagCounter();
 
 // 이미지를 저장하고 있는 우선순위 큐입니다.
-MaximumImageNum = 100; // 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 40개의 이미지
+MaximumImageNum = 80; // 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 40개의 이미지
 ImageQueue = new priorityQueue(MaximumImageNum); // 이곳에 현재 뿌려지는 모든 이미지들이 큐처럼 들어간다.
 
 /*****************************************************************************/
@@ -71,20 +71,7 @@ Template.Home.events({
         // Neo4j로 태그 쿼리를 날립니다.
         Meteor.neo4j.call('searchImagesForTag', {tagWord:tag, edgeScope:3, NodesLimit:20}, function(err,data){
           Images = data.i;
-          pushImages(Images);
-          // for(k=0;k<Images.length;k++){
-          //   var duplicatedFlag = false;
-          //   for(j=0;j<ImageQueue.heap.length;j++){
-          //     if(ImageQueue.heap[j].data.thumbnailImageUrl == Images[k].thumbnailImageUrl){
-          //       duplicatedFlag = true;
-          //       console.log('duplicated!')
-          //       break;
-          //     }
-          //   }
-          //   if(duplicatedFlag) continue;
-          //   // tag의 경우 중요도
-          //   ImageQueue.push(Images[k], 10);
-          // }
+          pushImages(Images, 10, data.t);
           Session.set("images", ImageQueue.heap);
         })
 
@@ -110,6 +97,12 @@ Template.Home.events({
           callCnt = 0;
           for(i=0;i<result.length;i++){
             // 비동기를 주의해야한다. 여기서 한방에 부르고 떠난다.
+
+            // (태그 직접 입력한 경우) 사용자가 찾고 싶은 이미지를 직접적으로 검색합니다.
+            // 이 경우는 태그와 매우 직접적인 이미지만 가져오는 것이 좋습니다. 사용자가 그것을 의도했기 때문입니다.
+            // 태그와 직접 연결된 이미지는 필수적으로 가져오고, 연관 이미지는 최대 3개 노드 이상을 넘지 않습니다.
+            // 다만 순서는 첫번째로 연결 노드 개수 낮은것들 우선, 그 중에서는 weight 점수 높은 녀석들 우선,
+            // 그 다음부터는 edge weight 합으로 정렬합니다.
             Meteor.neo4j.call('searchImagesForTag', {tagWord:result[i], edgeScope:3, NodesLimit:howManyEach}, function(err,data){
               callCnt++;
               if(data.t.length==0) return; //no image
@@ -121,21 +114,7 @@ Template.Home.events({
               }else{
                 // 이들은 모두 현재 구해야하는 result들이다.
                 Images = data.i;
-                pushImages(Images);
-                // for(k=0;k<Images.length;k++){
-                //   var duplicatedFlag = false;
-                //   for(j=0;j<ImageQueue.heap.length;j++){
-                //     if(ImageQueue.heap[j].data.thumbnailImageUrl == Images[k].thumbnailImageUrl){
-                //       duplicatedFlag = true;
-                //       console.log('duplicated!')
-                //       break;
-                //     }
-                //   }
-                //   if(duplicatedFlag) continue;
-                //   ImageQueue.push(Images[k], k);
-                // }
-                // console.log('imageQueue!!!');
-                // console.dir(ImageQueue);
+                pushImages(Images, 5, data.t);
 
                 if(callCnt==result.length){
                   //마지막에만 set
@@ -147,12 +126,6 @@ Template.Home.events({
           }
         }
       });
-
-      // (태그 직접 입력한 경우) 사용자가 찾고 싶은 이미지를 직접적으로 검색합니다.
-      // 이 경우는 태그와 매우 직접적인 이미지만 가져오는 것이 좋습니다. 사용자가 그것을 의도했기 때문입니다.
-      // 태그와 직접 연결된 이미지는 필수적으로 가져오고, 연관 이미지는 최대 5개 노드 이상을 넘지 않습니다.
-      // 다만 순서는 첫번째로 연결 노드 개수 낮은것들 우선, 그 중에서는 weight 점수 높은 녀석들 우선,
-      // 그 다음부터는 edge weight 합으로 정렬합니다.
     }
   },300),
   "click [name=moveToEditor]": function() {
@@ -252,22 +225,16 @@ Template.Home.rendered = function() {
 
   // 이미지를 Neo4j database에서 받아옵니다.
   Meteor.neo4j.call('setDefaultImages',{
-    NumImages: 100 // 최초 뿌려줄 이미지 개수입니다.
+    NumImages: MaximumImageNum // 최초 뿌려줄 이미지 개수입니다.
   },
   function(err, data){
     if(err) throw err;
 
     if(!!data){
-      console.log(data);
-
       AllImages = data.i;
+      console.log(AllImages);
 
-      pushImages(AllImages);
-      // // Neo4j에 들어있는 이미지를 세션에 넣습니다.
-      // for(k=0;k<AllImages.length;k++){
-      //   //이미 이미지 어레이에 들어가있으면 또 넣을 필요가 없다.
-      //   ImageQueue.push(AllImages[k], 0)
-      // }
+      pushImages(AllImages, 0, data.t);
       Session.set("images", ImageQueue.heap);
 
       // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
@@ -302,7 +269,7 @@ function TagCounter(){
   }
 }
 
-function pushImages(Images){
+function pushImages(Images, priority, tag){
   for(k=0;k<Images.length;k++){
     var duplicatedFlag = false;
     for(j=0;j<ImageQueue.heap.length;j++){
@@ -313,6 +280,6 @@ function pushImages(Images){
       }
     }
     if(duplicatedFlag) continue;
-    ImageQueue.push(Images[k], k);
+    ImageQueue.push(Images[k], priority, tag[k]);
   }
 }

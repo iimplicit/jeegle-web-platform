@@ -37,20 +37,25 @@
 						<label class="input__label input__label--minoru" for="input-15">
 							<span class="input__label-content input__label-content--minoru">당신이 원하는 그 어떤 문구라도 입력하세요.</span>
 						</label>
+						<ul id="tagBox" class="tags">
+						</ul>
 					</span>
 				</section>
 			</div>
 		</div>
 	</div>
 	<div class="row">
-		<ul id="tagBox" class="tags">
-		</ul>
-	</div>
-	<div class="row">
 		{{#each images}}
 		<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 image-wrapper" data-image-item>
 			<!-- <div class="image-item" name="image-item" style="background-image:url({{ _source.thumbnailImageUrl }})"></div> -->
-			<div class="image-item" name="image-item" style="background-image:url({{ data.thumbnailImageUrl }})"></div>
+			<div class="image-item" name="image-item" style="background-image:url({{ data.thumbnailImageUrl }})">
+				<div class="tag-div">
+					{{tag.word}}
+				</div>
+				<div class="priority-div">
+					{{priority}}
+				</div>
+			</div>
 		</div>
 		{{/each}}
 	</div>

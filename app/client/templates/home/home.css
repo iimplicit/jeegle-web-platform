@@ -45,6 +45,17 @@
   cursor: pointer !important;
 }
 
+.priority-div{
+  display:inline-block;
+  background-color:yellow;
+}
+
+.tag-div{
+  display:inline-block;
+  background-color:#00a0c6;
+  color:#fff;
+}
+
 .content {
   padding-top: 40px;
 }

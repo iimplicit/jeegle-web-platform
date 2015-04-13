@@ -1,6 +1,7 @@
-function Node(data, priority){
+function Node(data, priority, tag){
   this.data = data;
   this.priority = priority;
+  this.tag = tag;
 }
 // What's wrong with you?
 // Node.prototype.getPriority = function(){return this.priority;}
@@ -14,11 +15,11 @@ priorityQueue = function (maxSize){
 // We assume priority == score. it means that data with lower score will pop
 priorityQueue.prototype = {
 
-  push: function(data, priority) {
+  push: function(data, priority, tag) {
     if(this.heap.length==this.maxSize){
         console.log('we are full queue now. pop: '+this.pop());
     };
-    var node = new Node(data, priority); //create node
+    var node = new Node(data, priority, tag); //create node
     var i = this.heap.push(node) //it will return last index of heap
     this.bubble(i-1)
   },
@@ -72,7 +73,7 @@ priorityQueue.prototype = {
     */
   },
   higherPriority: function(i, j){
-    return this.heap[i].priority < this.heap[j].priority
+    return this.heap[i].priority <= this.heap[j].priority
   }
 }
 
