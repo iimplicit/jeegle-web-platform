@@ -1,96 +1,7 @@
-function Node(data, priority){
-  this.data = data;
-  this.priority = priority;
-}
-// What's wrong with you?
-// Node.prototype.getPriority = function(){return this.priority;}
-Node.prototype.toString = function(){return this.priority;}
-
-function priorityQueue(maxSize){
-  this.heap = [];
-  this.maxSize = maxSize;
-}
-
-// We assume priority == score. it means that data with lower score will pop
-priorityQueue.prototype = {
-
-  push: function(data, priority) {
-    if(this.heap.length==this.maxSize){
-        console.log('we are full queue now. pop: '+this.pop());
-    };
-    var node = new Node(data, priority); //create node
-    var i = this.heap.push(node) //it will return last index of heap
-    this.bubble(i-1)
-  },
-  pop: function() {
-    var topVal = this.heap[0].data;
-    //we don't need to deal with no data.
-    this.heap[0] = this.heap.pop(); //get last value
-    this.sink(0);
-    return topVal;
-  },
-  bubble: function(i){
-    while(i>0){
-      var parentIndex = (i-1) >> 1;
-
-      if(!this.higherPriority(i, parentIndex)) break;
-
-      this.swap(i, parentIndex);
-      i = parentIndex;
-    }
-  },
-  sink: function(i){
-    while((i*2)+1 < this.heap.length){
-      leftChildIndex = (i*2)+1;
-      var childIndex = 0;
-
-      if(leftChildIndex+1 == this.heap.length){
-        // if there is only leftChild
-        childIndex = leftChildIndex;
-      }else{
-        // there are both left and right child
-        var leftHigher = this.higherPriority(leftChildIndex, leftChildIndex+1);
-        childIndex = leftHigher? leftChildIndex : leftChildIndex+1;
-      }
-
-      if (this.higherPriority(i,childIndex)) break;
-
-      this.swap(i, childIndex);
-      i = childIndex;
-    }
-  },
-  swap: function(i, j){
-    var temp = this.heap[i];
-    this.heap[i] = this.heap[j];
-    this.heap[j] = temp;
-
-    /*
-    // swap without temp. But is it efficient enough?
-    this.heap[i] = this.heap[i] + this.heap[j]
-    this.heap[j] = this.heap[i] - this.heap[j]
-    this.heap[i] = this.heap[i] - this.heap[j]
-    */
-  },
-  higherPriority: function(i, j){
-    return this.heap[i].priority < this.heap[j].priority
-  }
-}
-
-
-function TagCounter(){
-  var cnt = 0;
-  this.decTagCount = function(){
-    cnt--;
-  }
-  this.incTagCount = function(){
-    cnt++;
-  }
-  this.getTagCount = function(){
-    return cnt;
-  }
-}
+// Tag 개수를 increase, decrease, get 하는 함수 객체입니다.
 tagCounter = new TagCounter();
 
+// 이미지를 저장하고 있는 우선순위 큐입니다.
 MaximumImageNum = 100; // 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 40개의 이미지
 ImageQueue = new priorityQueue(MaximumImageNum); // 이곳에 현재 뿌려지는 모든 이미지들이 큐처럼 들어간다.
 
@@ -110,56 +21,73 @@ Template.Home.events({
     tmpl.find('form').reset();
   },
   "keyup #input-15": _.debounce(function(e, tmpl){
+    // 사용자 입력이 들어오면 Neo4j에 쿼리를 날립니다. debounce 함수로 적절하게 쿼리양을 조절합니다.
     e.preventDefault();
 
     // 사용자 입력
     var query = tmpl.find('input').value;
-
-    // 태그 작성 중엔 쿼리날리지 않아도 된다.
-    var writingTagFlag = false;
-    var tagFlag = false;
+    var spaceRemovedQuery = query.replace(/\s+/g, '');
 
     // 태그를 제외한 문장
-    sentence = query.split('#')[0];
+    var sentence = query.split('#')[0];
+    var spaceRemovedSentence = sentence.replace(/\s+/g, '');
+
+    // 태그 작성 중엔 쿼리날리지 않아도 됩니다.
+    var writingTagFlag = false;
 
     // 아무 것도 없는 경우
-    if(query==""){
+    if(spaceRemovedQuery==""){
       //현재 이미지 유지
+      //아무것도 하지 않아도 된다.
+      //(아니면 그냥 랜덤이미지로 바꿔줘도 좋을듯하다.)
       return;
     }else if(!query.includes('#')){
       // 문장만 있는 경우
       console.log('only sentence');
-      // 문장 전체를 쿼리로 날린 다음, 이미지 점수별 Sorting
-      // 일단은 모두 같다고 가정하고, 같은 개수 만큼 정렬
 
     }else{
       // 태그 들어왔다. 엔터칠때까진 아무것도 안해도 됨.
       writingTagFlag = true;
-      console.log(e.which);
-      if(e.which==13){
 
-        tag = query.split('#')[1]; //if tag is not exist, tag will be undefined
+      // #태그가 있는데 enter키가 들어왔을 경우 태그를 처리한다.
+      if(e.which==13){
         console.log('There is a tag');
+
+        //if tag is not exist, tag will be undefined
+        var tag = query.split('#')[1];
+        var spaceRemovedTag = tag.replace(/\s+/g,'');
+        console.log(tag);
+
+        // delete #tag from input box
+        tmpl.find('input').value = sentence;
+
+        // return if there is no tag word
+        if(spaceRemovedTag=="") return;
 
         // create tag div and delete
         tagCounter.incTagCount();
         createTagDiv(tagCounter.getTagCount(), tag)
-        tmpl.find('input').value = sentence;
 
-        spaceRemoveSentence = sentence.replace(/\s+/g, '');
-        tagFlag=true;
+        // Neo4j로 태그 쿼리를 날립니다.
+        Meteor.neo4j.call('searchImagesForTag', {tagWord:tag, edgeScope:3, NodesLimit:20}, function(err,data){
+          Images = data.i;
+          pushImages(Images);
+          // for(k=0;k<Images.length;k++){
+          //   var duplicatedFlag = false;
+          //   for(j=0;j<ImageQueue.heap.length;j++){
+          //     if(ImageQueue.heap[j].data.thumbnailImageUrl == Images[k].thumbnailImageUrl){
+          //       duplicatedFlag = true;
+          //       console.log('duplicated!')
+          //       break;
+          //     }
+          //   }
+          //   if(duplicatedFlag) continue;
+          //   // tag의 경우 중요도
+          //   ImageQueue.push(Images[k], 10);
+          // }
+          Session.set("images", ImageQueue.heap);
+        })
 
-        if(spaceRemoveSentence == ""){
-          // 태그만 있는 경우
-          console.log('only tag')
-          // tag 100% => 여러개 tag n빵.
-
-        }else{
-          // 태그와 문장 둘다 있는 경우
-          // tag 50% 나머지 50%
-          console.log('both tag and sentence')
-
-        }
         writingTagFlag = false;
       }
     }
@@ -193,15 +121,21 @@ Template.Home.events({
               }else{
                 // 이들은 모두 현재 구해야하는 result들이다.
                 Images = data.i;
-                for(k=0;k<Images.length;k++){
-                  //이미 이미지 어레이에 들어가있으면 또 넣을 필요가 없다.
-                  // queue.heap.filter(function (Node, word) {return Node.data.p == word});
-                  // if(ImageQueue.heap.indexOf(Images[k])!=-1) continue;
-                  ImageQueue.push(Images[k], k);
-                  // ImageArray.push(Images[k]);
-                }
-                console.log('imageQueue!!!');
-                console.dir(ImageQueue);
+                pushImages(Images);
+                // for(k=0;k<Images.length;k++){
+                //   var duplicatedFlag = false;
+                //   for(j=0;j<ImageQueue.heap.length;j++){
+                //     if(ImageQueue.heap[j].data.thumbnailImageUrl == Images[k].thumbnailImageUrl){
+                //       duplicatedFlag = true;
+                //       console.log('duplicated!')
+                //       break;
+                //     }
+                //   }
+                //   if(duplicatedFlag) continue;
+                //   ImageQueue.push(Images[k], k);
+                // }
+                // console.log('imageQueue!!!');
+                // console.dir(ImageQueue);
 
                 if(callCnt==result.length){
                   //마지막에만 set
@@ -219,17 +153,6 @@ Template.Home.events({
       // 태그와 직접 연결된 이미지는 필수적으로 가져오고, 연관 이미지는 최대 5개 노드 이상을 넘지 않습니다.
       // 다만 순서는 첫번째로 연결 노드 개수 낮은것들 우선, 그 중에서는 weight 점수 높은 녀석들 우선,
       // 그 다음부터는 edge weight 합으로 정렬합니다.
-      if(tagFlag){
-        Meteor.neo4j.call('searchImagesForTag', {tagWord:tag, edgeScope:3, NodesLimit:20}, function(err,data){
-          Images = data.i;
-          for(k=0;k<Images.length;k++){
-            //이미 이미지 어레이에 들어가있으면 또 넣을 필요가 없다.
-            // if(ImageArray.indexOf(Images[k])!=-1) continue;
-            ImageQueue.push(Images[k], k)
-          }
-          Session.set("images", ImageQueue.heap);
-        })
-      }
     }
   },300),
   "click [name=moveToEditor]": function() {
@@ -296,6 +219,25 @@ Template.Home.created = function() {
 };
 
 Template.Home.rendered = function() {
+  $('#tagBox').on('click', '[data-tag]', function(e) {
+    console.log('해당 tag를 삭제합니다.');
+
+    // prevent a tag default event
+    e.preventDefault();
+
+    // select tag element
+    var selectedWord = $(this).attr('data-tag');
+
+    // delete tag element
+    this.parentElement.removeChild(this);
+
+    // decrease tag count
+    tagCounter.decTagCount();
+    console.log(tagCounter.getTagCount())
+
+    // reload images (delete selected images)
+  });
+
   // Auto focus when page is loaded
   $('#input-15').focus();
 
@@ -310,7 +252,7 @@ Template.Home.rendered = function() {
 
   // 이미지를 Neo4j database에서 받아옵니다.
   Meteor.neo4j.call('setDefaultImages',{
-    NumImages: 20 // 최초 뿌려줄 이미지 개수입니다.
+    NumImages: 100 // 최초 뿌려줄 이미지 개수입니다.
   },
   function(err, data){
     if(err) throw err;
@@ -320,11 +262,12 @@ Template.Home.rendered = function() {
 
       AllImages = data.i;
 
-      // Neo4j에 들어있는 이미지를 세션에 넣습니다.
-      for(k=0;k<AllImages.length;k++){
-        //이미 이미지 어레이에 들어가있으면 또 넣을 필요가 없다.
-        ImageQueue.push(AllImages[k], 0)
-      }
+      pushImages(AllImages);
+      // // Neo4j에 들어있는 이미지를 세션에 넣습니다.
+      // for(k=0;k<AllImages.length;k++){
+      //   //이미 이미지 어레이에 들어가있으면 또 넣을 필요가 없다.
+      //   ImageQueue.push(AllImages[k], 0)
+      // }
       Session.set("images", ImageQueue.heap);
 
       // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
@@ -338,9 +281,38 @@ Template.Home.destroyed = function() {};
 function createTagDiv(tagNum, tagWord){
   var html = '';
   // 보통 다른 id줄때 id? name? val? 뭐로 줌?
-  html += '<li><a href="#" id="tagNum-'+tagNum+'">';
+  html += '<li><a href="#" id="tagNum-'+tagNum+'" data-tag='+tagWord+'>';
   html += tagWord;
   html += '</a></li>';
 
   $('#tagBox').append(html);
+}
+
+// 사용자가 #태그를 다는 개수를 셉니다.
+function TagCounter(){
+  var cnt = 0;
+  this.decTagCount = function(){
+    cnt--;
+  }
+  this.incTagCount = function(){
+    cnt++;
+  }
+  this.getTagCount = function(){
+    return cnt;
+  }
+}
+
+function pushImages(Images){
+  for(k=0;k<Images.length;k++){
+    var duplicatedFlag = false;
+    for(j=0;j<ImageQueue.heap.length;j++){
+      if(ImageQueue.heap[j].data.thumbnailImageUrl == Images[k].thumbnailImageUrl){
+        duplicatedFlag = true;
+        console.log('duplicated!')
+        break;
+      }
+    }
+    if(duplicatedFlag) continue;
+    ImageQueue.push(Images[k], k);
+  }
 }

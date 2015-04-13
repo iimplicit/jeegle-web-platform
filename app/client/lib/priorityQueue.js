@@ -6,7 +6,7 @@ function Node(data, priority){
 // Node.prototype.getPriority = function(){return this.priority;}
 Node.prototype.toString = function(){return this.priority;}
 
-function priorityQueue(maxSize){
+priorityQueue = function (maxSize){
   this.heap = [];
   this.maxSize = maxSize;
 }
@@ -41,7 +41,7 @@ priorityQueue.prototype = {
   },
   sink: function(i){
     while((i*2)+1 < this.heap.length){
-      leftChildIndex = (i*2)+1;
+      var leftChildIndex = (i*2)+1;
       var childIndex = 0;
 
       if(leftChildIndex+1 == this.heap.length){
