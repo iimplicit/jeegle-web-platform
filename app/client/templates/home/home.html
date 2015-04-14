@@ -16,11 +16,11 @@
 					{{else}}
 					{{#if logginIn}}
 					<div class="login-wrapper">
-						<a class="login-wrapper">Logging in...</a>						
+						<a class="login-wrapper">Logging in...</a>
 					</div>
 					{{else}}
 					<div class="login-wrapper">
-						<a data-login><i class="fa fa-facebook"></i> | Sign in</a>	
+						<a data-login><i class="fa fa-facebook"></i> | Sign in</a>
 					</div>
 					{{/if}}
 					{{/if}}
@@ -37,6 +37,8 @@
 						<label class="input__label input__label--minoru" for="input-15">
 							<span class="input__label-content input__label-content--minoru">당신이 원하는 그 어떤 문구라도 입력하세요.</span>
 						</label>
+						<ul id="tagBox" class="tags">
+						</ul>
 					</span>
 				</section>
 			</div>
@@ -46,7 +48,14 @@
 		{{#each images}}
 		<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 image-wrapper" data-image-item>
 			<!-- <div class="image-item" name="image-item" style="background-image:url({{ _source.thumbnailImageUrl }})"></div> -->
-			<div class="image-item" name="image-item" style="background-image:url({{ thumbnailImageUrl }})"></div>
+			<div class="image-item" name="image-item" style="background-image:url(http://128.199.249.209:9990/images/{{data.imagePath}})">
+				<div class="tag-div">
+					{{tag.word}}
+				</div>
+				<div class="priority-div">
+					{{priority}}
+				</div>
+			</div>
 		</div>
 		{{/each}}
 	</div>
@@ -55,7 +64,7 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 			<button name="shakeImages">이미지 바꾸기</button>
 			<button name="moveToEditor">다음으로 넘어가기</button>
-			
+
 		</div>
 	</div>
 </div>
