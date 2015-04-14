@@ -2,7 +2,7 @@
 tagCounter = new TagCounter();
 
 // 이미지를 저장하고 있는 우선순위 큐입니다.
-MaximumImageNum = 80; // 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 40개의 이미지
+MaximumImageNum = 20; // 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 40개의 이미지
 ImageQueue = new priorityQueue(MaximumImageNum); // 이곳에 현재 뿌려지는 모든 이미지들이 큐처럼 들어간다.
 
 /*****************************************************************************/
@@ -36,12 +36,7 @@ Template.Home.events({
     var writingTagFlag = false;
 
     // 아무 것도 없는 경우
-    if(spaceRemovedQuery==""){
-      //현재 이미지 유지
-      //아무것도 하지 않아도 된다.
-      //(아니면 그냥 랜덤이미지로 바꿔줘도 좋을듯하다.)
-      return;
-    }else if(!query.includes('#')){
+    if(!query.includes('#')){
       // 문장만 있는 경우
       console.log('only sentence');
 
@@ -69,7 +64,9 @@ Template.Home.events({
         createTagDiv(tagCounter.getTagCount(), tag)
 
         // Neo4j로 태그 쿼리를 날립니다.
+        console.log('hey!')
         Meteor.neo4j.call('searchImagesForTag', {tagWord:tag, edgeScope:3, NodesLimit:20}, function(err,data){
+          console.dir(data);
           Images = data.i;
           pushImages(Images, 10, data.t);
           Session.set("images", ImageQueue.heap);
@@ -79,8 +76,9 @@ Template.Home.events({
       }
     }
 
-    if(writingTagFlag==false){
+    if(writingTagFlag==false && !spaceRemovedSentence==""){
       // 문장 형태소 분석 후 검색
+      console.log('ee'+sentence)
       Meteor.call('getNounArrayBySentence', sentence, function(error, result) {
         if (!!error) {
           throw error;
