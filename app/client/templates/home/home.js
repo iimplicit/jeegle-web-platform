@@ -137,7 +137,7 @@ Template.Home.events({
     var background = e.target.style.background;
     var url = background.slice(4, background.length - 1);
 
-    Sketches._collection.update({
+    TempWorkpieces.update({
       _id: Session.get("currentId")
     }, {
       $set: {
