@@ -268,6 +268,7 @@ Template.Home.rendered = function() {
 
         addEventListener: function() {
             this.toggleBottomFilter();
+            this.catchTextBoxEnterKeyEvent();
             this.setImageFilterType();
             this.setEditorStyle();
             this.setRenderImage();
@@ -284,6 +285,24 @@ Template.Home.rendered = function() {
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="imageFilter"]').show();
             })
+        },
+
+        catchTextBoxEnterKeyEvent: function() {
+            $('[data-main-text][contenteditable=true]').keydown(function(e) {
+                // trap the return key being pressed
+                if (e.keyCode == 13) {
+                    var height = $('[data-main-text]').height();
+                    console.log(height)
+                    if(height < 600) {
+                        // insert 2 br tags (if only one br tag is inserted the cursor won't go to the second line)
+                        document.execCommand('insertHTML', false, '<br><br>');
+                        // prevent the default behaviour of return key pressed
+                        return false;
+                    } else {
+                        return false;
+                    }
+                }
+            });
         },
 
         setEditorStyle: function() {
