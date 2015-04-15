@@ -18,3 +18,13 @@ Meteor.publish('workpiece', function(_id) {
         _id: _id
     });
 });
+
+Meteor.publish('facebook', function(userId) {
+    return Meteor.users.find({
+        _id: userId
+    }, {
+        fields: {
+        	"services.facebook.accessToken": 1
+        }
+    })
+});
