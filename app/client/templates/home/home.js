@@ -188,7 +188,7 @@ Template.Home.rendered = function() {
     function imageApp() {}
 
     imageApp.prototype = {
-        targetImage: $('#main-image'),
+        targetImage: $('.main-content'),
         mainText: $('[data-main-text]'),
 
         textConfig: {
@@ -290,18 +290,24 @@ Template.Home.rendered = function() {
         catchTextBoxEnterKeyEvent: function() {
             $('[data-main-text][contenteditable=true]').keydown(function(e) {
                 // trap the return key being pressed
-                if (e.keyCode == 13) {
-                    var height = $('[data-main-text]').height();
-                    console.log(height)
-                    if(height < 600) {
-                        // insert 2 br tags (if only one br tag is inserted the cursor won't go to the second line)
-                        document.execCommand('insertHTML', false, '<br><br>');
-                        // prevent the default behaviour of return key pressed
-                        return false;
-                    } else {
+                var height = $('[data-main-text]').height();
+                if(height > 620) {
+                    if(e.keyCode != 8) {
                         return false;
                     }
                 }
+
+//                if (e.keyCode == 13) {
+//                    var height = $('[data-main-text]').height();
+//                    if(height < 600) {
+//                        // insert 2 br tags (if only one br tag is inserted the cursor won't go to the second line)
+//                        document.execCommand('insertHTML', false, '<br><br>');
+//                        // prevent the default behaviour of return key pressed
+//                        return false;
+//                    } else {
+//                        return false;
+//                    }
+//                }
             });
         },
 
