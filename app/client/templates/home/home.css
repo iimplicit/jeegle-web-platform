@@ -182,3 +182,154 @@
     text-indent: 4px;
     /*padding: 0.75em 0.15em;*/
 }
+
+
+/*****************************************************************************/
+/* Write: Dooseong, Eom */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* Import Local WebFont
+/*****************************************************************************/
+@font-face{
+    font-family: Jua;
+    src: url('/font/Jua.woff') format('woff');
+}
+
+@font-face{
+    font-family: Hanna;
+    src: url('/font/Hanna.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Brush Script;
+    src: url('/font/BrushScript.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Gothic;
+    src: url('/font/Gothic.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Myeongjo;
+    src: url('/font/Myeongjo.woff') format('woff');
+}
+
+@font-face{
+    font-family: Nanum Pen Script;
+    src: url('/font/PenScript.woff') format('woff');
+}
+
+.preset-thumbnail {
+    padding: 0;
+    width: 50px;
+    height: 50px;
+}
+
+.list-inline {
+    padding-left: 0;
+    margin-left: -5px;
+    list-style: none;
+}
+.list-inline > li {
+    display: inline-block;
+}
+
+.slider-list-inline > li {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.slide-filter {
+    width: 90px;
+}
+
+.slide-thumbnail {
+    padding: 0;
+    width: 50px;
+    height: 50px;
+}
+
+/*****************************************************************************/
+/* select box */
+/*****************************************************************************/
+.select-style {
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    width: 120px;
+    border-radius: 3px;
+    overflow: hidden;
+    background-color: #fff;
+
+    background: #fff url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
+}
+
+.select-style select {
+    padding: 5px 8px;
+    width: 130%;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.select-style select:focus {
+    outline: none;
+}
+
+.main-content {
+    background-image: url(test.jpg);
+    width: 640px;
+    height: 640px;
+
+    margin: 0 auto;
+}
+
+.main-image-wrapper {
+    width: 640px;
+    height: 640px;
+
+    margin: 0 auto;
+}
+
+.main-image {
+    padding: 0;
+
+    width: 640px;
+    height: 640px;
+}
+
+.main-text {
+    font-family: Hanna;
+
+    width: 500px;
+    max-height: 600px;
+
+    margin: 0 auto;
+    z-index: 100;
+
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+}
+
+.bottom-content {
+    width: 640px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.ImageFilters {
+    text-align: center;
+}
+
+.tag-filter-item {
+    border: 1px solid #fff;
+    width: 20px;
+    height: 25px;
+}

@@ -75,6 +75,57 @@ Template.Home.events({
                 'content.0.url': url
             }
         });
+    },
+    "click [data-rasterize]": function(e, tmpl){
+        var $canvasWrapper = $('.main-content-wrapper');
+        var innerHtml = $canvasWrapper.html();
+
+        innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style>body {background-image: url(test.jpg)}</style></head><body>"
+            + innerHtml + '</body></html>';
+
+        rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+            console.dir(renderResult);
+            console.dir(renderResult.svg);
+            var url = getBase64Image(renderResult.image);
+
+            function _ImageFiles(url, callback) {
+                // client단에서 이미지를 넣어줍니다.
+                // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
+                // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
+                // 권장하고 있습니다.
+                ImageFiles.insert(url, function(err, fileObj) {
+                    // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
+                    // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
+                    // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
+                    // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
+                    // 에러 체크
+                    if (!err) {
+                        // setInterval을 find에 넣어줍니다.
+                        var find = setInterval(function() {
+                            var url = fileObj.url();
+
+                            if (!!url) {
+                                // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
+                                // setInterval을 멈춰줍니다.
+                                clearInterval(find);
+                                // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
+                                return callback(url);
+                            }
+                        }, 100);
+                    } else {
+                        console.log('file insert error: ', err);
+                    }
+                });
+            }
+
+            // _ImageFiles를 callback과 함께 실행시켜줍니다.
+            _ImageFiles(url, function(url) {
+                // 시범용 이미지를 보여줍니다. (추후 삭제 예정)
+                $('[data-rendered-image]').attr('src', url);
+            });
+        }, function error(err) {
+            console.log('rasterization failed: ', err);
+        });
     }
 });
 
@@ -120,6 +171,370 @@ Template.Home.created = function() {
 };
 
 Template.Home.rendered = function() {
+    //  참고.. image effect range
+    //            grayscale : 100 + '%', // 0~ 100
+    //            blur: 0 + 'px', // 10
+    //            brightness: 100 + '%', // 200
+    //            contrast: 100 + '%', // 200
+    //            hue_rotate: 0 + 'deg', // 360
+    //            opacity: 100 + '%', // 0 ~ 100
+    //            invert: 0 + '%', // 0 ~ 100
+    //            saturate: 100 + '%', // 0 ~ 500
+    //            sepia: 0 + '%' // 0 ~ 100
+
+    /*****************************************************************************/
+    /* Image 관련 기능*/
+    /*****************************************************************************/
+    function imageApp() {}
+
+    imageApp.prototype = {
+        targetImage: $('#main-image'),
+        mainText: $('[data-main-text]'),
+
+        textConfig: {
+            fontsize: 40,
+            fontype: 'Hanna',
+            fontfamily: 'Hanna'
+        },
+
+        imageFilterConfig: {
+            type: 'default',
+            grayscale: 0, // 100
+            blur: 0, // 10
+            brightness: 100, // 200
+            contrast: 100, // 200
+            hue_rotate: 0, // 360
+            opacity: 100, // 0 ~ 100
+            invert: 0, // 0 ~ 100
+            saturate: 100, // 0 ~ 500
+            sepia: 0 // 0 ~ 100
+        },
+
+        imageFilterType: {
+            default: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 0, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            },
+
+            vintage: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 0, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 100 // 0 ~ 100
+            },
+
+            clarity: {
+                grayscale: 100, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 0, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            }
+        },
+
+        slideOption: {
+            brightnessOpt: 'value: 100, min: 0, max: 200, step: 1',
+            contrastOpt: 'value: 100, min: 0, max: 200, step: 1',
+            blurOpt: 'value: 0, min: 0, max: 10, step: 1'
+        },
+
+        init: function() {
+            this.setBottomFilter();
+            this.addEventListener();
+            this.setImageSliderEventListener();
+        },
+
+        setBottomFilter: function() {
+            $('[data-main-text]').focus();
+            $('[data-bottom-type]').hide();
+            $('[data-bottom-type="fontFilter"]').show();
+        },
+
+        addEventListener: function() {
+            this.toggleBottomFilter();
+            this.setImageFilterType();
+            this.setEditorStyle();
+            this.setRenderImage();
+        },
+
+        toggleBottomFilter: function() {
+            $('body').on('click', '.main-text', function(e) {
+                e.stopPropagation();
+                $('[data-bottom-type]').hide();
+                $('[data-bottom-type="fontFilter"]').show();
+            })
+
+            $('body').on('click', '[data-content]', function() {
+                $('[data-bottom-type]').hide();
+                $('[data-bottom-type="imageFilter"]').show();
+            })
+        },
+
+        setEditorStyle: function() {
+            $('[data-main-text-typography]').change(function() {
+                var selectedFontType = $("[data-main-text-typography] option:selected").attr('data-event-change-typography');
+                var selectedFontFamily = $("[data-main-text-typography] option:selected").attr('data-font-family');
+
+                var prevClassName = $('[data-main-text]').attr('class');
+                var prevClassArray = prevClassName.split(' ');
+                for (var i = 0; i < prevClassArray.length; i++) {
+                    if (prevClassArray[i] != 'black-bg' && prevClassArray[i] != 'no-bg' && prevClassArray[i] != 'main-text') {
+                        $('[data-main-text]').removeClass(prevClassArray[i]);
+                    }
+                }
+
+                $('[data-main-text]').addClass(selectedFontType);
+                $('[data-main-text]').css('font-family', selectedFontFamily);
+
+                imageApp.textConfig.fontype = selectedFontType;
+                imageApp.textConfig.fontfamily = selectedFontFamily;
+            });
+
+            $('[data-change-font-size-filter]').on('change', function() {
+                var fontsize;
+                fontsize = $(this).val() - 0;
+
+                console.log(fontsize);
+                $('[data-main-text]').css('font-size', fontsize);
+                imageApp.textConfig.fontsize = fontsize;
+            });
+
+            $('[data-change-font-types]').on('change', function() {
+                var isCheckBold = $("input:checkbox[data-change-font-type='bold']").is(":checked");
+                var isCheckItalic = $("input:checkbox[data-change-font-type='italic']").is(":checked");
+                var isCheckShadow = $("input:checkbox[data-change-font-type='shadow']").is(":checked");
+
+                $('[data-main-text]').css('font-weight', '');
+                $('[data-main-text]').css('font-style', '');
+                $('[data-main-text]').css('text-shadow', '');
+
+                if(isCheckBold) {
+                    $('[data-main-text]').css('font-weight', 'bold');
+                }
+
+                if(isCheckItalic) {
+                    $('[data-main-text]').css('font-style', 'italic');
+                }
+
+                if(isCheckShadow) {
+                    $('[data-main-text]').css('text-shadow', '3px 3px #000');
+                }
+            });
+
+            $('[data-change-font-justify]').on('click', function() {
+                var selectedValue = $(this).val();
+                $('[data-main-text]').css('text-align', selectedValue);
+            });
+
+
+        },
+
+        setRenderImage: function() {
+            $('[data-render-image]').on('click', function(){
+                imageApp.setCssInlineStylePropsForTextEditorDiv();
+                imageApp.actionRasterizeHTML();
+
+            });
+        },
+
+        setCssInlineStylePropsForTextEditorDiv: function() {
+            var styleProps = $('#drag-me').css([
+                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family"
+            ]);
+
+            $.each(styleProps, function(prop, value) {
+                $('#drag-me').css(prop, value);
+            });
+        },
+
+        actionRasterizeHTML: function() {
+            console.log('font type : ' + imageApp.textConfig.fontype + ", font family: " + imageApp.textConfig.fontfamily)
+
+            var $canvasWrapper = $('[data-canvas-wrapper]');
+            var innerHtml = $canvasWrapper.html();
+
+            innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: "
+                + imageApp.textConfig.fontfamily
+                + "; src: url(/font/"
+                + imageApp.textConfig.fontype
+                + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top; }</style></head><body>"
+                + innerHtml + '</body></html>';
+            var element = document.getElementById('canvas');
+
+            // htmlToCanvas(innerHtml);
+
+            rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+                console.dir(renderResult);
+                console.dir(renderResult.svg);
+                var url = getBase64Image(renderResult.image);
+
+                function _ImageFiles(url, callback) {
+                    // client단에서 이미지를 넣어줍니다.
+                    // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
+                    // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
+                    // 권장하고 있습니다.
+                    ImageFiles.insert(url, function(err, fileObj) {
+                        // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
+                        // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
+                        // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
+                        // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
+                        // 에러 체크
+                        if (!err) {
+                            // setInterval을 find에 넣어줍니다.
+                            var find = setInterval(function() {
+                                var url = fileObj.url();
+                                if (!!url) {
+                                    // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
+                                    // setInterval을 멈춰줍니다.
+                                    clearInterval(find);
+                                    // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
+                                    return callback(url);
+                                }
+                            }, 100);
+                        } else {
+                            console.log('file insert error: ', err);
+                        }
+                    });
+                }
+
+                // _ImageFiles를 callback과 함께 실행시켜줍니다.
+                _ImageFiles(url, function(url) {
+                    // 시범용 이미지를 보여줍니다. (추후 삭제 예정)
+                    $('[data-rendered-image]').attr('src', url);
+
+                    // Workpieces collection에 정보를 넣어줍니다.
+                    // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
+
+                    var workpiece = {
+                        imageUrl: url
+                    }
+
+                    Workpieces.insert(workpiece, function(err, result) {
+                        if (!err) {
+                            // insert 시 반환되는 것은 inserted된 document의 _id값입니다.
+                            var _id = result;
+                            // Router.go('workpiece', {
+                            //     _id: _id
+                            // });
+                        } else {
+                            console.log('workpiece insert error: ', err);
+                        }
+                    });
+                });
+            }, function error(err) {
+                console.log('rasterization failed: ', err);
+            });
+        },
+
+        setImageFilterType: function() {
+
+            var self = this;
+
+            $('[data-preset]').on('click', function() {
+                var selectedFilterType = $(this).attr('data-preset');
+                self.imageFilterConfig.type = selectedFilterType;
+
+                if (selectedFilterType == 'default') {
+                    self.initSliderSetting();
+                    self.initImageFilterConfig();
+                }
+
+                self.setImageFilter();
+            });
+        },
+
+        setImageFilter: function() {
+            var selectedFilterType = this.imageFilterConfig.type;
+
+            this.targetImage.css("filter",
+                    'grayscale(' + (this.imageFilterConfig.grayscale + this.imageFilterType[selectedFilterType].grayscale) + '%)' +
+                    'blur(' + (this.imageFilterConfig.blur + this.imageFilterType[selectedFilterType].blur) + 'px)' +
+                    'brightness(' + (this.imageFilterConfig.brightness + this.imageFilterType[selectedFilterType].brightness) + '%)' +
+                    'contrast(' + (this.imageFilterConfig.contrast + this.imageFilterType[selectedFilterType].contrast) + '%)' +
+                    'hue-rotate(' + (this.imageFilterConfig.hue_rotate + this.imageFilterType[selectedFilterType].hue_rotate) + 'deg)' +
+                    'opacity(' + (this.imageFilterConfig.opacity + this.imageFilterType[selectedFilterType].opacity) + '%)' +
+                    'invert(' + (this.imageFilterConfig.invert + this.imageFilterType[selectedFilterType].invert) + '%)' +
+                    'saturate(' + (this.imageFilterConfig.saturate + this.imageFilterType[selectedFilterType].saturate) + '%)' +
+                    'sepia(' + (this.imageFilterConfig.sepia + this.imageFilterType[selectedFilterType].sepia) + '%)'
+            );
+
+            this.targetImage.css("-webkit-filter",
+                    'grayscale(' + (this.imageFilterConfig.grayscale + this.imageFilterType[selectedFilterType].grayscale) + '%)' +
+                    'blur(' + (this.imageFilterConfig.blur + this.imageFilterType[selectedFilterType].blur) + 'px)' +
+                    'brightness(' + (this.imageFilterConfig.brightness + this.imageFilterType[selectedFilterType].brightness) + '%)' +
+                    'contrast(' + (this.imageFilterConfig.contrast + this.imageFilterType[selectedFilterType].contrast) + '%)' +
+                    'hue-rotate(' + (this.imageFilterConfig.hue_rotate + this.imageFilterType[selectedFilterType].hue_rotate) + 'deg)' +
+                    'opacity(' + (this.imageFilterConfig.opacity + this.imageFilterType[selectedFilterType].opacity) + '%)' +
+                    'invert(' + (this.imageFilterConfig.invert + this.imageFilterType[selectedFilterType].invert) + '%)' +
+                    'saturate(' + (this.imageFilterConfig.saturate + this.imageFilterType[selectedFilterType].saturate) + '%)' +
+                    'sepia(' + (this.imageFilterConfig.sepia + this.imageFilterType[selectedFilterType].sepia) + '%)'
+            );
+        },
+
+        setImageSliderEventListener: function() {
+            this.initSliderSetting();
+        },
+
+        initSliderSetting: function() {
+
+            var self = this;
+
+            $('[data-event-slide-filter]').on('change', 'input', function() {
+                var filter, value;
+                filter = $(this).data('filter');
+                value = $(this).val() - 0;
+                self.imageFilterConfig[filter] = value;
+                self.setImageFilter();
+            });
+        },
+
+        initImageFilterConfig: function() {
+            this.imageFilterConfig = {
+                type: 'default',
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 100, // 200
+                contrast: 100, // 200
+                hue_rotate: 0, // 360
+                opacity: 100, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 100, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            },
+
+            $("input[data-filter=brightness]").val(100);
+            $("input[data-filter=contrast]").val(100);
+            $("input[data-filter=blur]").val(0);
+        }
+    }
+
+    /*****************************************************************************/
+    /* application init method
+     /*****************************************************************************/
+    var imageApp = new imageApp();
+    imageApp.init();
+
+
+
+    /*****************************************************************************/
+    /* sunpil
+     /*****************************************************************************/
     // Auto focus when page is loaded
     $('#input-15').focus();
 
@@ -152,208 +567,27 @@ Template.Home.rendered = function() {
         }
     });
 
-    // Session.set("images", [{
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "wMhTihYSvyumNjnb9",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "fallen trees",
-    //             "forest",
-    //             "lumber",
-    //             "material",
-    //             "stack",
-    //             "stacked",
-    //             "tree trunks",
-    //             "wood"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/fallen-trees-forest-stack-1045.jpg",
-    //         "_id": "wMhTihYSvyumNjnb9",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/fallen-trees-forest-stack-1045-821x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "N2u4Hy6WXnNML5H4m",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "building",
-    //             "city",
-    //             "closely",
-    //             "fire escape",
-    //             "fire ladder",
-    //             "house",
-    //             "skyscraper"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/city-closely-fire-ladder-1070.jpg",
-    //         "_id": "N2u4Hy6WXnNML5H4m",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/city-closely-fire-ladder-1070-901x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "ckpa7xMFkFJ3XywTF",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "buildings",
-    //             "city",
-    //             "sepia",
-    //             "skyscrapers",
-    //             "streets",
-    //             "urban",
-    //             "view"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/buildings-city-sepia-1054.jpg",
-    //         "_id": "ckpa7xMFkFJ3XywTF",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/buildings-city-sepia-1054-733x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "sQh3penvNxbpeHKFM",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "animal",
-    //             "eye",
-    //             "horse",
-    //             "poney"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/animal-eye-horse-1027.jpg",
-    //         "_id": "sQh3penvNxbpeHKFM",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/animal-eye-horse-1027-825x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "LxuEmvfK35DEd2rFc",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "amour",
-    //             "couple",
-    //             "date",
-    //             "feelings",
-    //             "hug",
-    //             "hugging",
-    //             "kissing",
-    //             "love",
-    //             "lovers",
-    //             "people",
-    //             "romantic",
-    //             "sun",
-    //             "together"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/couple-kissing-love-1075.jpg",
-    //         "_id": "LxuEmvfK35DEd2rFc",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/couple-kissing-love-1075-825x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "ZNZkfjTnDAGJWQfuC",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "broken",
-    //             "dangerous",
-    //             "jetty",
-    //             "lake",
-    //             "landing stage",
-    //             "pontoon",
-    //             "risky",
-    //             "sea",
-    //             "wood"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/broken-dangerous-lake-1087.jpg",
-    //         "_id": "ZNZkfjTnDAGJWQfuC",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/broken-dangerous-lake-1087-849x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "NmSyGbpcwXkoWBPZQ",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "creepy",
-    //             "curve",
-    //             "dark",
-    //             "fog",
-    //             "foggy",
-    //             "forest",
-    //             "railroad",
-    //             "rails",
-    //             "railway",
-    //             "scary"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/creepy-curve-dark-1096.jpg",
-    //         "_id": "NmSyGbpcwXkoWBPZQ",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/creepy-curve-dark-1096-824x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "rCtu9kTNXwegNqabx",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "lake",
-    //             "landscape",
-    //             "mountains",
-    //             "nature",
-    //             "sky",
-    //             "snow",
-    //             "winter"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/lake-landscape-mountains-1130.jpg",
-    //         "_id": "rCtu9kTNXwegNqabx",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/lake-landscape-mountains-1130-825x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "HLcQKMDZWH8jTDcDi",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "candle",
-    //             "fire",
-    //             "flame",
-    //             "hearts"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/candle-fire-flame-1095.jpg",
-    //         "_id": "HLcQKMDZWH8jTDcDi",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/candle-fire-flame-1095-825x550.jpg"
-    //     }
-    // }, {
-    //     "_index": "jeegle",
-    //     "_type": "Images",
-    //     "_id": "MvLdugP43CdpCpYyE",
-    //     "_score": 1,
-    //     "_source": {
-    //         "tags": [
-    //             "apple",
-    //             "computer",
-    //             "desk",
-    //             "device",
-    //             "imac",
-    //             "keyboard",
-    //             "magic mouse",
-    //             "technology",
-    //             "workspace",
-    //             "workstation"
-    //         ],
-    //         "originalImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/apple-imac-keyboard-1149.jpg",
-    //         "_id": "MvLdugP43CdpCpYyE",
-    //         "thumbnailImageUrl": "http://static.pexels.com/wp-content/uploads/2014/06/apple-imac-keyboard-1149-825x550.jpg"
-    //     }
-    // }]);
-
-    // Session.set("mainImage", "http://static.pexels.com/wp-content/uploads/2014/06/fallen-trees-forest-stack-1045-821x550.jpg");
 };
 
 Template.Home.destroyed = function() {};
+
+
+function getBase64Image(img) {
+    // Create an empty canvas element
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    // Copy the image contents to the canvas
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    // Get the data-URL formatted image
+    // Firefox supports PNG and JPEG. You could check img.src to
+    // guess the original format, but be aware the using "image/jpg"
+    // will re-encode the image.
+    var dataURL = canvas.toDataURL("image/png");
+
+    return dataURL;
+    // return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+}
