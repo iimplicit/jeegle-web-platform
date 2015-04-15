@@ -25,3 +25,17 @@ Router.route('workpiece/:_id', {
   action: 'action',
   where: 'client'
 });
+
+// Router.route('music', {where: 'server'}).get(function() {
+//   this.response.writeHead(302, {
+//     'Location': "bpc://landing?type=play_radio&amp;channel_id=136"
+//   });
+//   this.response.end();
+// });
+
+Router.route('music/:_id', {
+  name: 'music',
+  controller: 'MusicController',
+  action: 'action',
+  where: 'client'
+});
