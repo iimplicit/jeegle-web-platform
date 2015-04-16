@@ -188,10 +188,11 @@ Template.Home.rendered = function() {
     function imageApp() {}
 
     imageApp.prototype = {
-        targetImage: $('.main-content'),
+        targetImage: $('#main-image'),
         mainText: $('[data-main-text]'),
 
         textConfig: {
+            isFirstInput: true,
             fontsize: 40,
             fontype: 'Hanna',
             fontfamily: 'Hanna'
@@ -255,9 +256,15 @@ Template.Home.rendered = function() {
         },
 
         init: function() {
+            this.initTextDivPosition();
             this.setBottomFilter();
             this.addEventListener();
             this.setImageSliderEventListener();
+        },
+
+        initTextDivPosition: function() {
+            var textDivXPosition = (640 -  $('[data-main-text]').height()) / 2;
+            $('[data-main-text]').css('top', textDivXPosition);
         },
 
         setBottomFilter: function() {
@@ -271,6 +278,8 @@ Template.Home.rendered = function() {
             this.catchTextBoxEnterKeyEvent();
             this.setImageFilterType();
             this.setEditorStyle();
+            this.setTextDivPosition();
+
             this.setRenderImage();
         },
 
@@ -370,8 +379,22 @@ Template.Home.rendered = function() {
 
         },
 
+        setTextDivPosition: function() {
+            $('[data-main-text]').keyup(function(e) {
+                $('[data-main-text]').trigger('heightChange');
+            });
+
+            $('[data-main-text]').on('heightChange', function(e) {
+                var textHeight = $('[data-main-text]').height();
+                if(textHeight < 640) {
+                    var textDivXPosition = (640 -  textHeight) / 2;
+                    $('[data-main-text]').css('top', textDivXPosition);
+                }
+            })
+        },
+
         setRenderImage: function() {
-            $('[data-render-image]').on('click', function(){
+            $('[data-rasterize]').on('click', function(){
                 imageApp.setCssInlineStylePropsForTextEditorDiv();
                 imageApp.actionRasterizeHTML();
 
@@ -379,19 +402,19 @@ Template.Home.rendered = function() {
         },
 
         setCssInlineStylePropsForTextEditorDiv: function() {
-            var styleProps = $('#drag-me').css([
-                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family"
+            var styleProps = $('.main-text').css([
+                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family", "text-align", "font-weight", "font-style"
             ]);
 
             $.each(styleProps, function(prop, value) {
-                $('#drag-me').css(prop, value);
+                $('.main-text').css(prop, value);
             });
         },
 
         actionRasterizeHTML: function() {
             console.log('font type : ' + imageApp.textConfig.fontype + ", font family: " + imageApp.textConfig.fontfamily)
 
-            var $canvasWrapper = $('[data-canvas-wrapper]');
+            var $canvasWrapper = $('.main-content');
             var innerHtml = $canvasWrapper.html();
 
             innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: "

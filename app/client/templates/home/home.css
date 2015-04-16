@@ -283,7 +283,9 @@
 }
 
 .main-content {
-    background-image: url(test.jpg);
+    /*background-image: url(test.jpg);*/
+    position: relative;
+
     width: 640px;
     height: 640px;
 
@@ -298,20 +300,29 @@
 }
 
 .main-image {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+
     padding: 0;
 
     width: 640px;
-    height: 640px;
+    height: 640px !important;
 }
 
 .main-text {
+    position: absolute;
+    top: 0px;
+    left: 70px;
+    z-index: 10;
+    margin: 0 auto;
+
+
     font-family: Hanna;
 
     width: 500px;
     max-height: 640px;
-
-    margin: 0 auto;
-    z-index: 100;
 
     color: #fff;
     font-size: 40px;
@@ -322,6 +333,8 @@
     width: 640px;
     height: 200px;
     margin: 0 auto;
+
+    z-index: 1000;
 }
 
 .ImageFilters {
