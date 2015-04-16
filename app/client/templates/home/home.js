@@ -20,60 +20,44 @@ Template.Home.events({
         var query = tmpl.find('input').value;
         tmpl.find('form').reset();
     },
-    "keyup #input-15": _.debounce(function (e, tmpl) {
+    "keypress #tag_input": function(e, tmpl){
+      // e.preventDefault();
+
+      if(e.which == 13){
+        console.log('There is a tag');
+
+        //if tag is not exist, tag will be undefined
+        var tag = $('#tag_input').val();
+
+        // return if there is no tag word
+        var spaceRemovedTag = tag.replace(/\s+/g, '');
+        if (spaceRemovedTag == "") return;
+
+        // create tag div and delete
+        tagCounter.incTagCount();
+        createTagDiv(tagCounter.getTagCount(), tag)
+
+        // Neo4j로 태그 쿼리를 날립니다.
+        Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: 20}, function (err, data) {
+            Images = data.i;
+            pushImages(Images, 10, data.t);
+            Session.set("images", ImageQueue.heap);
+        })
+      }
+    },
+    "keypress #input-15": _.debounce(function (e, tmpl) {
         // 사용자 입력이 들어오면 Neo4j에 쿼리를 날립니다. debounce 함수로 적절하게 쿼리양을 조절합니다.
         e.preventDefault();
 
         // 사용자 입력
-        var query = tmpl.find('input').value;
+        var query = $('#input-15').text();
         var spaceRemovedQuery = query.replace(/\s+/g, '');
 
         // 태그를 제외한 문장
         var sentence = query.split('#')[0];
         var spaceRemovedSentence = sentence.replace(/\s+/g, '');
 
-        // 태그 작성 중엔 쿼리날리지 않아도 됩니다.
-        var writingTagFlag = false;
-
-        // 아무 것도 없는 경우
-        if (!query.includes('#')) {
-            // 문장만 있는 경우
-            console.log('only sentence');
-
-        } else {
-            // 태그 들어왔다. 엔터칠때까진 아무것도 안해도 됨.
-            writingTagFlag = true;
-
-            // #태그가 있는데 enter키가 들어왔을 경우 태그를 처리한다.
-            if (e.which == 13) {
-                console.log('There is a tag');
-
-                //if tag is not exist, tag will be undefined
-                var tag = query.split('#')[1];
-                var spaceRemovedTag = tag.replace(/\s+/g, '');
-
-                // delete #tag from input box
-                tmpl.find('input').value = sentence;
-
-                // return if there is no tag word
-                if (spaceRemovedTag == "") return;
-
-                // create tag div and delete
-                tagCounter.incTagCount();
-                createTagDiv(tagCounter.getTagCount(), tag)
-
-                // Neo4j로 태그 쿼리를 날립니다.
-                Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: 20}, function (err, data) {
-                    Images = data.i;
-                    pushImages(Images, 10, data.t);
-                    Session.set("images", ImageQueue.heap);
-                })
-
-                writingTagFlag = false;
-            }
-        }
-
-        if (writingTagFlag == false && !spaceRemovedSentence == "") {
+        if (!spaceRemovedSentence == "") {
             // 문장 형태소 분석 후 검색
             Meteor.call('getNounArrayBySentence', sentence, function (error, result) {
                 if (!!error) {
@@ -724,17 +708,15 @@ Template.Home.rendered = function () {
 
                 // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
                 Session.set("mainImage", AllImages[0].thumbnailImageUrl);
+
+                Deps.autorun(function(computation){
+                  if(Session.get('images')){
+                    setJeegleSlider();
+                    computation.stop();
+                  }
+                });
             }
         });
-
-    $('#meteordoctor').click(function () {
-        setJeegleSlider();
-    })
-
-    // Deps.autorun(function(computation){
-    //   if(Session.get('images')){
-    //   }
-    // });
 };
 
 function setJeegleSlider() {
@@ -771,6 +753,8 @@ function setJeegleSlider() {
     $('.image-div').css('width', smallElemsDivLen);
     $('.image-div').css('height', smallElemsDivLen);
 
+    $('#slider').css('top', (slider_options.$CenterLen-smallElemsDivLen)/2)
+
     // slider ul 또한 동일한 height를 주게 됩니다.
     $('#slider').css('height', smallElemsDivLen);
 
@@ -785,8 +769,8 @@ function setJeegleSlider() {
     $('#slider').css('left', leftPosition);
 
     // 버튼 위치 설정
-    $('.control_prev').css('top', (smallElemsDivLen - slider_options.$ArrowHeight) / 2 + "px");
-    $('.control_next').css('top', (smallElemsDivLen - slider_options.$ArrowHeight) / 2 + "px");
+    $('.control_prev').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
+    $('.control_next').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
 
     // 이미지 별 중앙 정렬을 해줍니다.
     var index = 0;

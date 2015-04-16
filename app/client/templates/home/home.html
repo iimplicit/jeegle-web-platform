@@ -121,6 +121,7 @@
                         </div>
 
                         <div class="tag-filter" >
+														<input type="text" id="tag_input"/>
                             <ul id="tagBox" class="tags">
                             </ul>
                             <!--<ul class="list-inline">-->
@@ -244,12 +245,12 @@
                 {{#each images}}
                 <li name="image-div" class="image-div">
                     <img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
-                    <div class="tag-div">
+                    <!-- <div class="tag-div">
                         {{tag.word}}
                     </div>
                     <div class="priority-div">
                         {{priority}}
-                    </div>
+                    </div> -->
                 </li>
                 {{/each}}
           </ul>
@@ -263,8 +264,6 @@
     <!-- 기능 확인을 위한 임시 구현 -->
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <button name="shakeImages">이미지 바꾸기</button>
-            <button name="moveToEditor">다음으로 넘어가기</button>
             <button id="meteordoctor">meteordoctor</button>
         </div>
     </div>
