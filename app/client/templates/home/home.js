@@ -258,15 +258,15 @@ function setJeegleSlider(){
 
     // 여기서부터 지글 슬라이드 코드 입니다.
     var slider_options = {
-        $ArrowWidth: 30,
-        $ArrowHeight: 30,
-        $CenterLen: 640,
-        $NestedWidth: 20,
-        $DisplayPieces: 11 //need to be odd number
+        $ArrowWidth: 30,    // 화살표 너비입니다.
+        $ArrowHeight: 30,   // 화살표 높이입니다.
+        $CenterLen: 640,    // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
+        $NestedWidth: 20,   // 가운데 사진과 겹치는 부분의 px 길이입니다.
+        $DisplayPieces: 11  // 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
     };
 
+    // I said it's odd.
     if(slider_options.$DisplayPieces%2==0){
-      // I said it's odd.
       slider_options.$DisplayPieces = slider_options.$DisplayPieces+1;
     }
 
@@ -275,14 +275,12 @@ function setJeegleSlider(){
     console.log('center:'+centerElem);
 
     // slider의 너비와 높이를 받아옵니다.
-    divWidth = $('#slider_box').width();
-    divHeight = $('#slider_box').height();
+    windowWidth = $('#slider_box').width();
+    windowHeight = slider_options.$CenterLen;
 
-    // 작은 이미지의 전체 길이
-    smallElemsWidth = divWidth - slider_options.$CenterLen;
-
-    // 작은 이미지의 각자 길이 width=height
-    smallElemsDivLen = parseInt(smallElemsWidth/(slider_options.$DisplayPieces-1));
+    // 작은 이미지들 너비 설정
+    smallElemsWholeWidth = windowWidth - slider_options.$CenterLen;                      // 작은 이미지의 전체 길이
+    smallElemsDivLen = parseInt(smallElemsWholeWidth/(slider_options.$DisplayPieces-1)); // 작은 이미지의 각자 길이 width=height
     $('.image-div').css('width', smallElemsDivLen);
     $('.image-div').css('height', smallElemsDivLen);
 
@@ -292,10 +290,11 @@ function setJeegleSlider(){
     // 중앙 엘리먼트 크기 설정
     $('#slider ul li:nth-child('+centerElem+')').css('width', slider_options.$CenterLen);
     $('#slider ul li:nth-child('+centerElem+')').css('height',  slider_options.$CenterLen);
+    $('#slider ul li:nth-child('+centerElem+')').css('bottom',  (slider_options.$CenterLen-smallElemsDivLen)/2);
 
     // 가운데 정렬!
     var slideULWidth = smallElemsDivLen*(MaximumImageNum-1)+slider_options.$CenterLen;
-    var leftPosition = -(slideULWidth-divWidth)/2
+    var leftPosition = -(slideULWidth-windowWidth)/2
     $('#slider').css('left', leftPosition);
 
     // 버튼 위치 설정
@@ -335,6 +334,9 @@ function setJeegleSlider(){
     })
 
     function moveLeft(cen) {
+        var bigToSmall = cen;
+        var smallToBig = cen-1;
+
         $('#slider ul').animate({
             left: + smallElemsDivLen
         }, 200, function () {
@@ -342,44 +344,46 @@ function setJeegleSlider(){
             $('#slider ul').css('left', '');
         });
 
-        $('#slider ul li:nth-child('+(cen)+')').animate({
+        $('#slider ul li:nth-child('+(bigToSmall)+')').animate({
           width: smallElemsDivLen,
-          height: smallElemsDivLen
+          height: smallElemsDivLen,
+          bottom: 0
         }, 200, function(){
         })
 
-        var bigToSmallImg = $('#slider ul li:nth-child('+(cen)+') img');
+        var bigToSmallImg = $('#slider ul li:nth-child('+(bigToSmall)+') img');
         if(bigToSmallImg.width() > bigToSmallImg.height()){
           var smallWidth = bigToSmallImg.width() * (smallElemsDivLen/slider_options.$CenterLen)
-          $('#slider ul li:nth-child('+(cen)+') img').animate({
+          $('#slider ul li:nth-child('+(bigToSmall)+') img').animate({
               left: -(smallWidth-smallElemsDivLen)/2+"px"
             }, 200, function(){
           })
         }else{
           var smallHeight = bigToSmallImg.height() * (smallElemsDivLen/slider_options.$CenterLen)
-          $('#slider ul li:nth-child('+(cen)+') img').animate({
+          $('#slider ul li:nth-child('+(bigToSmall)+') img').animate({
               top: -(smallHeight-smallElemsDivLen)/2+"px"
             }, 200, function(){
           })
         }
 
 
-        $('#slider ul li:nth-child('+(cen-1)+')').animate({
+        $('#slider ul li:nth-child('+(smallToBig)+')').animate({
           width: '640px',
-          height: '640px'
+          height: '640px',
+          bottom: (slider_options.$CenterLen-smallElemsDivLen)/2
         }, 200, function(){
         });
 
-        var smallToBigImg = $('#slider ul li:nth-child('+(cen-1)+') img');
+        var smallToBigImg = $('#slider ul li:nth-child('+(smallToBig)+') img');
         if(smallToBigImg.width() > smallToBigImg.height()){
           var bigWidth = smallToBigImg.width() * (slider_options.$CenterLen/smallElemsDivLen)
-          $('#slider ul li:nth-child('+(cen-1)+') img').animate({
+          $('#slider ul li:nth-child('+(smallToBig)+') img').animate({
               left: -(bigWidth-slider_options.$CenterLen)/2+"px"
             }, 200, function(){
           })
         }else{
           var bigHeight = smallToBigImg.height() * (slider_options.$CenterLen/smallElemsDivLen)
-          $('#slider ul li:nth-child('+(cen-1)+') img').animate({
+          $('#slider ul li:nth-child('+(smallToBig)+') img').animate({
               top: -(bigHeight-slider_options.$CenterLen)/2+"px"
             }, 200, function(){
           })
@@ -397,6 +401,9 @@ function setJeegleSlider(){
     };
 
     function moveRight(cen) {
+        var bigToSmall = cen;
+        var smallToBig = cen+1;
+
         $('#slider ul').animate({
             left: - smallElemsDivLen
         }, 200, function () {
@@ -404,74 +411,68 @@ function setJeegleSlider(){
             $('#slider ul').css('left', '');
         });
 
-        $('#slider ul li:nth-child('+(cen)+')').animate({
+        $('#slider ul li:nth-child('+(bigToSmall)+')').animate({
           width: smallElemsDivLen,
-          height: smallElemsDivLen
+          height: smallElemsDivLen,
+          bottom: 0
         }, 200, function(){
         })
-        var bigToSmallImg = $('#slider ul li:nth-child('+(cen)+') img');
+
+        var bigToSmallImg = $('#slider ul li:nth-child('+(bigToSmall)+') img');
+        console.dir(bigToSmallImg);
+
         if(bigToSmallImg.width() > bigToSmallImg.height()){
           var smallWidth = bigToSmallImg.width() * (smallElemsDivLen/slider_options.$CenterLen)
-          $('#slider ul li:nth-child('+(cen)+') img').animate({
+          $('#slider ul li:nth-child('+(bigToSmall)+') img').animate({
               left: -(smallWidth-smallElemsDivLen)/2+"px"
             }, 200, function(){
           })
         }else{
           var smallHeight = bigToSmallImg.height() * (smallElemsDivLen/slider_options.$CenterLen)
-          $('#slider ul li:nth-child('+(cen)+') img').animate({
+          $('#slider ul li:nth-child('+(bigToSmall)+') img').animate({
               top: -(smallHeight-smallElemsDivLen)/2+"px"
             }, 200, function(){
           })
         }
 
-        $('#slider ul li:nth-child('+(cen+1)+')').animate({
+        $('#slider ul li:nth-child('+(smallToBig)+')').animate({
           width: '640px',
-          height: '640px'
+          height: '640px',
+          bottom: (slider_options.$CenterLen-smallElemsDivLen)/2
         }, 200, function(){
         })
-        var smallToBigImg = $('#slider ul li:nth-child('+(cen-1)+') img');
+
+        var smallToBigImg = $('#slider ul li:nth-child('+(smallToBig)+') img');
+        console.dir(smallToBigImg);
         if(smallToBigImg.width() > smallToBigImg.height()){
           var bigWidth = smallToBigImg.width() * (slider_options.$CenterLen/smallElemsDivLen)
-          $('#slider ul li:nth-child('+(cen+1)+') img').animate({
+          console.log('!!!!!!33');
+          $('#slider ul li:nth-child('+(smallToBig)+') img').animate({
               left: -(bigWidth-slider_options.$CenterLen)/2+"px"
-            }, 200, function(){
+            }, 200, function(e){
           })
         }else{
           var bigHeight = smallToBigImg.height() * (slider_options.$CenterLen/smallElemsDivLen)
-          $('#slider ul li:nth-child('+(cen+1)+') img').animate({
+          console.log(bigHeight);
+          console.log('!!!!!!');
+          $('#slider ul li:nth-child('+(smallToBig)+') img').animate({
               top: -(bigHeight-slider_options.$CenterLen)/2+"px"
-            }, 200, function(){
+            }, 200, function(e){
           })
         }
     };
 
-    $('a.control_prev').click(function () {
-        moveLeft(centerElem);
-    });
+    $('a.control_prev').click(_.debounce(function(e){
+      e.preventDefault();
+      moveLeft(centerElem);
+    },220));
 
-    $('a.control_next').click(function () {
-        moveRight(centerElem);
-    });
+    $('a.control_next').click(_.debounce(function(e){
+      e.preventDefault();
+      moveRight(centerElem);
+    },220));
 }
 
-function imgAlignAniamtion(cen, left, top){
-  var imgWidth = $('#slider ul li:nth-child('+(cen)+') img').width();
-  var imgHeight = $('#slider ul li:nth-child('+(cen)+') img').height();
-
-  if(imgWidth>imgHeight){
-    $('#slider ul li:nth-child('+(cen)+') img').animate({
-      left: left+"px",
-    }, 200, function(){
-      // console.dir(this);
-    })
-  }else{
-    $('#slider ul li:nth-child('+(cen)+') img').animate({
-      top: top+"px",
-    }, 200, function(){
-      // console.dir(this);
-    })
-  }
-}
 
 Template.Home.destroyed = function() {};
 

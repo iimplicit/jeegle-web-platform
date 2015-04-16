@@ -44,20 +44,30 @@
 				</div>
 			</div>
 		</div>
-		<!-- <div class="row">
-			{{#each images}}
-			<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 image-wrapper" data-image-item>
-				<div class="image-item" name="image-item" style="background-image:url(http://128.199.249.209:9990/images/{{data.imagePath}})">
-					<div class="tag-div">
-						{{tag.word}}
-					</div>
-					<div class="priority-div">
-						{{priority}}
-					</div>
-				</div>
+
+		<!--Jeegle image slider start-->
+		<div id="slider_box">
+			<div id="slider">
+			  <ul id="slider_ul">
+					{{#each images}}
+					<li name="image-div" class="image-div">
+						<img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
+						<div class="tag-div">
+							{{tag.word}}
+						</div>
+						<div class="priority-div">
+							{{priority}}
+						</div>
+					</li>
+					{{/each}}
+			  </ul>
 			</div>
-			{{/each}}
-		</div> -->
+
+			<a href="#" class="control_next"></a>
+			<a href="#" class="control_prev"></a>
+		</div>
+		<!--Jeegle image slider end-->
+
 		<!-- 기능 확인을 위한 임시 구현 -->
 		<div class="row">
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -67,20 +77,6 @@
 			</div>
 		</div>
 
-		<div id="slider_box">
-			<div id="slider">
-			  <ul id="slider_ul">
-					{{#each images}}
-					<li data-path="{{data.imagePath}}" name="image-div" class="image-div">
-						<img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
-					</li>
-					{{/each}}
-			  </ul>
-			</div>
-
-			<a href="#" class="control_next"></a>
-			<a href="#" class="control_prev"></a>
-		</div>
 	</div>
 </template>
 
