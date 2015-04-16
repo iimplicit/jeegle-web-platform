@@ -39,14 +39,17 @@ Template.Home.events({
         createTagDiv(tagCounter.getTagCount(), tag)
 
         // Neo4j로 태그 쿼리를 날립니다.
-        console.dir(tag);
-        Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: 20}, function (err, data) {
+        Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: MaximumImageNum-1}, function (err, data) {
+            // 이미지를 받아온겁니다.
             Images = data.i;
-            console.log('about: '+tag);
-            console.dir(Images);
-            console.log('-----------');
-            pushImages(Images, 10, data.t);
-            Session.set("images", ImageQueue.heap);
+            if(Images.length!=0){
+              console.dir(Images);
+              pushImages(Images, 10, data.t); //무슨 태그에 의해 왔는지, 태그에 의해 검색된 것은 몇 점인지
+              console.dir(ImageQueue.heap);
+              Session.set("images", ImageQueue.heap);
+            }else{
+              console.log("결과가 없습니다.");
+            }
         })
       }
     },
@@ -774,11 +777,14 @@ function setJeegleSlider() {
     centralElement.css('bottom', (slider_options.$CenterLen - smallElemsDivLen) / 2);
     centralElement[0].children[0].id = 'main-image';
 
+    // 배경이미지 설정
+    backgroundStyle = "url('"+centralElement[0].children[0].src+"')";
+    $('.bg_body').css('background-image',backgroundStyle);
+
     // 가운데 정렬!
     var slideULWidth = smallElemsDivLen * (MaximumImageNum - 1) + slider_options.$CenterLen;
     var leftPosition = -(slideULWidth - windowWidth) / 2
-    console.log('bb'+leftPosition);
-    $('#slider').css('left', leftPosition);
+     $('#slider').css('left', leftPosition);
 
     // 버튼 위치 설정
     $('a.control_prev').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
@@ -873,6 +879,9 @@ function setJeegleSlider() {
             }, 200, function () {
             })
         }
+        // 배경이미지 설정
+        backgroundStyle = "url('"+smallToBigImg[0].src+"')";
+        $('.bg_body').css('background-image',backgroundStyle);
 
         // 현재 이미지가 width가 큰녀석이면
         // left를 맞춰준다.
@@ -941,6 +950,9 @@ function setJeegleSlider() {
             }, 200, function (e) {
             })
         }
+        // 배경이미지 설정
+        backgroundStyle = "url('"+smallToBigImg[0].src+"')";
+        $('.bg_body').css('background-image',backgroundStyle);
     };
 
     $('a.control_prev').click(_.debounce(function (e) {
