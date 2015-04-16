@@ -28,58 +28,244 @@
 				</header>
 			</div>
 		</div>
-		<div class="row">
-			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
-				<div name="mainImage" class="main-image" style="background-image:url({{ mainImage }})">
-					<section class="content bgcolor-4">
-						<span class="input input--minoru">
-							<input class="input__field input__field--minoru" type="text" id="input-15" />
-							<label class="input__label input__label--minoru" for="input-15">
-								<span class="input__label-content input__label-content--minoru">당신이 원하는 그 어떤 문구라도 입력하세요.</span>
-							</label>
-							<ul id="tagBox" class="tags">
-							</ul>
-						</span>
-					</section>
-				</div>
-			</div>
-		</div>
-
-		<!--Jeegle image slider start-->
-		<div id="slider_box">
-			<div id="slider">
-			  <ul id="slider_ul">
-					{{#each images}}
-					<li name="image-div" class="image-div">
-						<img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
-						<div class="tag-div">
-							{{tag.word}}
-						</div>
-						<div class="priority-div">
-							{{priority}}
-						</div>
-					</li>
-					{{/each}}
-			  </ul>
-			</div>
-
-			<a href="#" class="control_next"></a>
-			<a href="#" class="control_prev"></a>
-		</div>
-		<!--Jeegle image slider end-->
-
-		<!-- 기능 확인을 위한 임시 구현 -->
-		<div class="row">
-			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-				<button name="shakeImages">이미지 바꾸기</button>
-				<button name="moveToEditor">다음으로 넘어가기</button>
-				<button id="meteordoctor">meteordoctor</button>
-			</div>
-		</div>
-
 	</div>
-</template>
 
-<template name="jeegle_slider">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
+			<div class="main-content-wrapper" style="border: 5px solid red; ">
+                <div class="main-content" style="border: 5px solid orange;" data-content>
+                    <div id="input-15" class="main-text" contenteditable="true" style="border: 5px solid green; font-family: Hanna;" data-main-text>
+                        괜찮아 힘을내
+                    </div>
 
+                    <div class="main-image-wrapper">
+                        <img id="main-image" class="main-image" src="test.jpg" alt="" style="border: 5px solid #ffff00; ">
+                    </div>
+
+                </div>
+			</div>
+
+            <!--<button data-rasterize>Rasterize</button>-->
+            <!--<img src="" alt="" data-rendered-image/>-->
+		</div>
+	</div>
+
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="bottom-content-wrapper">
+                <div class="bottom-content" style="border: 5px solid orange;">
+
+                    <div class="font-filters" data-bottom-type="fontFilter">
+                        <div class="font-filter">
+                            <ul class="list-inline">
+                                <li>
+                                    <select name="fontType" data-main-text-typography>
+                                        <option value="Hanna" data-event-change-typography="Hanna" data-font-family="Hanna">한나</option>
+                                        <option value="Jua" data-event-change-typography="Jua" data-font-family="Jua">주아</option>
+                                        <option value="BrushScript" data-event-change-typography="BrushScript" data-font-family="Nanum Brush Script">나눔 브러쉬</option>
+                                        <option value="Gothic" data-event-change-typography="Gothic" data-font-family="Nanum Gothic">나눔 고딕</option>
+                                        <option value="Myeongjo" data-event-change-typography="Myeongjo" data-font-family="Nanum Myeongjo">나눔 명조</option>
+                                        <option value="PenScript" data-event-change-typography="PenScript" data-font-family="Nanum Pen Script">나눔 펜글씨</option>
+                                    </select>
+                                </li>
+
+                                <li>
+                                    <input type="range" class="font-size-filter" data-change-font-size-filter="font-size" value="40" min="22" max="140" step="2" />
+                                </li>
+
+                                <li>
+                                    <div class="btn-group" data-toggle="buttons" data-change-font-types>
+                                        <label class="btn btn-default">
+                                            <input type="checkbox" data-change-font-type="bold" name="data-change-font-type" value="bold">B
+                                        </label>
+
+                                        <label class="btn btn-default">
+                                            <input type="checkbox" data-change-font-type="italic" name="data-change-font-type" value="italic">I
+                                        </label>
+
+                                        <label class="btn btn-default">
+                                            <input type="checkbox" data-change-font-type="shadow" name="data-change-font-type" value="shadow">T
+                                        </label>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="btn-group" data-toggle="buttons" data-change-font-justifys>
+                                        <label class="btn btn-default">
+                                            <input type="radio" data-change-font-justify name="data-change-font-justify" value="left">Left
+                                        </label>
+
+                                        <label class="btn btn-default active">
+                                            <input type="radio" data-change-font-justify name="data-change-font-justify" value="center" checked>Center
+                                        </label>
+
+                                        <label class="btn btn-default">
+                                            <input type="radio" data-change-font-justify name="data-change-font-justify" value="right">Right
+                                        </label>
+                                    </div>
+                                </li>
+
+                                <li>
+                                    <div class="btn-group" data-toggle="buttons" data-change-font-backgrounds>
+                                        <label class="btn btn-default active">
+                                            <input type="radio" data-change-font-background name="data-change-font-background" value="A" checked>A
+                                        </label>
+
+                                        <label class="btn btn-default">
+                                            <input type="radio" data-change-font-background name="data-change-font-background" value="B">B
+                                        </label>
+
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="tag-filter" >
+                            <ul id="tagBox" class="tags">
+                            </ul>
+                            <!--<ul class="list-inline">-->
+                                <!--<li>-->
+                                    <!--<div class="tag-filter-item">-->
+                                    <!--+-->
+                                    <!--</div>-->
+                                <!--</li>-->
+
+                                <!--<li>-->
+                                    <!--<div class="tag-filter-item">-->
+                                    <!--괜찮아-->
+                                    <!--</div>-->
+                                <!--</li>-->
+
+                                <!--<li>-->
+                                    <!--<div class="tag-filter-item">-->
+                                    <!--힘-->
+                                    <!--</div>-->
+                                <!--</li>-->
+                            <!--</ul>-->
+                        </div>
+                    </div>
+
+                    <div class="ImageFilters" data-bottom-type="imageFilter">
+                        <div id="PresetFilters">
+                            <ul class="list-inline">
+                                <li>
+                                    <a data-preset="default">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="vintage">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a data-preset="clarity">
+                                        <img class="preset-thumbnail" src="test.jpg" alt="">
+                                    </a>
+                                </li>
+                            </ul>
+
+                        </div>
+
+                        <div id="SlideFilters" data-event-slide-filter>
+                            <ul class="list-inline slider-list-inline">
+                                <li>
+                                    <img class="slide-thumbnail" src="test.jpg" alt="">
+                                    <input type="range" class="slide-filter" data-filter="brightness" value="100" min="0" max="200" step="1" />
+                                </li>
+
+                                <li>
+                                    <img class="slide-thumbnail" src="test.jpg" alt="">
+                                    <input type="range" class="slide-filter" data-filter="contrast" value="100" min="0" max="200" step="1" />
+                                </li>
+
+                                <li>
+                                    <img class="slide-thumbnail" src="test.jpg" alt="">
+                                    <input type="range" class="slide-filter" data-filter="blur" value="0" min="0" max="10" step="1" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!--Jeegle image slider start-->
+    <div id="slider_box">
+        <div id="slider">
+          <ul id="slider_ul">
+                {{#each images}}
+                <li name="image-div" class="image-div">
+                    <img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
+                    <div class="tag-div">
+                        {{tag.word}}
+                    </div>
+                    <div class="priority-div">
+                        {{priority}}
+                    </div>
+                </li>
+                {{/each}}
+          </ul>
+        </div>
+
+        <a href="#" class="control_next"></a>
+        <a href="#" class="control_prev"></a>
+    </div>
+    <!--Jeegle image slider end-->
+
+    <!-- 기능 확인을 위한 임시 구현 -->
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <button name="shakeImages">이미지 바꾸기</button>
+            <button name="moveToEditor">다음으로 넘어가기</button>
+            <button id="meteordoctor">meteordoctor</button>
+        </div>
+    </div>
 </template>
