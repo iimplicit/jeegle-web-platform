@@ -1,71 +1,89 @@
 <template name="Home">
-<div class="container image-wrapper">
-	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
-			<header class="main-header">
-				<div  class="main-header-left">
-					<a>Jeegle.com</a>
-				</div>
-				<div class="main-header-center">
-				</div>
-				<div class="main-header-right">
-					{{#if currentUser}}
-					<div class="login-wrapper">
-						<p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
+	<div class="container image-wrapper">
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
+				<header class="main-header">
+					<div  class="main-header-left">
+						<a>Jeegle.com</a>
 					</div>
-					{{else}}
-					{{#if logginIn}}
-					<div class="login-wrapper">
-						<a class="login-wrapper">Logging in...</a>
+					<div class="main-header-center">
 					</div>
-					{{else}}
-					<div class="login-wrapper">
-						<a data-login><i class="fa fa-facebook"></i> | Sign in</a>
+					<div class="main-header-right">
+						{{#if currentUser}}
+						<div class="login-wrapper">
+							<p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
+						</div>
+						{{else}}
+						{{#if logginIn}}
+						<div class="login-wrapper">
+							<a class="login-wrapper">Logging in...</a>
+						</div>
+						{{else}}
+						<div class="login-wrapper">
+							<a data-login><i class="fa fa-facebook"></i> | Sign in</a>
+						</div>
+						{{/if}}
+						{{/if}}
 					</div>
-					{{/if}}
-					{{/if}}
-				</div>
-			</header>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
-			<div name="mainImage" class="main-image" style="background-image:url({{ mainImage }})">
-				<section class="content bgcolor-4">
-					<span class="input input--minoru">
-						<input class="input__field input__field--minoru" type="text" id="input-15" />
-						<label class="input__label input__label--minoru" for="input-15">
-							<span class="input__label-content input__label-content--minoru">당신이 원하는 그 어떤 문구라도 입력하세요.</span>
-						</label>
-						<ul id="tagBox" class="tags">
-						</ul>
-					</span>
-				</section>
+				</header>
 			</div>
 		</div>
-	</div>
-	<div class="row">
-		{{#each images}}
-		<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 image-wrapper" data-image-item>
-			<!-- <div class="image-item" name="image-item" style="background-image:url({{ _source.thumbnailImageUrl }})"></div> -->
-			<div class="image-item" name="image-item" style="background-image:url(http://128.199.249.209:9990/images/{{data.imagePath}})">
-				<div class="tag-div">
-					{{tag.word}}
-				</div>
-				<div class="priority-div">
-					{{priority}}
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
+				<div name="mainImage" class="main-image" style="background-image:url({{ mainImage }})">
+					<section class="content bgcolor-4">
+						<span class="input input--minoru">
+							<input class="input__field input__field--minoru" type="text" id="input-15" />
+							<label class="input__label input__label--minoru" for="input-15">
+								<span class="input__label-content input__label-content--minoru">당신이 원하는 그 어떤 문구라도 입력하세요.</span>
+							</label>
+							<ul id="tagBox" class="tags">
+							</ul>
+						</span>
+					</section>
 				</div>
 			</div>
 		</div>
-		{{/each}}
-	</div>
-	<!-- 기능 확인을 위한 임시 구현 -->
-	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<button name="shakeImages">이미지 바꾸기</button>
-			<button name="moveToEditor">다음으로 넘어가기</button>
+		<!-- <div class="row">
+			{{#each images}}
+			<div class="col-xs-4 col-sm-4 col-md-2 col-lg-2 image-wrapper" data-image-item>
+				<div class="image-item" name="image-item" style="background-image:url(http://128.199.249.209:9990/images/{{data.imagePath}})">
+					<div class="tag-div">
+						{{tag.word}}
+					</div>
+					<div class="priority-div">
+						{{priority}}
+					</div>
+				</div>
+			</div>
+			{{/each}}
+		</div> -->
+		<!-- 기능 확인을 위한 임시 구현 -->
+		<div class="row">
+			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+				<button name="shakeImages">이미지 바꾸기</button>
+				<button name="moveToEditor">다음으로 넘어가기</button>
+				<button id="meteordoctor">meteordoctor</button>
+			</div>
+		</div>
 
+		<div id="slider_box">
+			<div id="slider">
+			  <ul id="slider_ul">
+					{{#each images}}
+					<li data-path="{{data.imagePath}}" name="image-div" class="image-div">
+						<img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
+					</li>
+					{{/each}}
+			  </ul>
+			</div>
+
+			<a href="#" class="control_next"></a>
+			<a href="#" class="control_prev"></a>
 		</div>
 	</div>
-</div>
+</template>
+
+<template name="jeegle_slider">
+
 </template>
