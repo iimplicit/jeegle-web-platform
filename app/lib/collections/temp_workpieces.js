@@ -1,6 +1,6 @@
 // Mongo.Collection의 파라미터로 null을 집어넣어 오직 로컬에서만 DB가 생성되도록 합니다.
 // 이 DB는 미티어 startup시마다, 즉 새로고침 시마다 초기화됩니다.
-// 따라서 아래에서 브라우저의 local storage에 해당 정보를 저장해놔서 시작 시 끄집어내도록 합니다. 
+// 따라서 아래에서 브라우저의 local storage에 해당 정보를 저장해놔서 시작 시 끄집어내도록 합니다.
 TempWorkpieces = new Mongo.Collection(null);
 
 if (Meteor.isClient) {
@@ -31,18 +31,18 @@ if (Meteor.isClient) {
     Meteor.startup(function() {
         var userRecord = controller.getUserRecord();
         if (!!userRecord) {
-            console.log('jeegleUserRecord exists');
+            //console.log('jeegleUserRecord exists');
             _.each(userRecord, function(element, index, list) {
                 TempWorkpieces.insert(element, function(err, result) {
                     if (!!err) {
-                        console.log('jeegleUserRecord insert failed: ', err);
+                        //console.log('jeegleUserRecord insert failed: ', err);
                     } else {
-                        console.log('jeegleUserRecord initiated: ');
+                        //console.log('jeegleUserRecord initiated: ');
                     }
                 });
             });
         } else {
-            console.log('jeegleUserRecord does NOT exist');
+            //console.log('jeegleUserRecord does NOT exist');
             controller.setUserRecord([]);
         }
     });
@@ -51,21 +51,21 @@ if (Meteor.isClient) {
     // 즉시 이를 JSON의 형태로 만들어서 브라우저의 local storage에 저장해줍니다.
     TempWorkpieces.find().observe({
         addedAt: function(document, atIndex, before) {
-            console.log('added => ', document, atIndex, before);
+            //console.log('added => ', document, atIndex, before);
             var userRecord = controller.getUserRecord();
             userRecord[atIndex] = document;
             // console.log('json', JSON.stringify(userRecord));
             controller.setUserRecord(userRecord);
         },
         changedAt: function(newDocument, oldDocument, atIndex) {
-            console.log('changed => ', newDocument, oldDocument, atIndex);
+            // console.log('changed => ', newDocument, oldDocument, atIndex);
             var userRecord = controller.getUserRecord();
             userRecord[atIndex] = newDocument;
             // console.log('json', JSON.stringify(userRecord));
             controller.setUserRecord(userRecord);
         },
         removedAt: function(oldDocument, atIndex) {
-            console.log('removed => ', oldDocument, atIndex);
+            // console.log('removed => ', oldDocument, atIndex);
             var userRecord = controller.getUserRecord();
             // splice로 해당 index의 object literal을 삭제합니다.
             userRecord.splice(atIndex, 1);
