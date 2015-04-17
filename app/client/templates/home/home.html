@@ -17,7 +17,7 @@
 								<div id="slider_box" class="slider_box">
 										<ul id="slider">
 													{{#each images}}
-													<li name="image-div" class="image-div">
+													<li name="image-div" data-num="{{index}}" class="image-div">
 															<img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
 															<!-- <div class="tag-div">
 																	{{tag.word}}
@@ -110,30 +110,18 @@
                                 </li>
                             </ul>
                         </div>
-
+												<div class="div-line">
+												</div>
                         <div class="tag-filter" >
-														<input type="text" id="tag_input"/>
-                            <ul id="tagBox" class="tags">
-                            </ul>
-                            <!--<ul class="list-inline">-->
-                                <!--<li>-->
-                                    <!--<div class="tag-filter-item">-->
-                                    <!--+-->
-                                    <!--</div>-->
-                                <!--</li>-->
-
-                                <!--<li>-->
-                                    <!--<div class="tag-filter-item">-->
-                                    <!--괜찮아-->
-                                    <!--</div>-->
-                                <!--</li>-->
-
-                                <!--<li>-->
-                                    <!--<div class="tag-filter-item">-->
-                                    <!--힘-->
-                                    <!--</div>-->
-                                <!--</li>-->
-                            <!--</ul>-->
+														<input type="button" id="tag-toggle-btn" class="tag-btn toggle" value="+"/>
+														<div id="tag-input-box" class="tag-input-box">
+															<div>
+																<input type="text" id="tag-input" class="tag-input"/>
+																<input type="button" id="tag-submit" class="tag-btn submit"/>
+															</div>
+														</div>
+														<ul id="tagBox" class="list-inline">
+														</ul>
                         </div>
                     </div>
 

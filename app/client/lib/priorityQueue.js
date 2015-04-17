@@ -1,7 +1,8 @@
 function Node(data, priority, tag){
-  this.data = data;
-  this.priority = priority;
-  this.tag = tag;
+  this.data = data;             // 이미지 object를 저장합니다.
+  this.priority = priority;     // 이미지의 우선순위 점수를 저장합니다.
+  this.tag = tag;               // 이미지를 검색하게 된 계기(태그)입니다.
+  this.type = 0;                // type => 0:random, 1:tag, 2:sentence
 }
 // What's wrong with you?
 // Node.prototype.getPriority = function(){return this.priority;}
@@ -10,22 +11,46 @@ Node.prototype.toString = function(){return this.priority;}
 priorityQueue = function (maxSize){
   this.heap = [];
   this.maxSize = maxSize;
+  this.proportion = {
+    random:0,
+    tag:0,
+    sentence:0
+  };
 }
 
 // We assume priority == score. it means that data with lower score will pop
 priorityQueue.prototype = {
 
-  push: function(data, priority, tag) {
+  push: function(data, priority, tag, type) {
     if(this.heap.length==this.maxSize){
         // debugger;
         console.log('we are full queue now. pop: '+this.pop());
     };
-    var node = new Node(data, priority, tag); //create node
+
+    if(type==0){
+      this.proportion.random++;
+    }else if(type==1){
+      this.proportion.tag++;
+    }else{
+      this.proportion.sentence++;
+    }
+
+    var node = new Node(data, priority, tag, type); //create node
     var i = this.heap.push(node) //it will return last index of heap
     this.bubble(i-1)
   },
   pop: function() {
-    var topVal = this.heap[0].data;
+    var popNode = this.heap[0];
+    var topVal = popNode.data;
+
+    if(popNode.type==0){
+      this.proportion.random--;
+    }else if(popNode.type==1){
+      this.proportion.tag--;
+    }else{
+      this.proportion.sentence--;
+    }
+
     //we don't need to deal with no data.
     this.heap[0] = this.heap.pop(); //get last value
     this.sink(0);
@@ -65,13 +90,6 @@ priorityQueue.prototype = {
     var temp = this.heap[i];
     this.heap[i] = this.heap[j];
     this.heap[j] = temp;
-
-    /*
-    // swap without temp. But is it efficient enough?
-    this.heap[i] = this.heap[i] + this.heap[j]
-    this.heap[j] = this.heap[i] - this.heap[j]
-    this.heap[i] = this.heap[i] - this.heap[j]
-    */
   },
   higherPriority: function(i, j){
     return this.heap[i].priority <= this.heap[j].priority
