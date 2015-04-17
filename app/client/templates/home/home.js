@@ -2,7 +2,7 @@
 tagCounter = new TagCounter();
 
 // 이미지를 저장하고 있는 우선순위 큐입니다.
-MaximumImageNum = 21; // 홀수개입니다. 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 40개의 이미지
+MaximumImageNum = 21; // 홀수개입니다. 사용자이 입력에 대응하기 위해 기본적으로 우리가 가지고 있어야하는 이미지들
 ImageQueue = new priorityQueue(MaximumImageNum); // 이곳에 현재 뿌려지는 모든 이미지들이 큐처럼 들어간다.
 
 /*****************************************************************************/
@@ -28,6 +28,7 @@ Template.Home.events({
 
         //if tag is not exist, tag will be undefined
         var tag = $('#tag_input').val();
+        $('#tag_input').val('');
 
         // return if there is no tag word
         var spaceRemovedTag = tag.replace(/\s+/g, '');
@@ -38,10 +39,17 @@ Template.Home.events({
         createTagDiv(tagCounter.getTagCount(), tag)
 
         // Neo4j로 태그 쿼리를 날립니다.
-        Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: 20}, function (err, data) {
+        Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: MaximumImageNum-1}, function (err, data) {
+            // 이미지를 받아온겁니다.
             Images = data.i;
-            pushImages(Images, 10, data.t);
-            Session.set("images", ImageQueue.heap);
+            if(Images.length!=0){
+              console.dir(Images);
+              pushImages(Images, 10, data.t); //무슨 태그에 의해 왔는지, 태그에 의해 검색된 것은 몇 점인지
+              console.dir(ImageQueue.heap);
+              Session.set("images", ImageQueue.heap);
+            }else{
+              console.log("결과가 없습니다.");
+            }
         })
       }
     },
@@ -107,13 +115,13 @@ Template.Home.events({
         }
     }, 300),
 
-    "click [name=moveToEditor]": function () {
-        Router.go('editor', {}, {
-            query: {
-                _url: Session.get('mainImage')
-            }
-        });
-    },
+    // "click [name=moveToEditor]": function () {
+    //     Router.go('editor', {}, {
+    //         query: {
+    //             _url: Session.get('mainImage')
+    //         }
+    //     });
+    // },
     "click [data-image-item]": function (e, tmpl) {
         var background = e.target.style.background;
         var url = background.slice(4, background.length - 1);
@@ -177,27 +185,6 @@ Template.Home.events({
         }, function error(err) {
             console.log('rasterization failed: ', err);
         });
-    },
-
-    "click [name=moveToEditor]": function () {
-        Router.go('editor', {}, {
-            query: {
-                _url: Session.get('mainImage')
-            }
-        });
-    },
-    "click [data-image-item]": function (e, tmpl) {
-        var background = e.target.style.background;
-        var url = background.slice(4, background.length - 1);
-
-        TempWorkpieces.update({
-            _id: Session.get("currentId")
-        }, {
-            $set: {
-                updatedAt: new Date,
-                'content.0.url': url
-            }
-        });
     }
 });
 
@@ -209,12 +196,12 @@ Template.Home.helpers({
         console.log('hello images!');
 
         return Session.get("images");
-    },
-    mainImage: function () {
-        return TempWorkpieces.findOne({
-            _id: Session.get("currentId")
-        }).content[0].url;
-    }
+    }// },
+    // mainImage: function () {
+    //     return TempWorkpieces.findOne({
+    //         _id: Session.get("currentId")
+    //     }).content[0].url;
+    // }
 });
 
 /*****************************************************************************/
@@ -694,29 +681,30 @@ Template.Home.rendered = function () {
 
     // 이미지를 Neo4j database에서 받아옵니다.
     Meteor.neo4j.call('setDefaultImages', {
-            NumImages: MaximumImageNum // 최초 뿌려줄 이미지 개수입니다.
-        },
-        function (err, data) {
-            if (err) throw err;
+        NumImages: MaximumImageNum // 최초 뿌려줄 이미지 개수입니다.
+    },
+    function (err, data) {
+        if (err) throw err;
 
-            if (!!data) {
-                AllImages = data.i;
-                // console.log(AllImages);
+        if (!!data) {
+            AllImages = data.i;
+            // console.log(AllImages);
 
-                pushImages(AllImages, 0, data.t);
-                Session.set("images", ImageQueue.heap);
+            pushImages(AllImages, 0, data.t);
+            Session.set("images", ImageQueue.heap);
 
-                // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
-                Session.set("mainImage", AllImages[0].thumbnailImageUrl);
+            // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
+            // Session.set("mainImage", AllImages[0].thumbnailImageUrl);
 
-                Deps.autorun(function(computation){
-                  if(Session.get('images')){
-                    setJeegleSlider();
-                    computation.stop();
-                  }
-                });
-            }
-        });
+            Tracker.afterFlush(function(){
+                  setJeegleSlider();
+            })
+        }
+    });
+    //
+    // $('#meteordoctor').click(function () {
+    //   setJeegleSlider();
+    // })
 };
 
 function setJeegleSlider() {
@@ -759,18 +747,24 @@ function setJeegleSlider() {
     $('#slider').css('height', smallElemsDivLen);
 
     // 중앙 엘리먼트 크기 설정
-    $('#slider ul li:nth-child(' + centerElem + ')').css('width', slider_options.$CenterLen);
-    $('#slider ul li:nth-child(' + centerElem + ')').css('height', slider_options.$CenterLen);
-    $('#slider ul li:nth-child(' + centerElem + ')').css('bottom', (slider_options.$CenterLen - smallElemsDivLen) / 2);
+    var centralElement = $('#slider li:nth-child(' + centerElem + ')');
+    centralElement.css('width', slider_options.$CenterLen);
+    centralElement.css('height', slider_options.$CenterLen);
+    centralElement.css('bottom', (slider_options.$CenterLen - smallElemsDivLen) / 2);
+    centralElement[0].children[0].id = 'main-image';
+
+    // 배경이미지 설정
+    backgroundStyle = "url('"+centralElement[0].children[0].src+"')";
+    $('.bg_body').css('background-image',backgroundStyle);
 
     // 가운데 정렬!
     var slideULWidth = smallElemsDivLen * (MaximumImageNum - 1) + slider_options.$CenterLen;
     var leftPosition = -(slideULWidth - windowWidth) / 2
-    $('#slider').css('left', leftPosition);
+     $('#slider').css('left', leftPosition);
 
     // 버튼 위치 설정
-    $('.control_prev').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
-    $('.control_next').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
+    $('a.control_prev').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
+    $('a.control_next').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
 
     // 이미지 별 중앙 정렬을 해줍니다.
     var index = 0;
@@ -808,63 +802,68 @@ function setJeegleSlider() {
         var bigToSmall = cen;
         var smallToBig = cen - 1;
 
-        $('#slider ul').animate({
-            left: +smallElemsDivLen
+        $('#slider').animate({
+            left: leftPosition+smallElemsDivLen
         }, 200, function () {
-            $('#slider ul li:last-child').prependTo('#slider ul');
-            $('#slider ul').css('left', '');
+            $('#slider li:last-child').prependTo('#slider');
+            $('#slider').css('left', leftPosition);
         });
 
-        $('#slider ul li:nth-child(' + (bigToSmall) + ')').animate({
+        $('#slider li:nth-child(' + (bigToSmall) + ')').animate({
             width: smallElemsDivLen,
             height: smallElemsDivLen,
             bottom: 0
         }, 200, function () {
         })
 
-        var bigToSmallImg = $('#slider ul li:nth-child(' + (bigToSmall) + ') img');
+        var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
+        bigToSmallImg.attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
             var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider_options.$CenterLen)
-            $('#slider ul li:nth-child(' + (bigToSmall) + ') img').animate({
+            $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 left: -(smallWidth - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
             })
         } else {
             var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider_options.$CenterLen)
-            $('#slider ul li:nth-child(' + (bigToSmall) + ') img').animate({
+            $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 top: -(smallHeight - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
             })
         }
 
 
-        $('#slider ul li:nth-child(' + (smallToBig) + ')').animate({
+        $('#slider li:nth-child(' + (smallToBig) + ')').animate({
             width: '640px',
             height: '640px',
             bottom: (slider_options.$CenterLen - smallElemsDivLen) / 2
         }, 200, function () {
         });
 
-        var smallToBigImg = $('#slider ul li:nth-child(' + (smallToBig) + ') img');
+        var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
+        smallToBigImg.attr('id', 'main-image');
         if (smallToBigImg.width() > smallToBigImg.height()) {
             var bigWidth = smallToBigImg.width() * (slider_options.$CenterLen / smallElemsDivLen)
-            $('#slider ul li:nth-child(' + (smallToBig) + ') img').animate({
+            $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
                 left: -(bigWidth - slider_options.$CenterLen) / 2 + "px"
             }, 200, function () {
             })
         } else {
             var bigHeight = smallToBigImg.height() * (slider_options.$CenterLen / smallElemsDivLen)
-            $('#slider ul li:nth-child(' + (smallToBig) + ') img').animate({
+            $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
                 top: -(bigHeight - slider_options.$CenterLen) / 2 + "px"
             }, 200, function () {
             })
         }
+        // 배경이미지 설정
+        backgroundStyle = "url('"+smallToBigImg[0].src+"')";
+        $('.bg_body').css('background-image',backgroundStyle);
 
         // 현재 이미지가 width가 큰녀석이면
         // left를 맞춰준다.
         // 작아지는 이미지는 작았을때의 image width을 알아야하고
         // 커질때 이미지는 커질때 image width를 알아야한다.
-
+        //
         // height가 큰녀석이면
         // top을 맞춰준다.
         // 작아지는 이미지는 작았을때의 image height을 알아야하고
@@ -875,62 +874,61 @@ function setJeegleSlider() {
         var bigToSmall = cen;
         var smallToBig = cen + 1;
 
-        $('#slider ul').animate({
-            left: -smallElemsDivLen
+        $('#slider').animate({
+            left: leftPosition-smallElemsDivLen
         }, 200, function () {
-            $('#slider ul li:first-child').appendTo('#slider ul');
-            $('#slider ul').css('left', '');
+            $('#slider li:first-child').appendTo('#slider');
+            $('#slider').css('left', leftPosition);
         });
 
-        $('#slider ul li:nth-child(' + (bigToSmall) + ')').animate({
+        $('#slider li:nth-child(' + (bigToSmall) + ')').animate({
             width: smallElemsDivLen,
             height: smallElemsDivLen,
             bottom: 0
         }, 200, function () {
         })
 
-        var bigToSmallImg = $('#slider ul li:nth-child(' + (bigToSmall) + ') img');
-        console.dir(bigToSmallImg);
-
+        var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
+        bigToSmallImg.attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
             var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider_options.$CenterLen)
-            $('#slider ul li:nth-child(' + (bigToSmall) + ') img').animate({
+            $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 left: -(smallWidth - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
             })
         } else {
             var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider_options.$CenterLen)
-            $('#slider ul li:nth-child(' + (bigToSmall) + ') img').animate({
+            $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 top: -(smallHeight - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
             })
         }
 
-        $('#slider ul li:nth-child(' + (smallToBig) + ')').animate({
+        $('#slider li:nth-child(' + (smallToBig) + ')').animate({
             width: '640px',
             height: '640px',
             bottom: (slider_options.$CenterLen - smallElemsDivLen) / 2
         }, 200, function () {
         })
 
-        var smallToBigImg = $('#slider ul li:nth-child(' + (smallToBig) + ') img');
-        console.dir(smallToBigImg);
+        var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
+        smallToBigImg.attr('id', 'main-image');
         if (smallToBigImg.width() > smallToBigImg.height()) {
             var bigWidth = smallToBigImg.width() * (slider_options.$CenterLen / smallElemsDivLen)
-            console.log('!!!!!!33');
-            $('#slider ul li:nth-child(' + (smallToBig) + ') img').animate({
+            $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
                 left: -(bigWidth - slider_options.$CenterLen) / 2 + "px"
             }, 200, function (e) {
             })
         } else {
             var bigHeight = smallToBigImg.height() * (slider_options.$CenterLen / smallElemsDivLen)
-            console.log(bigHeight);
-            console.log('!!!!!!');
-            $('#slider ul li:nth-child(' + (smallToBig) + ') img').animate({
+            $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
                 top: -(bigHeight - slider_options.$CenterLen) / 2 + "px"
             }, 200, function (e) {
             })
         }
+        // 배경이미지 설정
+        backgroundStyle = "url('"+smallToBigImg[0].src+"')";
+        $('.bg_body').css('background-image',backgroundStyle);
     };
 
     $('a.control_prev').click(_.debounce(function (e) {

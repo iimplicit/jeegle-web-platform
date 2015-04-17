@@ -17,6 +17,7 @@ priorityQueue.prototype = {
 
   push: function(data, priority, tag) {
     if(this.heap.length==this.maxSize){
+        // debugger;
         console.log('we are full queue now. pop: '+this.pop());
     };
     var node = new Node(data, priority, tag); //create node
