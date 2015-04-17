@@ -115,13 +115,13 @@ Template.Home.events({
         }
     }, 300),
 
-    "click [name=moveToEditor]": function () {
-        Router.go('editor', {}, {
-            query: {
-                _url: Session.get('mainImage')
-            }
-        });
-    },
+    // "click [name=moveToEditor]": function () {
+    //     Router.go('editor', {}, {
+    //         query: {
+    //             _url: Session.get('mainImage')
+    //         }
+    //     });
+    // },
     "click [data-image-item]": function (e, tmpl) {
         var background = e.target.style.background;
         var url = background.slice(4, background.length - 1);
@@ -185,27 +185,6 @@ Template.Home.events({
         }, function error(err) {
             console.log('rasterization failed: ', err);
         });
-    },
-
-    "click [name=moveToEditor]": function () {
-        Router.go('editor', {}, {
-            query: {
-                _url: Session.get('mainImage')
-            }
-        });
-    },
-    "click [data-image-item]": function (e, tmpl) {
-        var background = e.target.style.background;
-        var url = background.slice(4, background.length - 1);
-
-        TempWorkpieces.update({
-            _id: Session.get("currentId")
-        }, {
-            $set: {
-                updatedAt: new Date,
-                'content.0.url': url
-            }
-        });
     }
 });
 
@@ -217,12 +196,12 @@ Template.Home.helpers({
         console.log('hello images!');
 
         return Session.get("images");
-    },
-    mainImage: function () {
-        return TempWorkpieces.findOne({
-            _id: Session.get("currentId")
-        }).content[0].url;
-    }
+    }// },
+    // mainImage: function () {
+    //     return TempWorkpieces.findOne({
+    //         _id: Session.get("currentId")
+    //     }).content[0].url;
+    // }
 });
 
 /*****************************************************************************/
@@ -715,20 +694,17 @@ Template.Home.rendered = function () {
             Session.set("images", ImageQueue.heap);
 
             // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
-            Session.set("mainImage", AllImages[0].thumbnailImageUrl);
+            // Session.set("mainImage", AllImages[0].thumbnailImageUrl);
 
-            // Deps.autorun(function(computation){
-            //   if(Session.get('images')){
-            //     setJeegleSlider();
-            //     computation.stop();
-            //   }
-            // });
+            Tracker.afterFlush(function(){
+                  setJeegleSlider();
+            })
         }
     });
-
-    $('#meteordoctor').click(function () {
-      setJeegleSlider();
-    })
+    //
+    // $('#meteordoctor').click(function () {
+    //   setJeegleSlider();
+    // })
 };
 
 function setJeegleSlider() {
@@ -957,13 +933,11 @@ function setJeegleSlider() {
 
     $('a.control_prev').click(_.debounce(function (e) {
         e.preventDefault();
-        console.log(centerElem);
         moveLeft(centerElem);
     }, 220));
 
     $('a.control_next').click(_.debounce(function (e) {
         e.preventDefault();
-        console.log(centerElem);
         moveRight(centerElem);
     }, 220));
 };
