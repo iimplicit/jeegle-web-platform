@@ -454,6 +454,7 @@ html, body {
 .tags a:hover:before{border-color:transparent #555 transparent transparent;}
 
 #slider_box{
+  display:none;
   width:100%;
   height: 640px; /*It could be changed*/
   position: absolute;

@@ -631,7 +631,7 @@ Template.Home.rendered = function () {
                 sepia: 0 // 0 ~ 100
             },
 
-                $("input[data-filter=brightness]").val(100);
+            $("input[data-filter=brightness]").val(100);
             $("input[data-filter=contrast]").val(100);
             $("input[data-filter=blur]").val(0);
         }
@@ -688,20 +688,20 @@ Template.Home.rendered = function () {
 
         if (!!data) {
             AllImages = data.i;
-            // console.log(AllImages);
+
+            console.dir(AllImages);
+            preload(AllImages);
 
             pushImages(AllImages, 0, data.t);
+
             Session.set("images", ImageQueue.heap);
-
-            // 그중에서 첫번째 이미지를¡ 배경으로 설정합니다.
-            // Session.set("mainImage", AllImages[0].thumbnailImageUrl);
-
+            Tracker.flush();
             Tracker.afterFlush(function(){
                   setJeegleSlider();
             })
         }
     });
-    //
+
     // $('#meteordoctor').click(function () {
     //   setJeegleSlider();
     // })
@@ -712,6 +712,7 @@ function setJeegleSlider() {
     //  slider
     //    slider ul
     //       slider ul li
+    $('.slider_box').css('display','block');
 
     // 여기서부터 지글 슬라이드 코드 입니다.
     var slider_options = {
@@ -767,35 +768,57 @@ function setJeegleSlider() {
     $('a.control_next').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
 
     // 이미지 별 중앙 정렬을 해줍니다.
-    var index = 0;
     slider_images = document.getElementsByName('images_in_belt');
     _.forEach(slider_images, function (img) {
+        if(img.complete){
+          imgWidth = img.width;
+          imgHeight = img.height;
 
-        imgWidth = img.width;
-        imgHeight = img.height;
-        // console.log(img.width);
+          if (imgWidth > imgHeight) {
+              // 가로가 더 긴 경우
+              img.style.height = "100%";
+              img.style.top = 0;
+              if (img.id == 'main-image') {
+                  img.style.left = -(img.width - slider_options.$CenterLen) / 2 + "px";
+              } else {
+                  img.style.left = -(img.width - smallElemsDivLen) / 2 + "px";
+              }
+          } else {
+              // 세로가 더 긴 경우
+              img.style.width = "100%";
+              img.style.left = 0;
+              if (img.id == 'main-image') {
+                  img.style.top = -(img.height - slider_options.$CenterLen) / 2 + "px";
+              } else {
+                  img.style.top = -(img.height - smallElemsDivLen) / 2 + "px";
+              }
+          }
+        }else{
+          img.onload = function (){
+            imgWidth = img.width;
+            imgHeight = img.height;
 
-        if (imgWidth > imgHeight) {
-            // 가로가 더 긴 경우
-            img.style.height = "100%";
-            img.style.top = 0;
-            if (index == centerElem - 1) {
-                img.style.left = -(img.width - slider_options.$CenterLen) / 2 + "px";
+            if (imgWidth > imgHeight) {
+                // 가로가 더 긴 경우
+                img.style.height = "100%";
+                img.style.top = 0;
+                if (img.id == 'main-image') {
+                    img.style.left = -(img.width - slider_options.$CenterLen) / 2 + "px";
+                } else {
+                    img.style.left = -(img.width - smallElemsDivLen) / 2 + "px";
+                }
             } else {
-                img.style.left = -(img.width - smallElemsDivLen) / 2 + "px";
+                // 세로가 더 긴 경우
+                img.style.width = "100%";
+                img.style.left = 0;
+                if (img.id == 'main-image') {
+                    img.style.top = -(img.height - slider_options.$CenterLen) / 2 + "px";
+                } else {
+                    img.style.top = -(img.height - smallElemsDivLen) / 2 + "px";
+                }
             }
-        } else {
-            // 세로가 더 긴 경우
-            img.style.width = "100%";
-            img.style.left = 0;
-            if (index == centerElem - 1) {
-                img.style.top = -(img.height - slider_options.$CenterLen) / 2 + "px";
-            } else {
-                img.style.top = -(img.height - smallElemsDivLen) / 2 + "px";
-            }
+          }
         }
-
-        index++;
     })
 
     function moveLeft(cen) {
@@ -990,6 +1013,8 @@ function TagCounter() {
 }
 
 function pushImages(Images, priority, tag) {
+    var ImageArray = new Array();
+
     for (k = 0; k < Images.length; k++) {
         var duplicatedFlag = false;
         for (j = 0; j < ImageQueue.heap.length; j++) {
@@ -1000,6 +1025,15 @@ function pushImages(Images, priority, tag) {
             }
         }
         if (duplicatedFlag) continue;
+
         ImageQueue.push(Images[k], priority, tag[k]);
     }
+}
+
+function preload(Images){
+  images = new Array();
+  for(var i=0;i<Images.length;i++){
+    images[i] = new Image();
+    images[i].src='http://128.199.249.209:9990/images/'+Images[i].imagePath;
+  }
 }
