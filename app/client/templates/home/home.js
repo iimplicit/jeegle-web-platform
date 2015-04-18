@@ -1,8 +1,7 @@
 slider_options = {
-    $ArrowWidth: 30,    // 화살표 너비입니다.
     $ArrowHeight: 30,   // 화살표 높이입니다.
     $CenterLen: 640,    // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
-    $NestedWidth: 20,   // 가운데 사진과 겹치는 부분의 px 길이입니다.
+    // $NestedWidth: 20,   // 가운데 사진과 겹치는 부분의 px 길이입니다.
     $DisplayPieces: 21,  // 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
     $smallElemsDivLen: 0
 };
@@ -70,8 +69,18 @@ Template.Home.events({
 
             pushImages(Images, tagCounter.getTagCount(), data.t, 1); //무슨 태그에 의해 왔는지, 태그에 의해 검색된 것은 몇 점인지
 
-            // 다시 바꿔주자.
-            ImageQueue.heap[CenterImageNum] = ImageNode;
+            restoreCenterImage(1);
+            // ImageQueue.proportion.tag--;
+            //
+            // // 다시 바꿔주자.
+            // if(CenterImageNode.type==0){
+            //   ImageQueue.proportion.random++;
+            // }else if(CenterImageNode.type==1){
+            //   ImageQueue.proportion.tag++;
+            // }else{
+            //   ImageQueue.proportion.sentence++;
+            // }
+            // ImageQueue.heap[CenterImageNum] = CenterImageNode;
 
             Session.set("images", ImageQueue.heap);
             Tracker.flush();
@@ -137,8 +146,9 @@ Template.Home.events({
                                 console.log(Images.length+'개의 결과를 가져왔습니다.')
                                 pushImages(Images, result.length /*나중에 Image 점수로 바꿔야해*/ , data.t, 2);
 
+                                restoreCenterImage(2);
                                 // 다시 바꿔주자.
-                                ImageQueue.heap[CenterImageNum] = ImageNode;
+                                // ImageQueue.heap[CenterImageNum] = CenterImageNode;
 
                                 Session.set("images", ImageQueue.heap);
                                 Tracker.flush();
@@ -737,7 +747,7 @@ Template.Home.rendered = function () {
 
             // 가운데 이미지 번호를 가지고 있습니다.
             CenterImageNum = parseInt(MaximumImageNum/2);
-            ImageNode = ImageQueue.heap[CenterImageNum];
+            CenterImageNode = ImageQueue.heap[CenterImageNum];
             console.dir(ImageQueue.heap[CenterImageNum]);
 
             Session.set("images", ImageQueue.heap);
@@ -865,7 +875,7 @@ function setJeegleSlider() {
 
         // 가운데 이미지 번호를 가지고 있습니다.
         CenterImageNum = smallToBigLi.attr('data-num'); //this image number
-        ImageNode = ImageQueue.heap[CenterImageNum];
+        CenterImageNode = ImageQueue.heap[CenterImageNum];
         console.log(CenterImageNum);
 
         // 배경이미지 설정
@@ -927,7 +937,7 @@ function setJeegleSlider() {
         })
         // 가운데 이미지 번호를 가지고 있습니다.
         CenterImageNum = smallToBigLi.attr('data-num'); //this image number
-        ImageNode = ImageQueue.heap[CenterImageNum];
+        CenterImageNode = ImageQueue.heap[CenterImageNum];
         console.log('center: '+CenterImageNum);
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
@@ -1069,4 +1079,25 @@ function TagCounter() {
     this.getTagCount = function () {
         return cnt;
     }
+}
+
+
+function restoreCenterImage(ImageNode, type){
+  if(type==0){
+    ImageQueue.proportion.random--;
+  }else if(type==1){
+    ImageQueue.proportion.tag--;
+  }else{
+    ImageQueue.proportion.sentence--;
+  }
+
+  if(CenterImageNode.type==0){
+    ImageQueue.proportion.random++;
+  }else if(CenterImageNode.type==1){
+    ImageQueue.proportion.tag++;
+  }else{
+    ImageQueue.proportion.sentence++;
+  }
+
+  ImageQueue.heap[CenterImageNum] = ImageNode;
 }

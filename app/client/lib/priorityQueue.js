@@ -11,6 +11,11 @@ Node.prototype.toString = function(){return this.priority;}
 priorityQueue = function (maxSize){
   this.heap = [];
   this.maxSize = maxSize;
+  // 총 사이즈는 maxSize이고,
+  // 그 중에서 random한 사진은 몇개이고,
+  // tag에 의한 사진은 몇개 이고,
+  // 문장에 의한 사진은 몇개인지 저장하고 있는다.
+  // 이 세가지의 합은 maxSize를 넘을 수 없다.
   this.proportion = {
     random:0,
     tag:0,
