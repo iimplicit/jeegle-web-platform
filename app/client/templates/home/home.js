@@ -1,18 +1,19 @@
-slider_options = {
+slider = {
     $ArrowHeight: 30,   // 화살표 높이입니다.
     $CenterLen: 640,    // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
-    // $NestedWidth: 20,   // 가운데 사진과 겹치는 부분의 px 길이입니다.
-    $DisplayPieces: 21,  // 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
-    $smallElemsDivLen: 0
+    $DisplayPieces: 21,  // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
+    $MaximumImageNum: 41, // [홀수] 로드하는 최대 이미지 개수입니다.
+    $CenterImageNode: null, // 중앙 이미지 노드입니다.
+    $CenterImageNum: 0, // 현재 중앙 이미지 번호입니다.
+    $smallElemsDivLen: 0, //이미지 하나당 너비입니다.
+    $currentKeyword: []
 };
 
 // Tag 개수를 increase, decrease, get 하는 함수 객체입니다.
 tagCounter = new TagCounter();
 
 // 이미지를 저장하고 있는 우선순위 큐입니다.
-MaximumImageNum = 21; //hunjae: setting으로 뺄것인가.
-ImageQueue = new priorityQueue(MaximumImageNum);
-CenterImageNum = 0;
+ImageQueue = new priorityQueue(slider.$MaximumImageNum);
 
 /*****************************************************************************/
 /* Home: Event Handlers */
@@ -44,53 +45,23 @@ Template.Home.events({
     "click #tag-submit": function(e, tmpl){
       //if tag is not exist, tag will be undefined
       var inputBox = $('#tag-input');
-      var tag = inputBox.val();
+      var tagWord = inputBox.val();
       inputBox.val('');
 
       // return if there is no tag word
-      var spaceRemovedTag = tag.replace(/\s+/g, '');
+      var spaceRemovedTag = tagWord.replace(/\s+/g, '');
       if (spaceRemovedTag == "") return;
 
       // create tag div and delete
       tagCounter.incTagCount();
-      createTagDiv(tagCounter.getTagCount(), tag)
+      createTagDiv(tagCounter.getTagCount(), tagWord)
 
       // 현재 태그 개수에 따라서 받아와야 할 이미지 개수를 조절합니다.
-      var howManyNodes = ImageQueue.maxSize - ImageQueue.proportion.sentence;
-      var NodesNum = parseInt(howManyNodes/tagCounter.getTagCount()) || 1;
+      // var howManyNodes = ImageQueue.maxSize - ImageQueue.proportion.sentence;
+      // var NodesLimit = parseInt(howManyNodes/tagCounter.getTagCount()) || 1;
+      var NodesLimit = parseInt(slider.$MaximumImageNum/2)
 
-      // Neo4j로 태그 쿼리를 날립니다.
-      Meteor.neo4j.call('searchImagesForTag', {tagWord: tag, edgeScope: 3, NodesLimit: NodesNum}, function (err, data) {
-          // 이미지를 받아온겁니다.
-          Images = data.i;
-          if(Images.length!=0){
-            console.dir(Images);
-            console.log(Images.length+'개의 결과를 가져왔습니다.')
-
-            pushImages(Images, tagCounter.getTagCount(), data.t, 1); //무슨 태그에 의해 왔는지, 태그에 의해 검색된 것은 몇 점인지
-
-            restoreCenterImage(1);
-            // ImageQueue.proportion.tag--;
-            //
-            // // 다시 바꿔주자.
-            // if(CenterImageNode.type==0){
-            //   ImageQueue.proportion.random++;
-            // }else if(CenterImageNode.type==1){
-            //   ImageQueue.proportion.tag++;
-            // }else{
-            //   ImageQueue.proportion.sentence++;
-            // }
-            // ImageQueue.heap[CenterImageNum] = CenterImageNode;
-
-            Session.set("images", ImageQueue.heap);
-            Tracker.flush();
-            Tracker.afterFlush(function(){
-                  setImagePosition(slider_options);
-            })
-          }else{
-            console.log("결과가 없습니다.");
-          }
-      })
+      getImagesForTag(tagWord, 3, NodesLimit, 1);
     },
     "keypress #tag-input": function(e, tmpl){
       if(e.which == 13){
@@ -119,9 +90,11 @@ Template.Home.events({
                     // 이 중에서 어떤 태그가 중요한지는 Neo4j만이 알고 있다.
                     console.log("형태소 분석 결과: ")
                     console.dir(result);
+                    slider.$currentKeyword = result;
 
                     // 키워드 당 대충 이 정도..
-                    howManyEach = parseInt(MaximumImageNum / result.length);
+                    var NodesLimit = parseInt(slider.$MaximumImageNum / result.length) || 1;
+                    console.log('각 키워드 별로 ' + NodesLimit + '개를 가져오자.');
 
                     // 키워드 별로 이미지를 찾아오자!
                     for (i = 0; i < result.length; i++) {
@@ -132,44 +105,35 @@ Template.Home.events({
                         // 태그와 직접 연결된 이미지는 필수적으로 가져오고, 연관 이미지는 최대 3개 노드 이상을 넘지 않습니다.
                         // 다만 순서는 첫번째로 연결 노드 개수 낮은것들 우선, 그 중에서는 weight 점수 높은 녀석들 우선,
                         // 그 다음부터는 edge weight 합으로 정렬합니다.
-                        Meteor.neo4j.call('searchImagesForTag', {tagWord: result[i], edgeScope: 3, NodesLimit: howManyEach}, function (err, data) {
-                            // callCnt++;
-                            Images = data.i;
-                            if (Images.length == 0) return; //no image
-
-                            if (result.indexOf(data.t[0].word) == -1) {
-                                // 만약 현재 구해야하는 result가 아닌 결과를 받아왔으면 과감하게 빠이를 외치자.
-                                // 넌 늦었어.
-                                return;
-                            } else {
-                                // 이들은 모두 현재 구해야하는 result들이다.
-                                console.log(Images.length+'개의 결과를 가져왔습니다.')
-                                pushImages(Images, result.length /*나중에 Image 점수로 바꿔야해*/ , data.t, 2);
-
-                                restoreCenterImage(2);
-                                // 다시 바꿔주자.
-                                // ImageQueue.heap[CenterImageNum] = CenterImageNode;
-
-                                Session.set("images", ImageQueue.heap);
-                                Tracker.flush();
-                                Tracker.afterFlush(function(){
-                                      setImagePosition(slider_options);
-                                })
-                            }
-                        })
+                        getImagesForTag(result[i], 3, NodesLimit, 2);
+                        // Meteor.neo4j.call('getImagesForTag', {tagWord: result[i], edgeScope: 3, NodesLimit: NodesLimit}, function (err, data) {
+                        //     // callCnt++;
+                        //     Images = data.i;
+                        //     if (Images.length == 0) return; //no image
+                        //
+                        //     if (result.indexOf(data.t[0].word) == -1) {
+                        //         // 만약 현재 구해야하는 result가 아닌 결과를 받아왔으면 과감하게 빠이를 외치자.
+                        //         // 넌 늦었어.
+                        //         return;
+                        //     } else {
+                        //         // 이들은 모두 현재 구해야하는 result들이다.
+                        //         console.log(Images.length+'개의 결과를 가져왔습니다.')
+                        //         pushImages(Images, result.length /*나중에 Image 점수로 바꿔야해*/ , data.t, 2);
+                        //
+                        //         restoreCenterImage(2);
+                        //
+                        //         Session.set("images", ImageQueue.heap);
+                        //         Tracker.flush();
+                        //         Tracker.afterFlush(function(){
+                        //               setImagePosition(slider);
+                        //         })
+                        //     }
+                        // })
                     }
                 }
             });
         }
     }, 300),
-
-    // "click [name=moveToEditor]": function () {
-    //     Router.go('editor', {}, {
-    //         query: {
-    //             _url: Session.get('mainImage')
-    //         }
-    //     });
-    // },
     "click [data-image-item]": function (e, tmpl) {
         var background = e.target.style.background;
         var url = background.slice(4, background.length - 1);
@@ -191,10 +155,11 @@ Template.Home.events({
 Template.Home.helpers({
     images: function () {
         var tempObject = Session.get("images");
-        for(var i=0;i<tempObject.length;i++){
-          tempObject[i].index = i;
+        if(!!tempObject){
+          for(var i=0;i<tempObject.length;i++){
+            tempObject[i].index = i;
+          }
         }
-
         return tempObject;
     }// },
     // mainImage: function () {
@@ -657,7 +622,6 @@ Template.Home.rendered = function () {
     /*****************************************************************************/
     /* Hunjae
      /*****************************************************************************/
-
     $('#tagBox').on('click', '[data-tag]', function (e) {
         console.log('해당 tag를 삭제합니다.');
 
@@ -675,48 +639,86 @@ Template.Home.rendered = function () {
         console.log(tagCounter.getTagCount())
 
         // reload images (delete selected images)
+        getRandomImages(parseInt(slider.$MaximumImageNum/4));
     });
 
     // Auto focus when page is loaded
     $('#input-15').focus();
-    //
-    // document.onkeypress = function(e) {
-    //   // Auto focus when keyboard is pressed (except when login)
-    //   $('#input-15').focus();
-    //
-    //   if (e.keyCode == 13) {
-    //     // Enter key event
-    //   }
-    // };
 
-    // 이미지를 Neo4j database에서 받아옵니다.
-    Meteor.neo4j.call('setDefaultImages', {
-        NumImages: MaximumImageNum // 최초 뿌려줄 이미지 개수입니다.
+    // 이미지를 Neo4j database에서 받아옵니다. 최초의 중앙 이미지 번호를 저장합니다.
+    getRandomImages(slider.$MaximumImageNum);
+};
+
+function getImagesForTag(tagWord, edgeScope, NodesLimit, type){
+  // Neo4j로 태그 쿼리를 날립니다.
+  console.log(tagWord);
+
+  Meteor.neo4j.call('getImagesForTag', {
+      tagWord: tagWord,
+      edgeScope: edgeScope,
+      NodesLimit: NodesLimit
     },
     function (err, data) {
-        if (err) throw err;
+      if(err) throw err;
 
-        if (!!data) {
-            AllImages = data.i;
+      if(data.i.length!=0){
+        // sentence 쿼리 결과가 너무 늦은 경우
+        console.log('hellp');
+        console.dir(data.i);
+        console.log('I found it for '+data.t[0].word)
 
-            console.dir('Random한 이미지로 가져왔습니다.');
-            console.dir(AllImages);
-
-            pushImages(AllImages, 0, data.t, 0);
-
-            // 가운데 이미지 번호를 가지고 있습니다.
-            CenterImageNum = parseInt(MaximumImageNum/2);
-            CenterImageNode = ImageQueue.heap[CenterImageNum];
-            console.dir(ImageQueue.heap[CenterImageNum]);
-
-            Session.set("images", ImageQueue.heap);
-            Tracker.flush();
-            Tracker.afterFlush(function(){
-                  setJeegleSlider();
-            })
+        if (type==2 /*sentence*/ && slider.$currentKeyword.indexOf(data.t[0].word) == -1) {
+            return;
         }
-    });
-};
+
+        Images = data.i;
+
+        pushImages(Images, 0, data.t, type); //무슨 태그에 의해 왔는지, 태그에 의해 검색된 것은 몇 점인지
+
+        restoreCenterImage(type);
+
+        Session.set("images", ImageQueue.heap);
+        Tracker.flush();
+        Tracker.afterFlush(function(){
+              setImagePosition(slider);
+        })
+      }else{
+        console.log("결과가 없습니다.");
+      }
+  })
+}
+
+function getRandomImages(NumOfImages){
+  // 이미지를 Neo4j database에서 받아옵니다.
+  Meteor.neo4j.call('getRandomImages', {
+      NumImages: NumOfImages
+  },
+  function (err, data) {
+      if (err) throw err;
+
+      if (data.i.length!=0) {
+        Images = data.i;
+
+        // console.log(Images.length+'개의 랜덤 이미지를 가져왔습니다.');
+        pushImages(Images, 0 /*priority*/, data.t, 0 /*type:random*/);
+
+        if(NumOfImages==slider.$MaximumImageNum){
+          slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum]; //전부 다 바꾸는 경우
+        }else{
+          restoreCenterImage(0 /*type: random*/);
+        }
+
+        // 세션에 새롭게 생성된 이미지 큐를 넣어줍니다.
+        Session.set("images", ImageQueue.heap);
+        Tracker.flush();
+        Tracker.afterFlush(function(){
+          setJeegleSlider();
+        })
+      }else{
+        console.log("결과가 없습니다.");
+      }
+  });
+}
 
 function setJeegleSlider() {
     // slider_box
@@ -726,36 +728,37 @@ function setJeegleSlider() {
     $('.slider_box').css('display','block');
 
     // I said it's odd.
-    if (slider_options.$DisplayPieces % 2 == 0) {
-        slider_options.$DisplayPieces = slider_options.$DisplayPieces + 1;
-    }
-
     //(ex) 21개면 centerElem은 11
-    centerElem = parseInt(MaximumImageNum / 2) + 1;
-    console.log('center:' + centerElem);
+    centerElem = parseInt(slider.$MaximumImageNum / 2) + 1;
+    slider.$CenterImageNum = centerElem;
+    // console.log('center:' + centerElem);
 
     // slider의 너비와 높이를 받아옵니다.
     windowWidth = $('#slider_box').width();
-    windowHeight = slider_options.$CenterLen;
+    windowHeight = slider.$CenterLen;
 
     // 작은 이미지들 너비 설정
-    smallElemsWholeWidth = windowWidth - slider_options.$CenterLen;                      // 작은 이미지의 전체 길이
-    smallElemsDivLen = parseInt(smallElemsWholeWidth / (slider_options.$DisplayPieces - 1)); // 작은 이미지의 각자 길이 width=height
-    slider_options.$smallElemsDivLen = smallElemsDivLen;
+    smallElemsWholeWidth = windowWidth - slider.$CenterLen;                      // 작은 이미지의 전체 길이
+    smallElemsDivLen = parseInt(smallElemsWholeWidth / (slider.$DisplayPieces - 1)); // 작은 이미지의 각자 길이 width=height
+    slider.$smallElemsDivLen = smallElemsDivLen;
+
+    // slider 너비 조절
+    var sliderWidth = smallElemsDivLen*(slider.$MaximumImageNum-1)+slider.$CenterLen;
+    $('#slider').css('width', sliderWidth)
 
     $('.image-div').css('width', smallElemsDivLen);
     $('.image-div').css('height', smallElemsDivLen);
 
-    $('#slider').css('top', (slider_options.$CenterLen-smallElemsDivLen)/2)
+    $('#slider').css('top', (slider.$CenterLen-smallElemsDivLen)/2)
 
     // slider ul 또한 동일한 height를 주게 됩니다.
     $('#slider').css('height', smallElemsDivLen);
 
     // 중앙 엘리먼트 크기 설정
     var centralElement = $('#slider li:nth-child(' + centerElem + ')');
-    centralElement.css('width', slider_options.$CenterLen);
-    centralElement.css('height', slider_options.$CenterLen);
-    centralElement.css('bottom', (slider_options.$CenterLen - smallElemsDivLen) / 2);
+    centralElement.css('width', slider.$CenterLen);
+    centralElement.css('height', slider.$CenterLen);
+    centralElement.css('bottom', (slider.$CenterLen - smallElemsDivLen) / 2);
     centralElement[0].children[0].id = 'main-image';
 
     // 배경이미지 설정
@@ -763,15 +766,15 @@ function setJeegleSlider() {
     $('.bg_body').css('background-image',backgroundStyle);
 
     // 가운데 정렬!
-    var slideULWidth = smallElemsDivLen * (MaximumImageNum - 1) + slider_options.$CenterLen;
-    var leftPosition = -(slideULWidth - windowWidth) / 2
+    var leftPosition = -(sliderWidth - windowWidth) / 2
      $('#slider').css('left', leftPosition);
+     $('#slider').css('width', sliderWidth+200); // This is margin for image load duration
 
     // 버튼 위치 설정
-    $('a.control_prev').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
-    $('a.control_next').css('top', (slider_options.$CenterLen - slider_options.$ArrowHeight) / 2 + "px");
+    $('a.control_prev').css('top', (slider.$CenterLen - slider.$ArrowHeight) / 2 + "px");
+    $('a.control_next').css('top', (slider.$CenterLen - slider.$ArrowHeight) / 2 + "px");
 
-    setImagePosition(slider_options);
+    setImagePosition(slider);
 
     function moveLeft(cen) {
         var bigToSmall = cen;
@@ -795,13 +798,13 @@ function setJeegleSlider() {
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
-            var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider_options.$CenterLen)
+            var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 left: -(smallWidth - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
             })
         } else {
-            var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider_options.$CenterLen)
+            var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 top: -(smallHeight - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
@@ -812,44 +815,34 @@ function setJeegleSlider() {
         smallToBigLi.animate({
             width: '640px',
             height: '640px',
-            bottom: (slider_options.$CenterLen - smallElemsDivLen) / 2
+            bottom: (slider.$CenterLen - smallElemsDivLen) / 2
         }, 200, function () {
         });
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
         if (smallToBigImg.width() > smallToBigImg.height()) {
-            var bigWidth = smallToBigImg.width() * (slider_options.$CenterLen / smallElemsDivLen)
+            var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                left: -(bigWidth - slider_options.$CenterLen) / 2 + "px"
+                left: -(bigWidth - slider.$CenterLen) / 2 + "px"
             }, 200, function () {
             })
         } else {
-            var bigHeight = smallToBigImg.height() * (slider_options.$CenterLen / smallElemsDivLen)
+            var bigHeight = smallToBigImg.height() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                top: -(bigHeight - slider_options.$CenterLen) / 2 + "px"
+                top: -(bigHeight - slider.$CenterLen) / 2 + "px"
             }, 200, function () {
             })
         }
 
         // 가운데 이미지 번호를 가지고 있습니다.
-        CenterImageNum = smallToBigLi.attr('data-num'); //this image number
-        CenterImageNode = ImageQueue.heap[CenterImageNum];
-        console.log(CenterImageNum);
+        slider.$CenterImageNum = smallToBigLi.attr('data-num'); //this image number
+        slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum];
+        console.log(slider.$CenterImageNum);
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
         $('.bg_body').css('background-image',backgroundStyle);
-
-        // 현재 이미지가 width가 큰녀석이면
-        // left를 맞춰준다.
-        // 작아지는 이미지는 작았을때의 image width을 알아야하고
-        // 커질때 이미지는 커질때 image width를 알아야한다.
-        //
-        // height가 큰녀석이면
-        // top을 맞춰준다.
-        // 작아지는 이미지는 작았을때의 image height을 알아야하고
-        // 커질때 이미지는 커질때 image height를 알아야한다.
     };
 
     function moveRight(cen) {
@@ -874,13 +867,13 @@ function setJeegleSlider() {
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
-            var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider_options.$CenterLen)
+            var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 left: -(smallWidth - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
             })
         } else {
-            var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider_options.$CenterLen)
+            var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
                 top: -(smallHeight - smallElemsDivLen) / 2 + "px"
             }, 200, function () {
@@ -891,36 +884,36 @@ function setJeegleSlider() {
         smallToBigLi.animate({
             width: '640px',
             height: '640px',
-            bottom: (slider_options.$CenterLen - smallElemsDivLen) / 2
+            bottom: (slider.$CenterLen - smallElemsDivLen) / 2
         }, 200, function () {
         })
         // 가운데 이미지 번호를 가지고 있습니다.
-        CenterImageNum = smallToBigLi.attr('data-num'); //this image number
-        CenterImageNode = ImageQueue.heap[CenterImageNum];
-        console.log('center: '+CenterImageNum);
+        slider.$CenterImageNum = smallToBigLi.attr('data-num'); //this image number
+        slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum];
+        console.log('center: '+slider.$CenterImageNum);
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
         if (smallToBigImg.width() > smallToBigImg.height()) {
-            var bigWidth = smallToBigImg.width() * (slider_options.$CenterLen / smallElemsDivLen)
+            var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                left: -(bigWidth - slider_options.$CenterLen) / 2 + "px"
+                left: -(bigWidth - slider.$CenterLen) / 2 + "px"
             }, 200, function (e) {
             })
         } else {
-            var bigHeight = smallToBigImg.height() * (slider_options.$CenterLen / smallElemsDivLen)
+            var bigHeight = smallToBigImg.height() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                top: -(bigHeight - slider_options.$CenterLen) / 2 + "px"
+                top: -(bigHeight - slider.$CenterLen) / 2 + "px"
             }, 200, function (e) {
             })
         }
-
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
         $('.bg_body').css('background-image',backgroundStyle);
     };
 
+    // hunjae: 왜 클릭이벤트 여러번 안먹지?
     $('a.control_prev').click(_.debounce(function (e) {
         e.preventDefault();
         moveLeft(centerElem);
@@ -932,7 +925,7 @@ function setJeegleSlider() {
     }, 220));
 };
 
-function setImagePosition(slider_options){
+function setImagePosition(slider){
   var slider_images = document.getElementsByName('images_in_belt');
 
   _.forEach(slider_images, function (img) {
@@ -957,18 +950,22 @@ function setImagePosition(slider_options){
         img.style.height = "100%";
         img.style.top = 0;
         if (img.id == 'main-image') {
-            img.style.left = -(img.width - slider_options.$CenterLen) / 2 + "px";
+            img.style.left = -(img.width - slider.$CenterLen) / 2 + "px";
         } else {
-            img.style.left = -(img.width - slider_options.$smallElemsDivLen) / 2 + "px";
+          // console.log(img.complete);
+          // console.log(img.width);
+          // console.log(-(img.width - slider.$smallElemsDivLen) / 2);
+          // console.log(img.style.left);
+          img.style.left = -(img.width - slider.$smallElemsDivLen) / 2 + "px";
         }
     } else {
         // 세로가 더 긴 경우
         img.style.width = "100%";
         img.style.left = 0;
         if (img.id == 'main-image') {
-            img.style.top = -(img.height - slider_options.$CenterLen) / 2 + "px";
+            img.style.top = -(img.height - slider.$CenterLen) / 2 + "px";
         } else {
-            img.style.top = -(img.height - slider_options.$smallElemsDivLen) / 2 + "px";
+            img.style.top = -(img.height - slider.$smallElemsDivLen) / 2 + "px";
         }
     }
   }
@@ -1011,6 +1008,11 @@ function createTagDiv(tagNum, tagWord) {
 function pushImages(Images, priority, tag, type) {
     var ImageArray = new Array();
 
+    console.log('before:')
+    console.dir(ImageQueue.heap)
+    if(ImageQueue.isFull()){
+      ImageQueue.decAllPriority();
+    }
     for (k = 0; k < Images.length; k++) {
         var duplicatedFlag = false;
         for (j = 0; j < ImageQueue.heap.length; j++) {
@@ -1024,6 +1026,8 @@ function pushImages(Images, priority, tag, type) {
 
         ImageQueue.push(Images[k], priority, tag[k], type);
     }
+    console.log('after:')
+    console.dir(ImageQueue.heap)
 }
 
 // 사용자가 #태그를 다는 개수를 셉니다.
@@ -1041,7 +1045,7 @@ function TagCounter() {
 }
 
 
-function restoreCenterImage(ImageNode, type){
+function restoreCenterImage(type){
   if(type==0){
     ImageQueue.proportion.random--;
   }else if(type==1){
@@ -1050,13 +1054,17 @@ function restoreCenterImage(ImageNode, type){
     ImageQueue.proportion.sentence--;
   }
 
-  if(CenterImageNode.type==0){
+  if(slider.$CenterImageNode.type==0){
     ImageQueue.proportion.random++;
-  }else if(CenterImageNode.type==1){
+  }else if(slider.$CenterImageNode.type==1){
     ImageQueue.proportion.tag++;
   }else{
     ImageQueue.proportion.sentence++;
   }
 
-  ImageQueue.heap[CenterImageNum] = ImageNode;
+  console.dir(slider.$CenterImageNode);
+  console.dir(slider.$CenterImageNum);
+  if(slider.$CenterImageNode!=null){
+    ImageQueue.heap[slider.$CenterImageNum] = slider.$CenterImageNode;
+  }
 }

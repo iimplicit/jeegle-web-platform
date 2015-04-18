@@ -25,11 +25,22 @@ priorityQueue = function (maxSize){
 
 // We assume priority == score. it means that data with lower score will pop
 priorityQueue.prototype = {
-
-  push: function(data, priority, tag, type) {
+  decAllPriority: function(){
+      for(var i=0;i<this.maxSize;i++){
+        this.heap[i].priority = this.heap[i].priority-1;
+      }
+  },
+  isFull: function(){
     if(this.heap.length==this.maxSize){
-        // debugger;
-        console.log('we are full queue now. pop: '+this.pop());
+      return true;
+    }else{
+      return false;
+    }
+  },
+  push: function(data, priority, tag, type) {
+    if(this.isFull()){
+      console.log('pop value: ')
+      console.dir(this.pop());
     };
 
     if(type==0){
@@ -97,13 +108,18 @@ priorityQueue.prototype = {
     this.heap[j] = temp;
   },
   higherPriority: function(i, j){
-    return this.heap[i].priority <= this.heap[j].priority
+    return this.heap[i].priority < this.heap[j].priority
   }
 }
-
-// queue = new priorityQueue(10);
+//
+// queue = new priorityQueue(5);
 //
 // queue.push({p:'two'}, 2);
+// queue.push({p:'two'}, 2);
+// queue.push({p:'two'}, 2);
+// queue.push({p:'two'}, 2);
+// queue.push({p:'two'}, 2);
+//
 // queue.push({p:'three'}, 3);
 // queue.push({p:'five'}, 5);
 // queue.push({p:'1st one'}, 1);
