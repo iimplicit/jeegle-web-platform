@@ -7,36 +7,26 @@
                     <div id="input-15" class="main-text" contenteditable="true" style="border: 5px solid green; font-family: Hanna;" data-main-text>
                         슈퍼파월
                     </div>
-
-                    <div class="main-image-wrapper">
-                        <!-- <img id="main-image" class="main-image" src="test.jpg" alt="" style="border: 5px solid #ffff00; "> -->
-                    </div>
                 </div>
 
-								<!--Jeegle image slider start-->
-								<div id="slider_box" class="slider_box">
-										<ul id="slider">
-													{{#each images}}
-													<li name="image-div" data-num="{{index}}" class="image-div">
-															<img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
-															<!-- <div class="tag-div">
-																	{{tag.word}}
-															</div>
-															<div class="priority-div">
-																	{{priority}}
-															</div> -->
-													</li>
-													{{/each}}
-										</ul>
+                <!--Jeegle image slider start-->
+                <div id="slider_box" class="slider_box">
+                    <ul id="slider">
+                        {{#each images}}
+                        <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none;">
+                            <img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
+                        </li>
+                        {{/each}}
+                    </ul>
 
-										<a href="#" class="control_next"></a>
-										<a href="#" class="control_prev"></a>
-								</div>
-								<!--Jeegle image slider end-->
+                    <a href="#" class="control_next"></a>
+                    <a href="#" class="control_prev"></a>
+                </div>
+                <!--Jeegle image slider end-->
 
 			</div>
 
-            <!--<button data-rasterize>Rasterize</button>-->
+            <!--<button data-rasterizes>Rasterize</button>-->
             <!--<img src="" alt="" data-rendered-image/>-->
 		</div>
 	</div>
@@ -110,18 +100,18 @@
                                 </li>
                             </ul>
                         </div>
-												<div class="div-line">
-												</div>
+                        <div class="div-line">
+                        </div>
                         <div class="tag-filter" >
-														<input type="button" id="tag-toggle-btn" class="tag-btn toggle" value="+"/>
-														<div id="tag-input-box" class="tag-input-box">
-															<div>
-																<input type="text" id="tag-input" class="tag-input"/>
-																<input type="button" id="tag-submit" class="tag-btn submit"/>
-															</div>
-														</div>
-														<ul id="tagBox" class="list-inline">
-														</ul>
+                            <input type="button" id="tag-toggle-btn" class="tag-btn toggle" value="+"/>
+                            <div id="tag-input-box" class="tag-input-box">
+                                <div>
+                                    <input type="text" id="tag-input" class="tag-input"/>
+                                    <input type="button" id="tag-submit" class="tag-btn submit"/>
+                                </div>
+                            </div>
+                            <ul id="tagBox" class="list-inline">
+                            </ul>
                         </div>
                     </div>
 
@@ -216,24 +206,24 @@
         </div>
     </div>
 
-		<!-- 기능 확인을 위한 임시 구현 -->
-		<!-- <button id="meteordoctor">meteordoctor</button> -->
+    <!-- 기능 확인을 위한 임시 구현 -->
+    <!-- <button id="meteordoctor">meteordoctor</button> -->
 
-		<div class="main-header-right">
-			{{#if currentUser}}
-			<div class="login-wrapper">
-				<p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
-			</div>
-			{{else}}
-			{{#if logginIn}}
-			<div class="login-wrapper">
-				<a class="login-wrapper">Logging in...</a>
-			</div>
-			{{else}}
-			<div class="login-wrapper">
-				<a data-login><i class="fa fa-facebook"></i> | Sign in</a>
-			</div>
-			{{/if}}
-			{{/if}}
-		</div>
+    <div class="main-header-right">
+        {{#if currentUser}}
+        <div class="login-wrapper">
+            <p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
+        </div>
+        {{else}}
+        {{#if logginIn}}
+        <div class="login-wrapper">
+            <a class="login-wrapper">Logging in...</a>
+        </div>
+        {{else}}
+        <div class="login-wrapper">
+            <a data-login><i class="fa fa-facebook"></i> | Sign in</a>
+        </div>
+        {{/if}}
+        {{/if}}
+    </div>
 </template>

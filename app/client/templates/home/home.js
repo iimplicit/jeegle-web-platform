@@ -182,57 +182,6 @@ Template.Home.events({
                 'content.0.url': url
             }
         });
-    },
-    "click [data-rasterize]": function (e, tmpl) {
-        var $canvasWrapper = $('.main-content-wrapper');
-        var innerHtml = $canvasWrapper.html();
-
-        innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style>body {background-image: url(test.jpg)}</style></head><body>"
-            + innerHtml + '</body></html>';
-
-        rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
-            console.dir(renderResult);
-            console.dir(renderResult.svg);
-            var url = getBase64Image(renderResult.image);
-
-            function _ImageFiles(url, callback) {
-                // client단에서 이미지를 넣어줍니다.
-                // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
-                // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
-                // 권장하고 있습니다.
-                ImageFiles.insert(url, function (err, fileObj) {
-                    // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
-                    // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
-                    // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
-                    // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
-                    // 에러 체크
-                    if (!err) {
-                        // setInterval을 find에 넣어줍니다.
-                        var find = setInterval(function () {
-                            var url = fileObj.url();
-
-                            if (!!url) {
-                                // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
-                                // setInterval을 멈춰줍니다.
-                                clearInterval(find);
-                                // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
-                                return callback(url);
-                            }
-                        }, 100);
-                    } else {
-                        console.log('file insert error: ', err);
-                    }
-                });
-            }
-
-            // _ImageFiles를 callback과 함께 실행시켜줍니다.
-            _ImageFiles(url, function (url) {
-                // 시범용 이미지를 보여줍니다. (추후 삭제 예정)
-                $('[data-rendered-image]').attr('src', url);
-            });
-        }, function error(err) {
-            console.log('rasterization failed: ', err);
-        });
     }
 });
 
@@ -406,7 +355,7 @@ Template.Home.rendered = function () {
                 $('[data-bottom-type="fontFilter"]').show();
             })
 
-            $('body').on('click', '[data-content]', function () {
+            $('body').on('click', '#main-image', function () {
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="imageFilter"]').show();
             })
@@ -510,7 +459,7 @@ Template.Home.rendered = function () {
         },
 
         setRenderImage: function () {
-            $('[data-rasterize]').on('click', function () {
+            $('[data-rasterizes]').on('click', function () {
                 imageApp.setCssInlineStylePropsForTextEditorDiv();
                 imageApp.actionRasterizeHTML();
 
@@ -519,7 +468,7 @@ Template.Home.rendered = function () {
 
         setCssInlineStylePropsForTextEditorDiv: function () {
             var styleProps = $('.main-text').css([
-                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family", "text-align", "font-weight", "font-style"
+                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family", "text-align", "font-weight", "font-style", "line-height", "margin", "padding"
             ]);
 
             $.each(styleProps, function (prop, value) {
@@ -530,22 +479,32 @@ Template.Home.rendered = function () {
         actionRasterizeHTML: function () {
             console.log('font type : ' + imageApp.textConfig.fontype + ", font family: " + imageApp.textConfig.fontfamily)
 
-            var $canvasWrapper = $('.main-content');
-            var innerHtml = $canvasWrapper.html();
+            var mainText = $('.main-text')[0].outerHTML;
 
-            innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: "
+            var parent = $('#main-image').parent();
+            var parentClone = parent.clone();
+
+            parentClone.css('width', '640px');
+            parentClone.css('height', '640px');
+
+            var parentResult = parentClone[0].outerHTML;
+
+            var mainClone = $('#main-image').clone();
+            mainClone.css('left', '100px');
+            mainClone.css('width', '640px');
+            mainClone.css('height', '640px');
+
+            var mainCloneOuterHTML = mainClone[0].outerHTML;
+
+            var innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: "
                 + imageApp.textConfig.fontfamily
                 + "; src: url(/font/"
                 + imageApp.textConfig.fontype
                 + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top; }</style></head><body>"
-                + innerHtml + '</body></html>';
-            var element = document.getElementById('canvas');
+                + parentResult + mainText + '</body></html>';
 
-            // htmlToCanvas(innerHtml);
 
             rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
-                console.dir(renderResult);
-                console.dir(renderResult.svg);
                 var url = getBase64Image(renderResult.image);
 
                 function _ImageFiles(url, callback) {
@@ -610,7 +569,7 @@ Template.Home.rendered = function () {
 
             var self = this;
 
-            $('[data-preset]').on('click', function () {
+            $('body').on('click','[data-preset]', function () {
                 var selectedFilterType = $(this).attr('data-preset');
                 self.imageFilterConfig.type = selectedFilterType;
 
@@ -626,7 +585,7 @@ Template.Home.rendered = function () {
         setImageFilter: function () {
             var selectedFilterType = this.imageFilterConfig.type;
 
-            this.targetImage.css("filter",
+            $('#main-image').css("filter",
                     'grayscale(' + (this.imageFilterConfig.grayscale + this.imageFilterType[selectedFilterType].grayscale) + '%)' +
                     'blur(' + (this.imageFilterConfig.blur + this.imageFilterType[selectedFilterType].blur) + 'px)' +
                     'brightness(' + (this.imageFilterConfig.brightness + this.imageFilterType[selectedFilterType].brightness) + '%)' +
@@ -638,7 +597,7 @@ Template.Home.rendered = function () {
                     'sepia(' + (this.imageFilterConfig.sepia + this.imageFilterType[selectedFilterType].sepia) + '%)'
             );
 
-            this.targetImage.css("-webkit-filter",
+            $('#main-image').css("-webkit-filter",
                     'grayscale(' + (this.imageFilterConfig.grayscale + this.imageFilterType[selectedFilterType].grayscale) + '%)' +
                     'blur(' + (this.imageFilterConfig.blur + this.imageFilterType[selectedFilterType].blur) + 'px)' +
                     'brightness(' + (this.imageFilterConfig.brightness + this.imageFilterType[selectedFilterType].brightness) + '%)' +
