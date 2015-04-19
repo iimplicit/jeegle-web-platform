@@ -3,12 +3,16 @@
   <div class="body-background"></div>
   <div class="main-image-wrapper" data-main-image-wrapper></div>
   <div class="container" style="padding: 0;">
-		<div class="row">
-	    <div class="nav-wrapper" data-nav-top>
-	      <img src="/images/logo.png" alt="" class="nav-logo">
-	      <button class="nav-button-complete">완료</button>
-	    </div>
-	  </div>
+    <div class="row">
+      <div class="nav-wrapper" data-nav-top>
+        <div>
+          <img src="/images/logo.png" alt="" class="nav-logo">
+        </div>
+        <div>
+          <button class="nav-button-complete" data-header-right-content="share">공유</button>
+        </div>
+      </div>
+    </div>
     <div class="row" style="margin: 68px 0 0 0;">
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
         <div class="main-content-wrapper">
@@ -33,16 +37,12 @@
           </div>
           <!--Jeegle image slider end-->
         </div>
-        <!--<button data-rasterizes>Rasterize</button>-->
-        <!--<img src="" alt="" data-rendered-image/>-->
       </div>
     </div>
-
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
         <div class="bottom-content-wrapper">
           <div class="bottom-content" style="border: 5px solid orange;">
-
             <div class="font-filters" data-bottom-type="fontFilter">
               <div class="font-filter">
                 <ul class="list-inline">
@@ -86,7 +86,6 @@
                       <label class="btn btn-default active">
                         <input type="radio" data-change-font-justify name="data-change-font-justify" value="center" checked>Center
                       </label>
-
                       <label class="btn btn-default">
                         <input type="radio" data-change-font-justify name="data-change-font-justify" value="right">Right
                       </label>
@@ -102,7 +101,6 @@
                       <label class="btn btn-default">
                         <input type="radio" data-change-font-background name="data-change-font-background" value="B">B
                       </label>
-
                     </div>
                   </li>
                 </ul>
@@ -116,9 +114,28 @@
                     <input type="text" id="tag-input" class="tag-input" />
                     <input type="button" id="tag-submit" class="tag-btn submit" />
                   </div>
+
                 </div>
                 <ul id="tagBox" class="list-inline">
                 </ul>
+              </div>
+            </div>
+            <div class="image-share" data-bottom-type="share">
+              <div class="image-share-with-music">
+                <div class="image-share-with-music-title">
+                  음악 담기
+                </div>
+                <div class="image-share-with-music-content">
+                  수고했어 오늘도 - 옥상달빛
+                  <button> refresh </button>
+                </div>
+                <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" value="beat" checked>
+              </div>
+
+              <hr>
+
+              <div class="image-share-with-facebook" data-share-facebook>
+                페이스북 공유하기
               </div>
             </div>
 
@@ -185,7 +202,6 @@
                     </a>
                   </li>
                 </ul>
-
               </div>
 
               <div id="SlideFilters" data-event-slide-filter>
@@ -200,39 +216,16 @@
                     <input type="range" class="slide-filter" data-filter="contrast" value="100" min="0" max="200" step="1" />
                   </li>
 
-                  <li>
+									<li>
                     <img class="slide-thumbnail" src="test.jpg" alt="">
                     <input type="range" class="slide-filter" data-filter="blur" value="0" min="0" max="10" step="1" />
                   </li>
                 </ul>
               </div>
             </div>
-
           </div>
         </div>
       </div>
     </div>
   </div>
-
-
-  <!-- 기능 확인을 위한 임시 구현 -->
-  <!-- <button id="meteordoctor">meteordoctor</button> -->
-
-  <!-- <div class="main-header-right">
-        {{#if currentUser}}
-        <div class="login-wrapper">
-            <p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
-        </div>
-        {{else}}
-        {{#if logginIn}}
-        <div class="login-wrapper">
-            <a class="login-wrapper">Logging in...</a>
-        </div>
-        {{else}}
-        <div class="login-wrapper">
-            <a data-login><i class="fa fa-facebook"></i> | Sign in</a>
-        </div>
-        {{/if}}
-        {{/if}}
-    </div> -->
 </template>

@@ -513,3 +513,39 @@ a.control_next {
   width: 160px;
   font-size: 18px;
 }
+
+
+.main-header {
+    height: 100px;
+}
+
+.image-share-with-music {
+    width: 638px; height: 44px;
+    border: 1px solid rgba(255,255,255,1);
+    font-size: 17px;
+    color: #fff;
+    line-height: 44px;
+}
+
+.image-share-with-music-title {
+    display:inline-block;
+    width: 71px;
+}
+
+.image-share-with-music-content {
+    display:inline-block;
+}
+
+.image-share-with-music-checkbox {
+    display:inline-block;
+}
+
+.image-share-with-facebook {
+    text-align: center;
+    width: 638px;
+    height: 58px;
+    border: 1px solid #fff;
+    font-sie: 18px;
+    color: #fff;
+    line-height: 58px;
+}

@@ -339,6 +339,8 @@ Template.Home.rendered = function () {
 
         textConfig: {
             isFirstInput: true,
+            isTypeableByEnter: true,
+            isTypeableByAnyKey: true,
             fontsize: 40,
             fontype: 'Hanna',
             fontfamily: 'Hanna'
@@ -437,35 +439,72 @@ Template.Home.rendered = function () {
                 e.stopPropagation();
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="fontFilter"]').show();
+
+                $('[data-header-right-content]').empty();
+                $('[data-header-right-content]').text("완료");
+                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
             })
 
             $('body').on('click', '#main-image', function () {
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="imageFilter"]').show();
+                $('[data-header-right-content]').empty();
+                $('[data-header-right-content]').text("완료");
+                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+            })
+
+            $('body').on('click', '[data-header-right-content]', function () {
+                if($('[data-header-right-content]').attr('data-header-right-content') == 'confirm') {
+                    $('[data-header-right-content]').empty();
+                    $('[data-header-right-content]').text("공유");
+                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+
+
+                } else if($('[data-header-right-content]').attr('data-header-right-content') == 'share') {
+                    $('[data-header-right-content]').empty();
+                    $('[data-header-right-content]').text("홈");
+                    $('[data-header-right-content]').attr('data-header-right-content', 'home');
+                    $('[data-bottom-type]').hide();
+                    $('[data-bottom-type="share"]').show();
+
+                } else if($('[data-header-right-content]').attr('data-header-right-content') == 'home') {
+                    $('[data-header-right-content]').empty();
+                    $('[data-header-right-content]').text("공유");
+                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+
+
+                    $('[data-main-text]').empty();
+                    $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
+                    $('[data-main-text]').focus();
+
+                    imageApp.textConfig.isFirstInput = true;
+                    imageApp.textConfig.isTypeableByEnter = true;
+                    imageApp.textConfig.isTypeableByAnyKey = true;
+
+                    $('[data-bottom-type]').hide();
+                    $('[data-bottom-type="fontFilter"]').show();
+                }
             })
         },
 
         catchTextBoxEnterKeyEvent: function () {
             $('[data-main-text][contenteditable=true]').keydown(function (e) {
-                // trap the return key being pressed
-                var height = $('[data-main-text]').height();
-                if (height > 620) {
-                    if (e.keyCode != 8) {
-                        return false;
+                if(imageApp.textConfig.isFirstInput) {
+                    imageApp.textConfig.isFirstInput = false;
+                    $('[data-main-text]').empty();
+                } else {
+                    if(!imageApp.textConfig.isTypeableByEnter) {
+                        if(e.keyCode == 13) {
+                            return false;
+                        }
+                    }
+
+                    if(!imageApp.textConfig.isTypeableByAnyKey) {
+                        if(e.keyCode != 8) {
+                            return false;
+                        }
                     }
                 }
-
-//                if (e.keyCode == 13) {
-//                    var height = $('[data-main-text]').height();
-//                    if(height < 600) {
-//                        // insert 2 br tags (if only one br tag is inserted the cursor won't go to the second line)
-//                        document.execCommand('insertHTML', false, '<br><br>');
-//                        // prevent the default behaviour of return key pressed
-//                        return false;
-//                    } else {
-//                        return false;
-//                    }
-//                }
             });
         },
 
@@ -496,6 +535,12 @@ Template.Home.rendered = function () {
                 console.log(fontsize);
                 $('[data-main-text]').css('font-size', fontsize);
                 imageApp.textConfig.fontsize = fontsize;
+
+                var textHeight = $('[data-main-text]').height();
+                if (textHeight < 640) {
+                    var textDivXPosition = (640 - textHeight) / 2;
+                    $('[data-main-text]').css('top', textDivXPosition);
+                }
             });
 
             $('[data-change-font-types]').on('change', function () {
@@ -530,8 +575,20 @@ Template.Home.rendered = function () {
 
         setTextDivPosition: function () {
             $('[data-main-text]').keyup(function (e) {
+                var height = $('[data-main-text]').height();
+                var fontsize = imageApp.textConfig.fontsize;
+
+                if(height + fontsize + 5 > 580) {
+                    imageApp.textConfig.isTypeableByEnter = false;
+                } else if(height + fontsize + 5 > 620) {
+                    imageApp.textConfig.isTypeableByAnyKey = false;
+                } else {
+                    imageApp.textConfig.isTypeableByAnyKey = true;
+                    imageApp.textConfig.isTypeableByEnter = true;
+                }
                 $('[data-main-text]').trigger('heightChange');
             });
+
 
             $('[data-main-text]').on('heightChange', function (e) {
                 var textHeight = $('[data-main-text]').height();
