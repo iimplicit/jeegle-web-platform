@@ -435,39 +435,74 @@ Template.Home.rendered = function () {
         },
 
         toggleBottomFilter: function () {
-            $('body').on('click', '.main-text', function (e) {
-                e.stopPropagation();
-                $('[data-bottom-type]').hide();
-                $('[data-bottom-type="fontFilter"]').show();
-
-                $('[data-header-right-content]').empty();
-                $('[data-header-right-content]').text("완료");
-                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
-            })
+            // $('body').on('click', '.main-text', function (e) {
+            //     e.stopPropagation();
+            //     $('[data-bottom-type]').hide();
+            //     $('[data-bottom-type="fontFilter"]').show();
+            //
+            //     $('[data-header-right-content]').empty();
+            //     $('[data-header-right-content]').text("완료");
+            //     $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+            // })
 
             $('body').on('click', '#main-image', function () {
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="imageFilter"]').show();
                 $('[data-header-right-content]').empty();
-                $('[data-header-right-content]').text("완료");
-                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+                // $('[data-header-right-content]').text("완료");
+
+                $('[data-header-right-content]').hide(200);
+                $('[data-apply-image-filter]').show(200);
+                $('[data-main-text]').css('pointer-events', 'none');
+                $('#main-image-wrapper').siblings().css('visibility', 'hidden');
+                $('#main-image-wrapper').css('border', '2px solid rgba(255,255,255,1)');
+                // $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
             })
 
+            $('body').on('click', '[data-apply-image-filter]', function () {
+                $('[data-header-right-content]').empty();
+                $('[data-header-right-content]').text("공유");
+                $('[data-header-right-content]').attr('data-header-right-content', 'share');
+
+                $('[data-header-right-content]').show(200);
+                $('[data-apply-image-filter]').hide(200);
+                $('[data-main-text]').css('pointer-events', 'auto');
+
+                $('[data-bottom-type]').hide();
+                $('[data-bottom-type="fontFilter"]').show();
+                $('#main-image-wrapper').siblings().css('visibility', '');
+                $('#main-image-wrapper').css('border', '1px solid rgba(0,0,0,0.3)');
+            });
+
             $('body').on('click', '[data-header-right-content]', function () {
-                if($('[data-header-right-content]').attr('data-header-right-content') == 'confirm') {
-                    $('[data-header-right-content]').empty();
-                    $('[data-header-right-content]').text("공유");
-                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+                // if($('[data-header-right-content]').attr('data-header-right-content') == 'confirm') {
+                //     $('[data-header-right-content]').empty();
+                //     $('[data-header-right-content]').text("공유");
+                //     $('[data-header-right-content]').attr('data-header-right-content', 'share');
+                // }
 
-
-                } else if($('[data-header-right-content]').attr('data-header-right-content') == 'share') {
+                if($('[data-header-right-content]').attr('data-header-right-content') == 'share') {
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("홈");
                     $('[data-header-right-content]').attr('data-header-right-content', 'home');
                     $('[data-bottom-type]').hide();
                     $('[data-bottom-type="share"]').show();
 
+                    // #1 pointer-events를 통해 클릭을 막습니다.
+                    $('#slider_box').css('pointer-events', 'none');
+                    $('[data-main-text]').css('pointer-events', 'none');
+                    // #2 메인이미지를 제외한 다른 이미지들을 숨겨줍니다. (hide를 사용하지 않는 이유는 hide 사용 시 이미지들의 위치가 왜곡되기 때문입니다.)
+                    $('#main-image-wrapper').siblings().css('visibility', 'hidden');
+
+
                 } else if($('[data-header-right-content]').attr('data-header-right-content') == 'home') {
+                    // #1 pointer-events 클릭을 막은 것은 풀어줍니다.
+                    $('#slider_box').css('pointer-events', 'auto');
+                    $('[data-main-text]').css('pointer-events', 'auto');
+                    // #2 메인이미지를 제외한 다른 이미지들을 다시 나타나게 해줍니다.
+                    $('#main-image-wrapper').siblings().css('visibility', '');
+
+
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("공유");
                     $('[data-header-right-content]').attr('data-header-right-content', 'share');
@@ -931,7 +966,7 @@ function setJeegleSlider() {
 
     $('[data-main-image-wrapper]').css('left',smallElemsDivLen*parseInt(slider.$DisplayPieces/2));
     $('[data-main-image-wrapper]').css('display','block');
-    
+
     // slider 너비 조절
     var sliderWidth = smallElemsDivLen*(slider.$MaximumImageNum-1)+slider.$CenterLen;
     $('#slider').css('width', sliderWidth)
