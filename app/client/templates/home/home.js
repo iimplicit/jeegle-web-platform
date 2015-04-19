@@ -223,6 +223,8 @@ Template.Home.rendered = function () {
 
         textConfig: {
             isFirstInput: true,
+            isTypeableByEnter: true,
+            isTypeableByAnyKey: true,
             fontsize: 40,
             fontype: 'Hanna',
             fontfamily: 'Hanna'
@@ -318,8 +320,10 @@ Template.Home.rendered = function () {
                 e.stopPropagation();
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="fontFilter"]').show();
+
                 $('[data-header-right-content]').empty();
                 $('[data-header-right-content]').text("완료");
+                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
             })
 
             $('body').on('click', '#main-image', function () {
@@ -327,6 +331,40 @@ Template.Home.rendered = function () {
                 $('[data-bottom-type="imageFilter"]').show();
                 $('[data-header-right-content]').empty();
                 $('[data-header-right-content]').text("완료");
+                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+            })
+
+            $('body').on('click', '[data-header-right-content]', function () {
+                if($('[data-header-right-content]').attr('data-header-right-content') == 'confirm') {
+                    $('[data-header-right-content]').empty();
+                    $('[data-header-right-content]').text("공유");
+                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+
+
+                } else if($('[data-header-right-content]').attr('data-header-right-content') == 'share') {
+                    $('[data-header-right-content]').empty();
+                    $('[data-header-right-content]').text("홈");
+                    $('[data-header-right-content]').attr('data-header-right-content', 'home');
+                    $('[data-bottom-type]').hide();
+                    $('[data-bottom-type="share"]').show();
+
+                } else if($('[data-header-right-content]').attr('data-header-right-content') == 'home') {
+                    $('[data-header-right-content]').empty();
+                    $('[data-header-right-content]').text("공유");
+                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+
+
+                    $('[data-main-text]').empty();
+                    $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
+                    $('[data-main-text]').focus();
+
+                    imageApp.textConfig.isFirstInput = true;
+                    imageApp.textConfig.isTypeableByEnter = true;
+                    imageApp.textConfig.isTypeableByAnyKey = true;
+
+                    $('[data-bottom-type]').hide();
+                    $('[data-bottom-type="fontFilter"]').show();
+                }
             })
         },
 
