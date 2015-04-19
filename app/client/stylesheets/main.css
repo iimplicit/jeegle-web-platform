@@ -19,19 +19,32 @@
 /* header */
 .main-header
 {
-	height:50px;
+	height: 100px;
+    width: 1170px;
+    margin: 0 auto;
+
 	vertical-align:top;
 	font-size:0;
-	background-color:#000
 }
 
 .main-header-right
 {
+    border: 1px solid #fff;
 	display:inline-block;
-	width:15%;
+	width:60px;
+    height:60px;
+    margin: 20px 20px;
+
 	text-align:center;
-	height:100%;
 	vertical-align:top
+}
+
+.header-right-content {
+    line-height: 18px;
+    color: #fff;
+    font-size: 18px;
+
+    line-height: 60px;
 }
 
 .main-header-right a

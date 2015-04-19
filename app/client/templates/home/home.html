@@ -1,10 +1,27 @@
 <template name="Home">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
+            <header class="main-header">
+                <div  class="main-header-left">
+
+                </div>
+                <div class="main-header-center">
+
+                </div>
+                <div class="main-header-right" >
+                    <div class="header-right-content" data-header-right-content>
+                        공유
+                    </div>
+                </div>
+            </header>
+        </div>
+    </div>
 	<div class="bg_body"></div>
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 image-wrapper">
-			<div class="main-content-wrapper" style="border: 5px solid red; ">
-                <div class="main-content" style="border: 5px solid orange;" data-content>
-                    <div id="input-15" class="main-text" contenteditable="true" style="border: 5px solid green; font-family: Hanna;" data-main-text>
+			<div class="main-content-wrapper" >
+                <div class="main-content" data-content>
+                    <div id="input-15" class="main-text" contenteditable="true" style="font-family: Hanna; border: 1px dashed #fff;" data-main-text>
                         슈퍼파월
                     </div>
                 </div>
@@ -13,7 +30,7 @@
                 <div id="slider_box" class="slider_box">
                     <ul id="slider">
                         {{#each images}}
-                        <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none;">
+                        <li name="image-div" data-num="{{index}}" class="image-div" id="main-image" style="overflow: hidden; height: 640px; width: 640px; list-style: none;">
                             <img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}"/>
                         </li>
                         {{/each}}
@@ -34,7 +51,7 @@
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div class="bottom-content-wrapper">
-                <div class="bottom-content" style="border: 5px solid orange;">
+                <div class="bottom-content">
 
                     <div class="font-filters" data-bottom-type="fontFilter">
                         <div class="font-filter">
@@ -88,15 +105,16 @@
 
                                 <li>
                                     <div class="btn-group" data-toggle="buttons" data-change-font-backgrounds>
-                                        <label class="btn btn-default active">
-                                            <input type="radio" data-change-font-background name="data-change-font-background" value="A" checked>A
+                                        <label class="btn btn-default">
+                                            <input type="checkbox" data-change-font-background name="data-change-font-background" value="A">A
                                         </label>
 
                                         <label class="btn btn-default">
-                                            <input type="radio" data-change-font-background name="data-change-font-background" value="B">B
+                                            <input type="checkbox" data-change-font-background name="data-change-font-background" value="B">B
                                         </label>
 
                                     </div>
+
                                 </li>
                             </ul>
                         </div>
@@ -209,21 +227,21 @@
     <!-- 기능 확인을 위한 임시 구현 -->
     <!-- <button id="meteordoctor">meteordoctor</button> -->
 
-    <div class="main-header-right">
-        {{#if currentUser}}
-        <div class="login-wrapper">
-            <p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>
-        </div>
-        {{else}}
-        {{#if logginIn}}
-        <div class="login-wrapper">
-            <a class="login-wrapper">Logging in...</a>
-        </div>
-        {{else}}
-        <div class="login-wrapper">
-            <a data-login><i class="fa fa-facebook"></i> | Sign in</a>
-        </div>
-        {{/if}}
-        {{/if}}
-    </div>
+    <!--<div class="main-header-right">-->
+        <!--{{#if currentUser}}-->
+        <!--<div class="login-wrapper">-->
+            <!--<p>{{currentUser.profile.name}}</p> - <a data-logout>Facebook Logout</a>-->
+        <!--</div>-->
+        <!--{{else}}-->
+        <!--{{#if logginIn}}-->
+        <!--<div class="login-wrapper">-->
+            <!--<a class="login-wrapper">Logging in...</a>-->
+        <!--</div>-->
+        <!--{{else}}-->
+        <!--<div class="login-wrapper">-->
+            <!--<a data-login><i class="fa fa-facebook"></i> | Sign in</a>-->
+        <!--</div>-->
+        <!--{{/if}}-->
+        <!--{{/if}}-->
+    <!--</div>-->
 </template>
