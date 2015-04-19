@@ -20,11 +20,18 @@
 .main-header
 {
 	height: 100px;
-    width: 1170px;
+    width: 1070px;
     margin: 0 auto;
 
 	vertical-align:top;
 	font-size:0;
+}
+
+.main-header-left {
+    width: 35px;
+    heigth: 35px;
+
+    margin: 32px 20px;
 }
 
 .main-header-right
