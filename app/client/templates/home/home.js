@@ -1,7 +1,7 @@
 slider = {
     $ArrowHeight: 30,   // 화살표 높이입니다.
     $CenterLen: 640,    // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
-    $DisplayPieces: 21,  // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
+    $DisplayPieces: 9,  // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
     $MaximumImageNum: 41, // [홀수] 로드하는 최대 이미지 개수입니다.
     $CenterImageNode: null, // 중앙 이미지 노드입니다.
     $CenterImageNum: 0, // 현재 중앙 이미지 번호입니다.
@@ -406,6 +406,9 @@ Template.Home.rendered = function () {
             this.setBottomFilter();
             this.addEventListener();
             this.setImageSliderEventListener();
+
+            this.initNavbar();
+            this.initMainImageWrapper();
         },
 
         initTextDivPosition: function () {
@@ -725,6 +728,17 @@ Template.Home.rendered = function () {
             $("input[data-filter=brightness]").val(100);
             $("input[data-filter=contrast]").val(100);
             $("input[data-filter=blur]").val(0);
+        },
+
+        initNavbar: function(){
+          $('[data-nav-top]').width($('body').height());
+        },
+        initMainImageWrapper: function(){
+          // var offset = $('#main-image-wrapper').offset();
+          // $('[data-main-image-wrapper]').offset({
+          //   top: offset.top,
+          //   left: offset.left
+          // })
         }
     }
 
@@ -858,6 +872,9 @@ function setJeegleSlider() {
     smallElemsDivLen = parseInt(smallElemsWholeWidth / (slider.$DisplayPieces - 1)); // 작은 이미지의 각자 길이 width=height
     slider.$smallElemsDivLen = smallElemsDivLen;
 
+    $('[data-main-image-wrapper]').css('left',smallElemsDivLen*parseInt(slider.$DisplayPieces/2));
+    $('[data-main-image-wrapper]').css('display','block');
+    
     // slider 너비 조절
     var sliderWidth = smallElemsDivLen*(slider.$MaximumImageNum-1)+slider.$CenterLen;
     $('#slider').css('width', sliderWidth)
@@ -876,10 +893,11 @@ function setJeegleSlider() {
     centralElement.css('height', slider.$CenterLen);
     centralElement.css('bottom', (slider.$CenterLen - smallElemsDivLen) / 2);
     centralElement[0].children[0].id = 'main-image';
+    centralElement[0].id = 'main-image-wrapper';
 
     // 배경이미지 설정
     backgroundStyle = "url('"+centralElement[0].children[0].src+"')";
-    $('.bg_body').css('background-image',backgroundStyle);
+    $('.body-background').css('background-image',backgroundStyle);
 
     // 가운데 정렬!
     var leftPosition = -(sliderWidth - windowWidth) / 2
@@ -913,6 +931,7 @@ function setJeegleSlider() {
 
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
+        bigToSmallImg.parent().attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
             var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
@@ -937,6 +956,7 @@ function setJeegleSlider() {
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
+        smallToBigImg.parent().attr('id', 'main-image-wrapper');
         if (smallToBigImg.width() > smallToBigImg.height()) {
             var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
@@ -958,7 +978,7 @@ function setJeegleSlider() {
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
-        $('.bg_body').css('background-image',backgroundStyle);
+        $('.body-background').css('background-image',backgroundStyle);
     };
 
     function moveRight(cen) {
@@ -982,6 +1002,7 @@ function setJeegleSlider() {
 
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
+        bigToSmallImg.parent().attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
             var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
@@ -1010,6 +1031,7 @@ function setJeegleSlider() {
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
+        smallToBigImg.parent().attr('id', 'main-image-wrapper');
         if (smallToBigImg.width() > smallToBigImg.height()) {
             var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
@@ -1026,7 +1048,7 @@ function setJeegleSlider() {
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
-        $('.bg_body').css('background-image',backgroundStyle);
+        $('.body-background').css('background-image',backgroundStyle);
     };
 
     // hunjae: 왜 클릭이벤트 여러번 안먹지?

@@ -6,27 +6,64 @@ html, body {
   padding: 0;
 }
 
-.bg_body{
+.body-background-wrapper {
   position:fixed;
   top:0;
   left:0;
+  background-color: rgba(0,0,0,0.5);
+  width: 100%;
+  height: 100%;
+  z-index:-1;
+}
 
+.body-background{
+  position:fixed;
+  top:0;
+  left:0;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   width: 100%;
   height: 100%;
+  z-index:-2;
 
-  -webkit-filter: blur(25px);
+  /* -webkit-filter: blur(25px);
   -moz-filter: blur(25px);
   -o-filter: blur(25px);
   -ms-filter: blur(25px);
-  filter: blur(25px);
-  z-index:-1;
+  filter: blur(25px); */
 }
 
-.home {
+/* Navigation Bar */
 
+.nav-wrapper {
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  height: 100px;
+}
+
+.nav-logo {
+  position: absolute;
+  top: 32px;
+  left: 20px;
+}
+
+.nav-button-complete {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border: 1px solid #fff;
+  background-color: rgba(0,0,0,0.1);
+
+  font-size: 18px;
+  color: #fff;
+}
+
+.nav-button-complete:hover {
+  background-color: rgba(0,0,0,0.2);
 }
 
 .main-input {
@@ -55,9 +92,10 @@ html, body {
     background-size: cover !important;
 }
 
-.image-wrapper {
+/* .image-wrapper {
     padding: 0 !important;
-}
+    top: 68px;
+} */
 
 .image-item {
     width: 100% !important;
@@ -309,23 +347,21 @@ html, body {
     margin: 0 auto;
 }
 
+/* #main-image-wrapper {
+  box-sizing: border-box;
+  border: 1px solid rgba(0,0,0,0.3);
+  box-shadow: 0px 0px 100px rgba(0,0,0,0.5);
+} */
+
 .main-image-wrapper {
-    width: 640px;
-    height: 640px;
-
-    margin: 0 auto;
-}
-
-.main-image {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-
-
-    padding: 0;
-
-    width: 640px;
-    height: 640px !important;
+  position: fixed;
+  display:none;
+  width: 640px;
+  height: 640px;
+  top: 168px;
+  box-sizing: border-box;
+  border: 1px solid rgba(0,0,0,0.3);
+  box-shadow: 0px 0px 100px rgba(0,0,0,0.5);
 }
 
 .main-text {
@@ -348,9 +384,7 @@ html, body {
 
 .bottom-content {
     width: 640px;
-    height: 200px;
     margin: 0 auto;
-
     z-index: 1000;
 }
 
