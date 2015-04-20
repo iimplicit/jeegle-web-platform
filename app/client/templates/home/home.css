@@ -603,3 +603,20 @@ a.control_next {
     outline:none;
     border:1px dashed #fff;
 }
+
+/*spinner*/
+.before-load{
+  z-index:10000;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top:0;
+  left:0;
+  background: #0e0e0e;
+}
+
+.spinner{
+  position: relative;
+  top:50%;
+  left:50%;
+}
