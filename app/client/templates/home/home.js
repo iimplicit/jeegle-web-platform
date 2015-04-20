@@ -1,7 +1,7 @@
 slider = {
     $ArrowHeight: 30,   // 화살표 높이입니다.
     $CenterLen: 640,    // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
-    $DisplayPieces: 21,  // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
+    $DisplayPieces: 9,  // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
     $MaximumImageNum: 41, // [홀수] 로드하는 최대 이미지 개수입니다.
     $CenterImageNode: null, // 중앙 이미지 노드입니다.
     $CenterImageNum: 0, // 현재 중앙 이미지 번호입니다.
@@ -19,13 +19,127 @@ ImageQueue = new priorityQueue(slider.$MaximumImageNum);
 /* Home: Event Handlers */
 /*****************************************************************************/
 Template.Home.events({
-    "click [data-login]": function () {
-        Meteor.loginWithFacebook();
+    "click [data-login-and-share]": function() {
+        // 미티어의 기본 loginWith<Service> 매소드를 사용하여 로그인을 합니다.
+        // 여기서 requestPermissions란에 'user_photos', 'publish_actions'를 요청합니다.
+        Meteor.loginWithFacebook({
+            requestPermissions: ['user_photos', 'publish_actions']
+        }, function(err) {
+            // Deps.autorun은 미티어의 reactive programming에서 계속 의존하고 있는 변수들의 루프를 감시하고 있다가
+            // 그 변수가 바뀔 경우 다시 돌아가는 매소드입니다.
+            // 여기서는 계속 Meteor.user().services를 감시하고 있다가 PUB/SUB에 의해 이게 생기게 되면, if 문 안의 코드를 실행시키게 됩니다.
+            Deps.autorun(function(computation) {
+                if (Meteor.user().services) {
+                    // 회원정보를 받아올 때 가져오는 accessToken을 가져옵니다.
+                    // 실제적으로 데이터를 서버에서 가져오는 부분은 PUB/SUB에 의해 home_controller.js와  server/publish.js에 구현되어있습니다.
+                    var accessToken = Meteor.user().services.facebook.accessToken;
+
+                    // 페이스북의 graph api를 POST 방식으로 콜합니다.
+                    // 아래의 FB 객체는 Facebook JavaScript SDK의 광역 객체입니다. (현재 rendered에서 이 FB객체를 불러오고 있습니다.)
+                    // *** 아래의 api의 정보는 페이스북 앱으로 등록된 "Jeegle"의 대시보드에서 Open Graph에서 확인하실 수 있습니다. ***
+                    // call 자체는 story를 참조하고,
+                    // 첨부하는 json의 최상단은 action,
+                    // 그리고 가장 하단의 jeegle object는 object를 참조합니다.
+                    // *** jeegle object 설명 ***
+                    // og:url | <hostname>/music/:_id | _id에는 Beat의 음악 id 6자리를 넣습니다.
+                    // jeegle-web:music_info | String | Beat에서 제공하는 제목과 가수를 넣습니다. 예를 들어 "맛좋은 산 - San E"
+                    // og:image | String | 포스팅할 이미지의 URL을 넣습니다. (페이스북에서 허용하는 다른 이미지 형식도 가능합니다.)
+                    FB.api(
+                        "/me/jeegle-web:create",
+                        "POST", {
+                            "access_token": accessToken,
+                            "created_time": new Date().toISOString(),
+                            "message": "신기하다.",
+                            "fb:explicitly_shared": true,
+                            "jeegle": {
+                                "og:type": "jeegle-web:jeegle",
+                                "og:url": "http://172.16.101.216:3000/music/123456",
+                                "og:title": "Sample Jeegle",
+                                "og:locale": "ko_KR",
+                                "og:image": "http://placehold.it/640x640",
+                                "og:image:width": "640",
+                                "og:image:height": "640",
+                                "fb:app_id": "575943959175026",
+                                "jeegle-web:music_info": "music_info",
+                                "al:web:url": "http://placehold.it/640x640",
+                                "al:web:should_fallback": true,
+                                "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                "al:ios:app_store_id": "853073541",
+                                "al:ios:app_name": "BEAT",
+                                "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                "al:iphone:app_store_id": "853073541",
+                                "al:iphone:app_name": "BEAT",
+                                "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                "al:android:package": "com.beatpacking.beat",
+                                "al:android:app_name": "BEAT"
+                            }
+                        },
+                        function(response) {
+                            console.dir(response);
+                            if (response && !response.error) {
+                                computation.stop();
+                            }
+                        }
+                    );
+
+                    // 향후 사용할 가능성이 있어서 남겨두었습니다. 페이스북 일반적인 포스트를 생성할 때 아래의 방식으로 api 콜을 날립니다.
+                    // FB.api(
+                    //     "/me/feed",
+                    //     "POST", {
+                    //         "access_token": accessToken,
+                    //         message: "이미지",
+                    //         url: "http://128.199.249.209:9990/images/activity-aviation-fly-2302-640.jpg"
+                    //     },
+                    //     function(response) {
+                    //         if (!response || response.error) {
+                    //             console.log(response.error);
+                    //         } else {
+                    //             console.log(response);
+                    //             console.log(response.id);
+                    //         }
+                    //     }
+                    // );
+
+                    // 마찬가지로 향후 사용할 가능성이 있어서 남겨두었습니다.
+                    // 먼저 페이스북에서 앨범을 만들고, 그 앨범 안에 사진을 넣는 방식으로 포스팅 할 때 이런 방식으로 api 콜을 날립니다.
+                    // 나중에는 먼저 앨범이 있는지 확인하고, 날짜를 사진 이름으로 해서 올리는 방식으로 향후 개선해야 합니다.
+                    // FB.api(
+                    //     "/me/albums",
+                    //     "POST", {
+                    //         "name": "Jeegle(지글)",
+                    //         "message": "지글 앱을 위한 앨범입니다."
+                    //     },
+                    //     function(response) {
+                    //         if (!response || response.error) {
+                    //             console.log(response.error);
+                    //         } else {
+                    //             var albumID = response.id;
+                    //             FB.api(
+                    //                 "/" + albumID + "/photos",
+                    //                 "POST", {
+                    //                     message: "지글 테스트 사진 업로드입니다.",
+                    //                     url: "http://4de08c6af39c20343f39-fec7c301d7eca18188203e783b444e60.r36.cf1.rackcdn.com/2010/04/facebook-social.jpg"
+                    //                 },
+                    //                 function(response) {
+                    //                     if (!response || response.error) {
+                    //                         console.log(response.error);
+                    //                     } else {
+                    //                         console.log(response);
+                    //                         console.log(response.id);
+                    //                     }
+                    //                 }
+                    //             );
+                    //         }
+                    //     }
+                    // );
+                }
+            });
+        });
     },
-    "click [data-logout]": function () {
+    "click [data-logout]": function() {
         Meteor.logout();
     },
-    "submit form": function (e, tmpl) {
+    "submit form": function(e, tmpl) {
         e.preventDefault();
         var query = tmpl.find('input').value;
         tmpl.find('form').reset();
@@ -172,6 +286,7 @@ Template.Home.helpers({
 /*****************************************************************************/
 /* Home: Lifecycle Hooks */
 /*****************************************************************************/
+
 Template.Home.created = function () {
     var firstSketch = {
         createdAt: new Date,
@@ -198,6 +313,7 @@ Template.Home.created = function () {
         }
     });
 };
+
 
 Template.Home.rendered = function () {
     //  참고.. image effect range
@@ -292,6 +408,9 @@ Template.Home.rendered = function () {
             this.setBottomFilter();
             this.addEventListener();
             this.setImageSliderEventListener();
+
+            this.initNavbar();
+            this.initMainImageWrapper();
         },
 
         initTextDivPosition: function () {
@@ -316,39 +435,74 @@ Template.Home.rendered = function () {
         },
 
         toggleBottomFilter: function () {
-            $('body').on('click', '.main-text', function (e) {
-                e.stopPropagation();
-                $('[data-bottom-type]').hide();
-                $('[data-bottom-type="fontFilter"]').show();
-
-                $('[data-header-right-content]').empty();
-                $('[data-header-right-content]').text("완료");
-                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
-            })
+            // $('body').on('click', '.main-text', function (e) {
+            //     e.stopPropagation();
+            //     $('[data-bottom-type]').hide();
+            //     $('[data-bottom-type="fontFilter"]').show();
+            //
+            //     $('[data-header-right-content]').empty();
+            //     $('[data-header-right-content]').text("완료");
+            //     $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+            // })
 
             $('body').on('click', '#main-image', function () {
                 $('[data-bottom-type]').hide();
                 $('[data-bottom-type="imageFilter"]').show();
                 $('[data-header-right-content]').empty();
-                $('[data-header-right-content]').text("완료");
-                $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+                // $('[data-header-right-content]').text("완료");
+
+                $('[data-header-right-content]').hide(200);
+                $('[data-apply-image-filter]').show(200);
+                $('[data-main-text]').css('pointer-events', 'none');
+                $('#main-image-wrapper').siblings().css('visibility', 'hidden');
+                $('#main-image-wrapper').css('border', '2px solid rgba(255,255,255,1)');
+                // $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
             })
 
+            $('body').on('click', '[data-apply-image-filter]', function () {
+                $('[data-header-right-content]').empty();
+                $('[data-header-right-content]').text("공유");
+                $('[data-header-right-content]').attr('data-header-right-content', 'share');
+
+                $('[data-header-right-content]').show(200);
+                $('[data-apply-image-filter]').hide(200);
+                $('[data-main-text]').css('pointer-events', 'auto');
+
+                $('[data-bottom-type]').hide();
+                $('[data-bottom-type="fontFilter"]').show();
+                $('#main-image-wrapper').siblings().css('visibility', '');
+                $('#main-image-wrapper').css('border', '1px solid rgba(0,0,0,0.3)');
+            });
+
             $('body').on('click', '[data-header-right-content]', function () {
-                if($('[data-header-right-content]').attr('data-header-right-content') == 'confirm') {
-                    $('[data-header-right-content]').empty();
-                    $('[data-header-right-content]').text("공유");
-                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+                // if($('[data-header-right-content]').attr('data-header-right-content') == 'confirm') {
+                //     $('[data-header-right-content]').empty();
+                //     $('[data-header-right-content]').text("공유");
+                //     $('[data-header-right-content]').attr('data-header-right-content', 'share');
+                // }
 
-
-                } else if($('[data-header-right-content]').attr('data-header-right-content') == 'share') {
+                if($('[data-header-right-content]').attr('data-header-right-content') == 'share') {
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("홈");
                     $('[data-header-right-content]').attr('data-header-right-content', 'home');
                     $('[data-bottom-type]').hide();
                     $('[data-bottom-type="share"]').show();
 
+                    // #1 pointer-events를 통해 클릭을 막습니다.
+                    $('#slider_box').css('pointer-events', 'none');
+                    $('[data-main-text]').css('pointer-events', 'none');
+                    // #2 메인이미지를 제외한 다른 이미지들을 숨겨줍니다. (hide를 사용하지 않는 이유는 hide 사용 시 이미지들의 위치가 왜곡되기 때문입니다.)
+                    $('#main-image-wrapper').siblings().css('visibility', 'hidden');
+
+
                 } else if($('[data-header-right-content]').attr('data-header-right-content') == 'home') {
+                    // #1 pointer-events 클릭을 막은 것은 풀어줍니다.
+                    $('#slider_box').css('pointer-events', 'auto');
+                    $('[data-main-text]').css('pointer-events', 'auto');
+                    // #2 메인이미지를 제외한 다른 이미지들을 다시 나타나게 해줍니다.
+                    $('#main-image-wrapper').siblings().css('visibility', '');
+
+
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("공유");
                     $('[data-header-right-content]').attr('data-header-right-content', 'share');
@@ -666,6 +820,17 @@ Template.Home.rendered = function () {
             $("input[data-filter=brightness]").val(100);
             $("input[data-filter=contrast]").val(100);
             $("input[data-filter=blur]").val(0);
+        },
+
+        initNavbar: function(){
+          $('[data-nav-top]').width($('body').height());
+        },
+        initMainImageWrapper: function(){
+          // var offset = $('#main-image-wrapper').offset();
+          // $('[data-main-image-wrapper]').offset({
+          //   top: offset.top,
+          //   left: offset.left
+          // })
         }
     }
 
@@ -799,6 +964,9 @@ function setJeegleSlider() {
     smallElemsDivLen = parseInt(smallElemsWholeWidth / (slider.$DisplayPieces - 1)); // 작은 이미지의 각자 길이 width=height
     slider.$smallElemsDivLen = smallElemsDivLen;
 
+    $('[data-main-image-wrapper]').css('left',smallElemsDivLen*parseInt(slider.$DisplayPieces/2));
+    $('[data-main-image-wrapper]').css('display','block');
+
     // slider 너비 조절
     var sliderWidth = smallElemsDivLen*(slider.$MaximumImageNum-1)+slider.$CenterLen;
     $('#slider').css('width', sliderWidth)
@@ -817,10 +985,11 @@ function setJeegleSlider() {
     centralElement.css('height', slider.$CenterLen);
     centralElement.css('bottom', (slider.$CenterLen - smallElemsDivLen) / 2);
     centralElement[0].children[0].id = 'main-image';
+    centralElement[0].id = 'main-image-wrapper';
 
     // 배경이미지 설정
     backgroundStyle = "url('"+centralElement[0].children[0].src+"')";
-    $('.bg_body').css('background-image',backgroundStyle);
+    $('.body-background').css('background-image',backgroundStyle);
 
     // 가운데 정렬!
     var leftPosition = -(sliderWidth - windowWidth) / 2
@@ -854,6 +1023,7 @@ function setJeegleSlider() {
 
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
+        bigToSmallImg.parent().attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
             var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
@@ -878,6 +1048,7 @@ function setJeegleSlider() {
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
+        smallToBigImg.parent().attr('id', 'main-image-wrapper');
         if (smallToBigImg.width() > smallToBigImg.height()) {
             var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
@@ -899,7 +1070,7 @@ function setJeegleSlider() {
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
-        $('.bg_body').css('background-image',backgroundStyle);
+        $('.body-background').css('background-image',backgroundStyle);
     };
 
     function moveRight(cen) {
@@ -923,6 +1094,7 @@ function setJeegleSlider() {
 
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
+        bigToSmallImg.parent().attr('id', '');
         if (bigToSmallImg.width() > bigToSmallImg.height()) {
             var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
@@ -951,6 +1123,7 @@ function setJeegleSlider() {
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
+        smallToBigImg.parent().attr('id', 'main-image-wrapper');
         if (smallToBigImg.width() > smallToBigImg.height()) {
             var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
@@ -967,7 +1140,7 @@ function setJeegleSlider() {
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
-        $('.bg_body').css('background-image',backgroundStyle);
+        $('.body-background').css('background-image',backgroundStyle);
     };
 
     // hunjae: 왜 클릭이벤트 여러번 안먹지?
