@@ -2,9 +2,9 @@ slider = {
     $ArrowHeight: 30,   // 화살표 높이입니다.
     $CenterLen: 640,    // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
     $DisplayPieces: 9,  // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
-    $MaximumImageNum: 41, // [홀수] 로드하는 최대 이미지 개수입니다.
+    $MaximumImageNum: 21, // [홀수] 로드하는 최대 이미지 개수입니다.
     $CenterImageNode: null, // 중앙 이미지 노드입니다.
-    $CenterImageNum: 0, // 현재 중앙 이미지 번호입니다.
+    $CenterImageIndex: 0, // 현재 중앙 이미지 번호입니다.
     $smallElemsDivLen: 0, //이미지 하나당 너비입니다.
     $currentKeyword: []
 };
@@ -956,6 +956,7 @@ Template.Home.rendered = function () {
     $('#input-15').focus();
 
     // 이미지를 Neo4j database에서 받아옵니다. 최초의 중앙 이미지 번호를 저장합니다.
+    slider.$CenterImageIndex = parseInt(slider.$MaximumImageNum / 2);// + 1; => heap index 0 to (MaximumImageNum-1)
     getRandomImages(slider.$MaximumImageNum);
 };
 
@@ -972,7 +973,6 @@ function getImagesForTag(tagWord, edgeScope, NodesLimit, type){
 
       if(data.i.length!=0){
         // sentence 쿼리 결과가 너무 늦은 경우
-
         if (type==2 /*sentence*/ && slider.$currentKeyword.indexOf(data.t[0].word) == -1) {
             return;
         }
@@ -996,11 +996,21 @@ function getImagesForTag(tagWord, edgeScope, NodesLimit, type){
 
 function getRandomImages(NumOfImages){
   // 이미지를 Neo4j database에서 받아옵니다.
+  console.log('getRandomImage');
+  var start = new Date();
+  var startTime = start.getTime();
+
   Meteor.neo4j.call('getRandomImages', {
       NumImages: NumOfImages
   },
   function (err, data) {
       if (err) throw err;
+      var end = new Date();
+      var endTime = end.getTime();
+      $('.before-load').css('display','none');
+
+      var diffTime = new Date(endTime-startTime);
+      console.log(diffTime.getSeconds()+'.'+diffTime.getMilliseconds()+' seconds takes to get '+ slider.$MaximumImageNum +' Images');
 
       if (data.i.length!=0) {
         Images = data.i;
@@ -1009,17 +1019,26 @@ function getRandomImages(NumOfImages){
         pushImages(Images, 0 /*priority*/, data.t, 0 /*type:random*/);
 
         if(NumOfImages==slider.$MaximumImageNum){
-          slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum]; //전부 다 바꾸는 경우
+          // 처음이에요.
+          slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageIndex]; //전부 다 바꾸는 경우
+
+          // 세션에 새롭게 생성된 이미지 큐를 넣어줍니다.
+          Session.set("images", ImageQueue.heap);
+          Tracker.flush();
+          Tracker.afterFlush(function(){
+            setJeegleSlider();
+            setImagePosition(slider);
+          })
         }else{
           restoreCenterImage(0 /*type: random*/);
-        }
 
-        // 세션에 새롭게 생성된 이미지 큐를 넣어줍니다.
-        Session.set("images", ImageQueue.heap);
-        Tracker.flush();
-        Tracker.afterFlush(function(){
-          setJeegleSlider();
-        })
+          // 세션에 새롭게 생성된 이미지 큐를 넣어줍니다.
+          Session.set("images", ImageQueue.heap);
+          Tracker.flush();
+          Tracker.afterFlush(function(){
+            setImagePosition(slider);
+          })
+        }
       }else{
         console.log("결과가 없습니다.");
       }
@@ -1031,12 +1050,13 @@ function setJeegleSlider() {
     //  slider
     //    slider ul
     //       slider ul li
+    console.log('setJeegleSlider called');
     $('.slider_box').css('display','block');
 
     // I said it's odd.
     //(ex) 21개면 centerElem은 11
-    centerElem = parseInt(slider.$MaximumImageNum / 2) + 1;
-    slider.$CenterImageNum = centerElem;
+    centerElem = parseInt(slider.$MaximumImageNum / 2);// + 1;
+    slider.$CenterImageIndex = centerElem;
     // console.log('center:' + centerElem);
 
     // slider의 너비와 높이를 받아옵니다.
@@ -1064,7 +1084,7 @@ function setJeegleSlider() {
     $('#slider').css('height', smallElemsDivLen);
 
     // 중앙 엘리먼트 크기 설정
-    var centralElement = $('#slider li:nth-child(' + centerElem + ')');
+    var centralElement = $('#slider li:nth-child(' + parseInt(centerElem+1) + ')');
     centralElement.css('width', slider.$CenterLen);
     centralElement.css('height', slider.$CenterLen);
     centralElement.css('bottom', (slider.$CenterLen - smallElemsDivLen) / 2);
@@ -1084,11 +1104,9 @@ function setJeegleSlider() {
     $('a.control_prev').css('top', (slider.$CenterLen - slider.$ArrowHeight) / 2 + "px");
     $('a.control_next').css('top', (slider.$CenterLen - slider.$ArrowHeight) / 2 + "px");
 
-    setImagePosition(slider);
-
     function moveLeft(cen) {
-        var bigToSmall = cen;
-        var smallToBig = cen - 1;
+        var bigToSmall = cen+1;
+        var smallToBig = cen;
 
         $('#slider').animate({
             left: leftPosition+smallElemsDivLen
@@ -1124,8 +1142,8 @@ function setJeegleSlider() {
 
         var smallToBigLi = $('#slider li:nth-child(' + (smallToBig) + ')')
         smallToBigLi.animate({
-            width: '640px',
-            height: '640px',
+            width: slider.$CenterLen,
+            height: slider.$CenterLen,
             bottom: (slider.$CenterLen - smallElemsDivLen) / 2
         }, 200, function () {
         });
@@ -1148,8 +1166,8 @@ function setJeegleSlider() {
         }
 
         // 가운데 이미지 번호를 가지고 있습니다.
-        slider.$CenterImageNum = smallToBigLi.attr('data-num'); //this image number
-        slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum];
+        slider.$CenterImageIndex = parseInt(smallToBigLi.attr('data-num')); //this image number
+        slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageIndex];
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
@@ -1157,8 +1175,8 @@ function setJeegleSlider() {
     };
 
     function moveRight(cen) {
-        var bigToSmall = cen;
-        var smallToBig = cen + 1;
+        var bigToSmall = cen + 1;
+        var smallToBig = cen + 2;
 
         $('#slider').animate({
             left: leftPosition-smallElemsDivLen
@@ -1194,14 +1212,14 @@ function setJeegleSlider() {
 
         var smallToBigLi = $('#slider li:nth-child(' + (smallToBig) + ')');
         smallToBigLi.animate({
-            width: '640px',
-            height: '640px',
+            width: slider.$CenterLen, //'640px',
+            height: slider.$CenterLen, //'640px',
             bottom: (slider.$CenterLen - smallElemsDivLen) / 2
         }, 200, function () {
         })
         // 가운데 이미지 번호를 가지고 있습니다.
-        slider.$CenterImageNum = smallToBigLi.attr('data-num'); //this image number
-        slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum];
+        slider.$CenterImageIndex = parseInt(smallToBigLi.attr('data-num')); //this image number
+        slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageIndex];
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
@@ -1260,24 +1278,22 @@ function setImagePosition(slider){
     if (imgWidth > imgHeight) {
         // 가로가 더 긴 경우
         img.style.height = "100%";
+        img.style.width = 'auto';
         img.style.top = 0;
         if (img.id == 'main-image') {
             img.style.left = -(img.width - slider.$CenterLen) / 2 + "px";
         } else {
-          // console.log(img.complete);
-          // console.log(img.width);
-          // console.log(-(img.width - slider.$smallElemsDivLen) / 2);
-          // console.log(img.style.left);
           img.style.left = -(img.width - slider.$smallElemsDivLen) / 2 + "px";
         }
     } else {
         // 세로가 더 긴 경우
-        img.style.width = "100%";
+        img.style.width = '100%';
+        img.style.height = 'auto';
         img.style.left = 0;
         if (img.id == 'main-image') {
-            img.style.top = -(img.height - slider.$CenterLen) / 2 + "px";
+            img.style.top = -(img.offsetHeight - slider.$CenterLen) / 2 + "px";
         } else {
-            img.style.top = -(img.height - slider.$smallElemsDivLen) / 2 + "px";
+            img.style.top = 0;
         }
     }
   }
@@ -1369,9 +1385,7 @@ function restoreCenterImage(type){
     ImageQueue.proportion.sentence++;
   }
 
-  console.dir(slider.$CenterImageNode);
-  console.dir(slider.$CenterImageNum);
   if(slider.$CenterImageNode!=null){
-    ImageQueue.heap[slider.$CenterImageNum] = slider.$CenterImageNode;
+    ImageQueue.heap[slider.$CenterImageIndex] = slider.$CenterImageNode;
   }
 }

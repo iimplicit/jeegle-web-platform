@@ -39,8 +39,7 @@ priorityQueue.prototype = {
   },
   push: function(data, priority, tag, type) {
     if(this.isFull()){
-      console.log('pop value: ')
-      console.dir(this.pop());
+      this.pop();
     };
 
     if(type==0){
