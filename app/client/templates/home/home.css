@@ -408,7 +408,7 @@ html, body {
     font-size: 40px;
     text-align: center;
 
-    border: 1px dashed #fff;
+    /*border: 1px dashed #fff;*/
 }
 
 .bottom-content {
@@ -597,4 +597,9 @@ a.control_next {
 
 .button-apply-image-filter:hover {
   background-color: rgba(0,0,0,0.2);
+}
+
+:focus {
+    outline:none;
+    border:1px dashed #fff;
 }
