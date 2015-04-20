@@ -202,13 +202,10 @@ Template.Home.events({
                 } else {
                     // result에는 형태소 분석 결과 (현재 한글 명사, 한글 복합명사, 영어 단어 가리지 않고 모두)가 들어온다.
                     // 이 중에서 어떤 태그가 중요한지는 Neo4j만이 알고 있다.
-                    console.log("형태소 분석 결과: ")
-                    console.dir(result);
                     slider.$currentKeyword = result;
 
                     // 키워드 당 대충 이 정도..
                     var NodesLimit = parseInt(slider.$MaximumImageNum / result.length) || 1;
-                    console.log('각 키워드 별로 ' + NodesLimit + '개를 가져오자.');
 
                     // 키워드 별로 이미지를 찾아오자!
                     for (i = 0; i < result.length; i++) {
@@ -394,6 +391,102 @@ Template.Home.rendered = function () {
                 invert: 0, // 0 ~ 100
                 saturate: 0, // 0 ~ 500
                 sepia: 0 // 0 ~ 100
+            },
+
+            saturation: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 0, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 400, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            },
+
+            hue_rotate: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 90, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            },
+
+            invert: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 0, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 80, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            },
+
+            opacity: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 0, // 360
+                opacity: 25, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 0 // 0 ~ 100
+            },
+
+            tint: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 0, // 200
+                hue_rotate: 200, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 0, // 0 ~ 500
+                sepia: 100 // 0 ~ 100
+            },
+
+            conSetuSepia: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 140, // 200
+                hue_rotate: 0, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 180, // 0 ~ 500
+                sepia: 60 // 0 ~ 100
+            },
+
+            old: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 80, // 200
+                hue_rotate: -30, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 120, // 0 ~ 500
+                sepia: 50 // 0 ~ 100
+            },
+
+            toaster: {
+                grayscale: 0, // 100
+                blur: 0, // 10
+                brightness: 0, // 200
+                contrast: 67, // 200
+                hue_rotate: -30, // 360
+                opacity: 0, // 0 ~ 100
+                invert: 0, // 0 ~ 100
+                saturate: 250, // 0 ~ 500
+                sepia: 40 // 0 ~ 100
             }
         },
 
@@ -454,7 +547,7 @@ Template.Home.rendered = function () {
                 $('[data-header-right-content]').hide(200);
                 $('[data-apply-image-filter]').show(200);
                 $('[data-main-text]').css('pointer-events', 'none');
-                $('#main-image-wrapper').siblings().css('visibility', 'hidden');
+                $('#main-image-wrapper').siblings().css('visibility',  'hidden');
                 $('#main-image-wrapper').css('border', '2px solid rgba(255,255,255,1)');
                 // $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
             })
@@ -502,24 +595,29 @@ Template.Home.rendered = function () {
                     // #2 메인이미지를 제외한 다른 이미지들을 다시 나타나게 해줍니다.
                     $('#main-image-wrapper').siblings().css('visibility', '');
 
-
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("공유");
                     $('[data-header-right-content]').attr('data-header-right-content', 'share');
 
-
-                    $('[data-main-text]').empty();
-                    $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
-                    $('[data-main-text]').focus();
-
-                    imageApp.textConfig.isFirstInput = true;
-                    imageApp.textConfig.isTypeableByEnter = true;
-                    imageApp.textConfig.isTypeableByAnyKey = true;
-
-                    $('[data-bottom-type]').hide();
-                    $('[data-bottom-type="fontFilter"]').show();
+                    imageApp.initializationByHomeBtn();
                 }
             })
+        },
+
+        initializationByHomeBtn: function() {
+            $('[data-main-text]').empty();
+            $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
+
+            imageApp.textConfig.isFirstInput = true;
+            imageApp.textConfig.isTypeableByEnter = true;
+            imageApp.textConfig.isTypeableByAnyKey = true;
+
+            imageApp.initSliderSetting();
+            imageApp.initImageFilterConfig();
+
+            imageApp.initTextDivPosition();
+            imageApp.setBottomFilter();
+
         },
 
         catchTextBoxEnterKeyEvent: function () {
@@ -567,7 +665,6 @@ Template.Home.rendered = function () {
                 var fontsize;
                 fontsize = $(this).val() - 0;
 
-                console.log(fontsize);
                 $('[data-main-text]').css('font-size', fontsize);
                 imageApp.textConfig.fontsize = fontsize;
 
@@ -637,8 +734,6 @@ Template.Home.rendered = function () {
         setRenderImage: function () {
             $('[data-rasterizes]').on('click', function () {
                 imageApp.setCssInlineStylePropsForTextEditorDiv();
-                imageApp.actionRasterizeHTML();
-
             });
         },
 
@@ -650,10 +745,6 @@ Template.Home.rendered = function () {
             $.each(styleProps, function (prop, value) {
                 $('.main-text').css(prop, value);
             });
-        },
-
-        actionRasterizeHTML: function () {
-            console.log('font type : ' + imageApp.textConfig.fontype + ", font family: " + imageApp.textConfig.fontfamily)
 
             var mainText = $('.main-text')[0].outerHTML;
 
@@ -845,8 +936,6 @@ Template.Home.rendered = function () {
     /* Hunjae
      /*****************************************************************************/
     $('#tagBox').on('click', '[data-tag]', function (e) {
-        console.log('해당 tag를 삭제합니다.');
-
         // prevent a tag default event
         e.preventDefault();
 
@@ -858,7 +947,6 @@ Template.Home.rendered = function () {
 
         // decrease tag count
         tagCounter.decTagCount();
-        console.log(tagCounter.getTagCount())
 
         // reload images (delete selected images)
         getRandomImages(parseInt(slider.$MaximumImageNum/4));
@@ -873,7 +961,6 @@ Template.Home.rendered = function () {
 
 function getImagesForTag(tagWord, edgeScope, NodesLimit, type){
   // Neo4j로 태그 쿼리를 날립니다.
-  console.log(tagWord);
 
   Meteor.neo4j.call('getImagesForTag', {
       tagWord: tagWord,
@@ -885,9 +972,6 @@ function getImagesForTag(tagWord, edgeScope, NodesLimit, type){
 
       if(data.i.length!=0){
         // sentence 쿼리 결과가 너무 늦은 경우
-        console.log('hellp');
-        console.dir(data.i);
-        console.log('I found it for '+data.t[0].word)
 
         if (type==2 /*sentence*/ && slider.$currentKeyword.indexOf(data.t[0].word) == -1) {
             return;
@@ -1066,7 +1150,6 @@ function setJeegleSlider() {
         // 가운데 이미지 번호를 가지고 있습니다.
         slider.$CenterImageNum = smallToBigLi.attr('data-num'); //this image number
         slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum];
-        console.log(slider.$CenterImageNum);
 
         // 배경이미지 설정
         backgroundStyle = "url('"+smallToBigImg[0].src+"')";
@@ -1119,7 +1202,6 @@ function setJeegleSlider() {
         // 가운데 이미지 번호를 가지고 있습니다.
         slider.$CenterImageNum = smallToBigLi.attr('data-num'); //this image number
         slider.$CenterImageNode = ImageQueue.heap[slider.$CenterImageNum];
-        console.log('center: '+slider.$CenterImageNum);
 
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
@@ -1238,8 +1320,6 @@ function createTagDiv(tagNum, tagWord) {
 function pushImages(Images, priority, tag, type) {
     var ImageArray = new Array();
 
-    console.log('before:')
-    console.dir(ImageQueue.heap)
     if(ImageQueue.isFull()){
       ImageQueue.decAllPriority();
     }
@@ -1248,7 +1328,6 @@ function pushImages(Images, priority, tag, type) {
         for (j = 0; j < ImageQueue.heap.length; j++) {
             if (ImageQueue.heap[j].data.thumbnailImageUrl == Images[k].thumbnailImageUrl) {
                 duplicatedFlag = true;
-                console.log('duplicated!')
                 break;
             }
         }
@@ -1256,8 +1335,6 @@ function pushImages(Images, priority, tag, type) {
 
         ImageQueue.push(Images[k], priority, tag[k], type);
     }
-    console.log('after:')
-    console.dir(ImageQueue.heap)
 }
 
 // 사용자가 #태그를 다는 개수를 셉니다.
