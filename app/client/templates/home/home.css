@@ -643,7 +643,7 @@ a.control_next {
   vertical-align:top;
   background-image:url('./image/random_btn_normal.png');
   display: inline-block;
-  vertical-align: baseline;
+  vertical-align: text-top;
   background-color: rgba(0,0,0,0);
   background-size: cover;
   background-position: center center;
@@ -651,6 +651,7 @@ a.control_next {
   width:24px;
   height:24px;
   margin-right:5px;
+  border: 1px solid #fff;
 }
 
 .refresh-musicDeeplink:hover{
