@@ -652,6 +652,7 @@ Template.Home.rendered = function() {
                                     var imageUrl = Workpieces.findOne({
                                         _id: _id
                                     }).url;
+                                    console.log('imageUrl =>', imageUrl);
                                     imageUrl = 'http://jeegle.io' + url;
 
                                     Deps.autorun(function(computation) {
@@ -663,7 +664,7 @@ Template.Home.rendered = function() {
                                             // 페이스북의 graph api를 POST 방식으로 콜합니다.
                                             // 아래의 FB 객체는 Facebook JavaScript SDK의 광역 객체입니다. (현재 rendered에서 이 FB객체를 불러오고 있습니다.)
                                             // *** 아래의 api의 정보는 페이스북 앱으로 등록된 "Jeegle"의 대시보드에서 Open Graph에서 확인하실 수 있습니다. ***
-                                            // call 자체는 story를 참조하고,
+                                            // call 자체는 story를 참조하고,지글은 좋은 글을 좋은 이미지에 쓸 수 있도록 해주는 서비스입니다.
                                             // 첨부하는 json의 최상단은 action,
                                             // 그리고 가장 하단의 jeegle object는 object를 참조합니다.
                                             // *** jeegle object 설명 ***

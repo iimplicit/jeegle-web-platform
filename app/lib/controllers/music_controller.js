@@ -40,11 +40,12 @@ MusicController = RouteController.extend({
             });
         } else {
             // Web의 경우 Workpiece 탬플릿을 render 해줍니다.
-            this.render('Workpiece', {
-                data: {
-
-                }
-            });
+            // this.render('Workpiece', {
+            //     data: {
+            //
+            //     }
+            // });
+            this.render('Home');
         }
     }
 });
