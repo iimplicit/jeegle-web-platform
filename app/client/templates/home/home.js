@@ -634,113 +634,120 @@ Template.Home.rendered = function() {
                     rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
                         var url = getBase64Image(renderResult.image);
 
-                        Deps.autorun(function(computation) {
-                            if (Meteor.user().services) {
-                                // 회원정보를 받아올 때 가져오는 accessToken을 가져옵니다.
-                                // 실제적으로 데이터를 서버에서 가져오는 부분은 PUB/SUB에 의해 home_controller.js와  server/publish.js에 구현되어있습니다.
-                                var accessToken = Meteor.user().services.facebook.accessToken;
-
-                                // 페이스북의 graph api를 POST 방식으로 콜합니다.
-                                // 아래의 FB 객체는 Facebook JavaScript SDK의 광역 객체입니다. (현재 rendered에서 이 FB객체를 불러오고 있습니다.)
-                                // *** 아래의 api의 정보는 페이스북 앱으로 등록된 "Jeegle"의 대시보드에서 Open Graph에서 확인하실 수 있습니다. ***
-                                // call 자체는 story를 참조하고,
-                                // 첨부하는 json의 최상단은 action,
-                                // 그리고 가장 하단의 jeegle object는 object를 참조합니다.
-                                // *** jeegle object 설명 ***
-                                // og:url | <hostname>/music/:_id | _id에는 Beat의 음악 id 6자리를 넣습니다.
-                                // jeegle-web:music_info | String | Beat에서 제공하는 제목과 가수를 넣습니다. 예를 들어 "맛좋은 산 - San E"
-                                // og:image | String | 포스팅할 이미지의 URL을 넣습니다. (페이스북에서 허용하는 다른 이미지 형식도 가능합니다.)
-
-                                FB.api(
-                                    "/me/jeegle-web:create",
-                                    "POST", {
-                                        "access_token": accessToken,
-                                        "created_time": new Date().toISOString(),
-                                        "message": "신기하다.",
-                                        "fb:explicitly_shared": true,
-                                        "jeegle": {
-                                            "og:type": "jeegle-web:jeegle",
-                                            "og:url": "http://localhost:3000/music/123456",
-                                            "og:title": "Sample Jeegle",
-                                            "og:locale": "ko_KR",
-                                            "og:image": "http://placehold.it/640x640",
-                                            "og:image:width": "640",
-                                            "og:image:height": "640",
-                                            "fb:app_id": "575943959175026",
-                                            "jeegle-web:music_info": "music_info",
-                                            "al:web:url": "http://placehold.it/640x640",
-                                            "al:web:should_fallback": true,
-                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
-                                            "al:ios:app_store_id": "853073541",
-                                            "al:ios:app_name": "BEAT",
-                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
-                                            "al:iphone:app_store_id": "853073541",
-                                            "al:iphone:app_name": "BEAT",
-                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
-                                            "al:android:package": "com.beatpacking.beat",
-                                            "al:android:app_name": "BEAT"
-                                        }
-                                    },
-                                    function(response) {
-                                        console.dir(response);
-                                        if (response && !response.error) {
-                                            computation.stop();
-                                            console.log('facebook upload complete');
-                                        }
-                                    }
-                                );
-
-                                // 향후 사용할 가능성이 있어서 남겨두었습니다. 페이스북 일반적인 포스트를 생성할 때 아래의 방식으로 api 콜을 날립니다.
-                                // FB.api(
-                                //     "/me/feed",
-                                //     "POST", {
-                                //         "access_token": accessToken,
-                                //         message: "이미지",
-                                //         url: "http://128.199.249.209:9990/images/activity-aviation-fly-2302-640.jpg"
-                                //     },
-                                //     function(response) {
-                                //         if (!response || response.error) {
-                                //             console.log(response.error);
-                                //         } else {
-                                //             console.log(response);
-                                //             console.log(response.id);
-                                //         }
-                                //     }
-                                // );
-
-                                // 마찬가지로 향후 사용할 가능성이 있어서 남겨두었습니다.
-                                // 먼저 페이스북에서 앨범을 만들고, 그 앨범 안에 사진을 넣는 방식으로 포스팅 할 때 이런 방식으로 api 콜을 날립니다.
-                                // 나중에는 먼저 앨범이 있는지 확인하고, 날짜를 사진 이름으로 해서 올리는 방식으로 향후 개선해야 합니다.
-                                // FB.api(
-                                //     "/me/albums",
-                                //     "POST", {
-                                //         "name": "Jeegle(지글)",
-                                //         "message": "지글 앱을 위한 앨범입니다."
-                                //     },
-                                //     function(response) {
-                                //         if (!response || response.error) {
-                                //             console.log(response.error);
-                                //         } else {
-                                //             var albumID = response.id;
-                                //             FB.api(
-                                //                 "/" + albumID + "/photos",
-                                //                 "POST", {
-                                //                     message: "지글 테스트 사진 업로드입니다.",
-                                //                     url: "http://4de08c6af39c20343f39-fec7c301d7eca18188203e783b444e60.r36.cf1.rackcdn.com/2010/04/facebook-social.jpg"
-                                //                 },
-                                //                 function(response) {
-                                //                     if (!response || response.error) {
-                                //                         console.log(response.error);
-                                //                     } else {
-                                //                         console.log(response);
-                                //                         console.log(response.id);
-                                //                     }
-                                //                 }
-                                //             );
-                                //         }
-                                //     }
-                                // );
+                        // _ImageFiles를 callback과 함께 실행시켜줍니다.
+                        _ImageFiles(url, function(url) {
+                            // Workpieces collection에 정보를 넣어줍니다.
+                            // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
+                            var workpiece = {
+                                imageUrl: url,
+                                createdBy: Meteor.userId(),
+                                createdAt: new Date(),
+                                updatedAt: new Date()
                             }
+
+                            Workpieces.insert(workpiece, function(err, result) {
+                                if (!err) {
+                                    // insert 시 반환되는 것은 inserted된 document의 _id값입니다.
+                                    var _id = result;
+                                    var imageUrl = Workpieces.findOne({
+                                        _id: _id
+                                    }).url;
+                                    imageUrl = 'http://jeegle.io' + url;
+
+                                    Deps.autorun(function(computation) {
+                                        if (Meteor.user().services) {
+                                            // 회원정보를 받아올 때 가져오는 accessToken을 가져옵니다.
+                                            // 실제적으로 데이터를 서버에서 가져오는 부분은 PUB/SUB에 의해 home_controller.js와  server/publish.js에 구현되어있습니다.
+                                            var accessToken = Meteor.user().services.facebook.accessToken;
+
+                                            // 페이스북의 graph api를 POST 방식으로 콜합니다.
+                                            // 아래의 FB 객체는 Facebook JavaScript SDK의 광역 객체입니다. (현재 rendered에서 이 FB객체를 불러오고 있습니다.)
+                                            // *** 아래의 api의 정보는 페이스북 앱으로 등록된 "Jeegle"의 대시보드에서 Open Graph에서 확인하실 수 있습니다. ***
+                                            // call 자체는 story를 참조하고,
+                                            // 첨부하는 json의 최상단은 action,
+                                            // 그리고 가장 하단의 jeegle object는 object를 참조합니다.
+                                            // *** jeegle object 설명 ***
+                                            // og:url | <hostname>/music/:_id | _id에는 Beat의 음악 id 6자리를 넣습니다.
+                                            // jeegle-web:music_info | String | Beat에서 제공하는 제목과 가수를 넣습니다. 예를 들어 "맛좋은 산 - San E"
+                                            // og:image | String | 포스팅할 이미지의 URL을 넣습니다. (페이스북에서 허용하는 다른 이미지 형식도 가능합니다.)
+
+                                            var isSharingMusic = $('[data-share-music-type="beat"]').prop('checked');
+                                            if (isSharingMusic) {
+                                                FB.api(
+                                                    "/me/jeegle-web:create",
+                                                    "POST", {
+                                                        "access_token": accessToken,
+                                                        "created_time": new Date().toISOString(),
+                                                        "message": "신기하다.",
+                                                        "fb:explicitly_shared": true,
+                                                        "jeegle": {
+                                                            "og:type": "jeegle-web:jeegle",
+                                                            "og:url": "http://jeegle.io/music/123456",
+                                                            "og:title": "Sample Jeegle",
+                                                            "og:locale": "ko_KR",
+                                                            "og:image": imageUrl,
+                                                            "og:image:width": "640",
+                                                            "og:image:height": "640",
+                                                            "fb:app_id": "575943959175026",
+                                                            "jeegle-web:music_info": "music_info",
+                                                            "al:web:url": imageUrl,
+                                                            "al:web:should_fallback": true,
+                                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                                            "al:ios:app_store_id": "853073541",
+                                                            "al:ios:app_name": "BEAT",
+                                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                                            "al:iphone:app_store_id": "853073541",
+                                                            "al:iphone:app_name": "BEAT",
+                                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                                            "al:android:package": "com.beatpacking.beat",
+                                                            "al:android:app_name": "BEAT"
+                                                        }
+                                                    },
+                                                    function(response) {
+                                                        console.log('this is response', response);
+                                                        console.dir(response);
+                                                        if (response && !response.error) {
+                                                            console.log('facebook upload complete', response);
+                                                            computation.stop();
+                                                        }
+                                                    }
+                                                );
+                                            } else {
+                                                // 마찬가지로 향후 사용할 가능성이 있어서 남겨두었습니다.
+                                                // 먼저 페이스북에서 앨범을 만들고, 그 앨범 안에 사진을 넣는 방식으로 포스팅 할 때 이런 방식으로 api 콜을 날립니다.
+                                                // 나중에는 먼저 앨범이 있는지 확인하고, 날짜를 사진 이름으로 해서 올리는 방식으로 향후 개선해야 합니다.
+                                                console.log(imageUrl);
+                                                FB.api(
+                                                    "/me/photos",
+                                                    "POST", {
+                                                        "access_token": accessToken,
+                                                        "message": "Made in http://jeegle.io",
+                                                        "url": imageUrl
+                                                    },
+                                                    function(response) {
+                                                        if (!response || response.error) {
+                                                            console.log(response.error);
+                                                        } else {
+                                                            console.log('facebook upload complete', response);
+                                                            computation.stop();
+                                                        }
+                                                    }
+                                                );
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    console.log('workpiece insert error: ', err);
+                                }
+                            });
+
+                            $('[data-main-text]').on('heightChange', function(e) {
+                                var textHeight = $('[data-main-text]').height();
+                                if (textHeight < 640) {
+                                    var textDivXPosition = (640 - textHeight) / 2;
+                                    $('[data-main-text]').css('top', textDivXPosition);
+                                }
+                            })
                         });
 
                         function _ImageFiles(url, callback) {
@@ -772,36 +779,6 @@ Template.Home.rendered = function() {
                                 }
                             });
                         }
-
-                        // _ImageFiles를 callback과 함께 실행시켜줍니다.
-                        _ImageFiles(url, function(url) {
-                            // Workpieces collection에 정보를 넣어줍니다.
-                            // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
-                            var workpiece = {
-                                imageUrl: url,
-                                createdBy: Meteor.userId(),
-                                createdAt: new Date(),
-                                updatedAt: new Date()
-                            }
-
-                            Workpieces.insert(workpiece, function(err, result) {
-                                if (!err) {
-                                    // insert 시 반환되는 것은 inserted된 document의 _id값입니다.
-                                    var _id = result;
-
-                                } else {
-                                    console.log('workpiece insert error: ', err);
-                                }
-                            });
-
-                            $('[data-main-text]').on('heightChange', function(e) {
-                                var textHeight = $('[data-main-text]').height();
-                                if (textHeight < 640) {
-                                    var textDivXPosition = (640 - textHeight) / 2;
-                                    $('[data-main-text]').css('top', textDivXPosition);
-                                }
-                            })
-                        });
                     }, function error(err) {
                         console.log('rasterization failed: ', err);
                     });
