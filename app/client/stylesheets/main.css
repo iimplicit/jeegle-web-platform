@@ -100,3 +100,16 @@
 	width:120px;
 	margin:6px auto
 }
+
+
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+::-webkit-scrollbar-track {
+
+}
+
+::-webkit-scrollbar-thumb {
+    
+}
