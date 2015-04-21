@@ -19,9 +19,6 @@ ImageQueue = new priorityQueue(slider.$MaximumImageNum);
 /* Home: Event Handlers */
 /*****************************************************************************/
 Template.Home.events({
-    "click [data-share-facebook]": function() {
-
-    },
     "click [data-logout]": function() {
         Meteor.logout();
     },
@@ -127,22 +124,20 @@ Template.Home.events({
                 }
             });
         }
-    });
-}
-}, 300),
-"click [data-image-item]": function(e, tmpl) {
-    var background = e.target.style.background;
-    var url = background.slice(4, background.length - 1);
+    }, 300),
+    "click [data-image-item]": function(e, tmpl) {
+        var background = e.target.style.background;
+        var url = background.slice(4, background.length - 1);
 
-    TempWorkpieces.update({
-        _id: Session.get("currentId")
-    }, {
-        $set: {
-            updatedAt: new Date,
-            'content.0.url': url
-        }
-    });
-}
+        TempWorkpieces.update({
+            _id: Session.get("currentId")
+        }, {
+            $set: {
+                updatedAt: new Date,
+                'content.0.url': url
+            }
+        });
+    }
 });
 
 /*****************************************************************************/
@@ -195,23 +190,23 @@ Template.Home.created = function() {
 
 
 Template.Home.rendered = function() {
-//  참고.. image effect range
-//            grayscale : 100 + '%', // 0~ 100
-//            blur: 0 + 'px', // 10
-//            brightness: 100 + '%', // 200
-//            contrast: 100 + '%', // 200
-//            hue_rotate: 0 + 'deg', // 360
-//            opacity: 100 + '%', // 0 ~ 100
-//            invert: 0 + '%', // 0 ~ 100
-//            saturate: 100 + '%', // 0 ~ 500
-//            sepia: 0 + '%' // 0 ~ 100
+    //  참고.. image effect range
+    //            grayscale : 100 + '%', // 0~ 100
+    //            blur: 0 + 'px', // 10
+    //            brightness: 100 + '%', // 200
+    //            contrast: 100 + '%', // 200
+    //            hue_rotate: 0 + 'deg', // 360
+    //            opacity: 100 + '%', // 0 ~ 100
+    //            invert: 0 + '%', // 0 ~ 100
+    //            saturate: 100 + '%', // 0 ~ 500
+    //            sepia: 0 + '%' // 0 ~ 100
 
-/*****************************************************************************/
-/* Image 관련 기능*/
-/*****************************************************************************/
-function imageApp() {}
+    /*****************************************************************************/
+    /* Image 관련 기능*/
+    /*****************************************************************************/
+    function imageApp() {}
 
-imageApp.prototype = {
+    imageApp.prototype = {
         targetImage: $('#main-image'),
         mainText: $('[data-main-text]'),
 
@@ -402,7 +397,7 @@ imageApp.prototype = {
             this.setImageFilterType();
             this.setEditorStyle();
             this.setTextDivPosition();
-            this.setRenderImage();
+            this.facebookLoginAndRasterizeHTML();
         },
         toggleBottomFilter: function() {
             // $('body').on('click', '.main-text', function (e) {
@@ -469,27 +464,31 @@ imageApp.prototype = {
                     // #1 pointer-events 클릭을 막은 것은 풀어줍니다.
                     $('#slider_box').css('pointer-events', 'auto');
                     $('[data-main-text]').css('pointer-events', 'auto');
-                    // #2 메인이미지를 제외한 다른 이미지들을 다시 나타나게 해줍니다.ㅎㅏㄱㄱㅗ
+                    // #2 메인이미지를 제외한 다른 이미지들을 다시 나타나게 해줍니다.
                     $('#main-image-wrapper').siblings().css('visibility', '');
-
 
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("공유");
                     $('[data-header-right-content]').attr('data-header-right-content', 'share');
 
-
-                    $('[data-main-text]').empty();
-                    $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
-                    $('[data-main-text]').focus();
-
-                    imageApp.textConfig.isFirstInput = true;
-                    imageApp.textConfig.isTypeableByEnter = true;
-                    imageApp.textConfig.isTypeableByAnyKey = true;
-
-                    $('[data-bottom-type]').hide();
-                    $('[data-bottom-type="fontFilter"]').show();
+                    imageApp.initializationByHomeBtn();
                 }
-            })
+            });
+        },
+        initializationByHomeBtn: function() {
+            $('[data-main-text]').empty();
+            $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
+
+            imageApp.textConfig.isFirstInput = true;
+            imageApp.textConfig.isTypeableByEnter = true;
+            imageApp.textConfig.isTypeableByAnyKey = true;
+
+            imageApp.initSliderSetting();
+            imageApp.initImageFilterConfig();
+
+            imageApp.initTextDivPosition();
+            imageApp.setBottomFilter();
+
         },
 
         catchTextBoxEnterKeyEvent: function() {
@@ -512,7 +511,6 @@ imageApp.prototype = {
                 }
             });
         },
-
         setEditorStyle: function() {
             $('[data-main-text-typography]').change(function() {
                 var selectedFontType = $("[data-main-text-typography] option:selected").attr('data-event-change-typography');
@@ -537,7 +535,6 @@ imageApp.prototype = {
                 var fontsize;
                 fontsize = $(this).val() - 0;
 
-                console.log(fontsize);
                 $('[data-main-text]').css('font-size', fontsize);
                 imageApp.textConfig.fontsize = fontsize;
 
@@ -549,360 +546,272 @@ imageApp.prototype = {
             });
 
             $('[data-change-font-types]').on('change', function() {
-                    var isCheckBold = $("input:checkbox[data-change-font-type='bold']").is(":checked");
-                    var isCheckItalic = $("input:checkbox[data-change-font-type='italic']").is(":checked");
-                    var isCheckShadow = $("input:checkbox[data-change-font-type='shadow']").is(":checked");
-                    $('[data-header-right-content]').empty();
-                    $('[data-header-right-content]').text("공유");
-                    $('[data-header-right-content]').attr('data-header-right-content', 'share');
+                var isCheckBold = $("input:checkbox[data-change-font-type='bold']").is(":checked");
+                var isCheckItalic = $("input:checkbox[data-change-font-type='italic']").is(":checked");
+                var isCheckShadow = $("input:checkbox[data-change-font-type='shadow']").is(":checked");
 
-                    imageApp.initializationByHomeBtn();
+                $('[data-main-text]').css('font-weight', '');
+                $('[data-main-text]').css('font-style', '');
+                $('[data-main-text]').css('text-shadow', '');
+
+                if (isCheckBold) {
+                    $('[data-main-text]').css('font-weight', 'bold');
+                }
+
+                if (isCheckItalic) {
+                    $('[data-main-text]').css('font-style', 'italic');
+                }
+
+                if (isCheckShadow) {
+                    $('[data-main-text]').css('text-shadow', '3px 3px #000');
+                }
+            });
+
+            $('[data-change-font-justify]').on('click', function() {
+                var selectedValue = $(this).val();
+                $('[data-main-text]').css('text-align', selectedValue);
+            });
+
+
+        },
+
+        setTextDivPosition: function() {
+            $('[data-main-text]').keyup(function(e) {
+                var height = $('[data-main-text]').height();
+                var fontsize = imageApp.textConfig.fontsize;
+
+                if (height + fontsize + 5 > 580) {
+                    imageApp.textConfig.isTypeableByEnter = false;
+                } else if (height + fontsize + 5 > 620) {
+                    imageApp.textConfig.isTypeableByAnyKey = false;
+                } else {
+                    imageApp.textConfig.isTypeableByAnyKey = true;
+                    imageApp.textConfig.isTypeableByEnter = true;
+                }
+                $('[data-main-text]').trigger('heightChange');
+            });
+
+
+            $('[data-main-text]').on('heightChange', function(e) {
+                var textHeight = $('[data-main-text]').height();
+                if (textHeight < 640) {
+                    var textDivXPosition = (640 - textHeight) / 2;
+                    $('[data-main-text]').css('top', textDivXPosition);
                 }
             })
-    },
+        },
+        setCssInlineStylePropsForTextEditorDiv: function() {
+            var styleProps = $('.main-text').css([
+                "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family", "text-align", "font-weight", "font-style", "line-height", "margin", "padding"
+            ]);
 
-    initializationByHomeBtn: function() {
-        $('[data-main-text]').empty();
-        $('[data-main-text]').text("무슨 생각을 하고 계신가요?");
+            $.each(styleProps, function(prop, value) {
+                $('.main-text').css(prop, value);
+            });
+        },
+        facebookLoginAndRasterizeHTML: function() {
+            var self = this;
 
-        imageApp.textConfig.isFirstInput = true;
-        imageApp.textConfig.isTypeableByEnter = true;
-        imageApp.textConfig.isTypeableByAnyKey = true;
+            $('[data-share-facebook]').on('click', function(e) {
+                // 이미지의 css 속성들을 인라인으로 넣어주는 함수 실행
+                self.setCssInlineStylePropsForTextEditorDiv();
 
-        imageApp.initSliderSetting();
-        imageApp.initImageFilterConfig();
+                Meteor.loginWithFacebook({
+                    requestPermissions: ['user_photos', 'publish_actions']
+                }, function(err) {
+                    var mainText = $('.main-text')[0].outerHTML;
 
-        imageApp.initTextDivPosition();
-        imageApp.setBottomFilter();
+                    var parent = $('#main-image').parent();
+                    var parentClone = parent.clone();
+                    parentClone.css('width', '640px');
+                    parentClone.css('height', '640px');
+                    parentClone.css('bottom', '0');
 
-    },
+                    var parentResult = parentClone[0].outerHTML;
 
-    $('[data-main-text]').css('font-weight', '');
-$('[data-main-text]').css('font-style', '');
-$('[data-main-text]').css('text-shadow', '');
+                    var innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: " + imageApp.textConfig.fontfamily + "; src: url(/font/" + imageApp.textConfig.fontype + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} ul {margin: 0; padding: 0;} li {margin: 0; padding: 0} img { margin: 0; padding: 0; vertical-align: middle; }</style></head><body><ul id='slider'>" + parentResult + mainText + '</ul></body></html>';
 
-if (isCheckBold) {
-    $('[data-main-text]').css('font-weight', 'bold');
-}
+                    rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+                        var url = getBase64Image(renderResult.image);
 
-if (isCheckItalic) {
-    $('[data-main-text]').css('font-style', 'italic');
-}
+                        Deps.autorun(function(computation) {
+                            if (Meteor.user().services) {
+                                // 회원정보를 받아올 때 가져오는 accessToken을 가져옵니다.
+                                // 실제적으로 데이터를 서버에서 가져오는 부분은 PUB/SUB에 의해 home_controller.js와  server/publish.js에 구현되어있습니다.
+                                var accessToken = Meteor.user().services.facebook.accessToken;
 
-if (isCheckShadow) {
-    $('[data-main-text]').css('text-shadow', '3px 3px #000');
-}
-});
+                                // 페이스북의 graph api를 POST 방식으로 콜합니다.
+                                // 아래의 FB 객체는 Facebook JavaScript SDK의 광역 객체입니다. (현재 rendered에서 이 FB객체를 불러오고 있습니다.)
+                                // *** 아래의 api의 정보는 페이스북 앱으로 등록된 "Jeegle"의 대시보드에서 Open Graph에서 확인하실 수 있습니다. ***
+                                // call 자체는 story를 참조하고,
+                                // 첨부하는 json의 최상단은 action,
+                                // 그리고 가장 하단의 jeegle object는 object를 참조합니다.
+                                // *** jeegle object 설명 ***
+                                // og:url | <hostname>/music/:_id | _id에는 Beat의 음악 id 6자리를 넣습니다.
+                                // jeegle-web:music_info | String | Beat에서 제공하는 제목과 가수를 넣습니다. 예를 들어 "맛좋은 산 - San E"
+                                // og:image | String | 포스팅할 이미지의 URL을 넣습니다. (페이스북에서 허용하는 다른 이미지 형식도 가능합니다.)
 
-$('[data-change-font-justify]').on('click', function() {
-    var selectedValue = $(this).val();
-    $('[data-main-text]').css('text-align', selectedValue);
-});
-
-
-$('[data-main-text]').css('font-size', fontsize);
-imageApp.textConfig.fontsize = fontsize;
-},
-
-setTextDivPosition: function() {
-        $('[data-main-text]').keyup(function(e) {
-            var height = $('[data-main-text]').height();
-            var fontsize = imageApp.textConfig.fontsize;
-
-            if (height + fontsize + 5 > 580) {
-                imageApp.textConfig.isTypeableByEnter = false;
-            } else if (height + fontsize + 5 > 620) {
-                imageApp.textConfig.isTypeableByAnyKey = false;
-            } else {
-                imageApp.textConfig.isTypeableByAnyKey = true;
-                imageApp.textConfig.isTypeableByEnter = true;
-            }
-            $('[data-main-text]').trigger('heightChange');
-        });
-
-
-        $('[data-main-text]').on('heightChange', function(e) {
-            var textHeight = $('[data-main-text]').height();
-            if (textHeight < 640) {
-                var textDivXPosition = (640 - textHeight) / 2;
-                $('[data-main-text]').css('top', textDivXPosition);
-            }
-        })
-    },
-
-    setRenderImage: function() {
-        var self = this;
-
-        $('[data-share-facebook]').on('click', function() {
-            self.setCssInlineStylePropsForTextEditorDiv();
-            self.facebookLoginAndRasterizeHTML();
-            self.shareOnFacebook();
-        });
-    },
-
-    setCssInlineStylePropsForTextEditorDiv: function() {
-        var styleProps = $('.main-text').css([
-            "width", "height", "position", "top", "left", "color", "background-color", "font-size", "font-family", "text-align", "font-weight", "font-style", "line-height", "margin", "padding"
-        ]);
-
-        $.each(styleProps, function(prop, value) {
-            $('.main-text').css(prop, value);
-        });
-    },
-
-    facebookLoginAndRasterizeHTML: function() {
-        Meteor.loginWithFacebook({
-                requestPermissions: ['user_photos', 'publish_actions']
-            }, function(err) {
-                var mainText = $('.main-text')[0].outerHTML;
-
-                var parent = $('#main-image').parent();
-                var parentClone = parent.clone();
-                parentClone.css('width', '640px');
-                parentClone.css('height', '640px');
-                parentClone.css('bottom', '0');
-
-                var parentResult = parentClone[0].outerHTML;
-
-                var innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: " + imageApp.textConfig.fontfamily + "; src: url(/font/" + imageApp.textConfig.fontype + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} ul {margin: 0; padding: 0;} li {margin: 0; padding: 0} img { margin: 0; padding: 0; vertical-align: middle; }</style></head><body><ul id='slider'>" + parentResult + mainText + '</ul></body></html>';
-
-                rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
-                            var url = getBase64Image(renderResult.image);
-
-                            Deps.autorun(function(computation) {
-                                if (Meteor.user().services) {
-                                    // 회원정보를 받아올 때 가져오는 accessToken을 가져옵니다.
-                                    // 실제적으로 데이터를 서버에서 가져오는 부분은 PUB/SUB에 의해 home_controller.js와  server/publish.js에 구현되어있습니다.
-                                    var accessToken = Meteor.user().services.facebook.accessToken;
-
-                                    // 페이스북의 graph api를 POST 방식으로 콜합니다.
-                                    // 아래의 FB 객체는 Facebook JavaScript SDK의 광역 객체입니다. (현재 rendered에서 이 FB객체를 불러오고 있습니다.)
-                                    // *** 아래의 api의 정보는 페이스북 앱으로 등록된 "Jeegle"의 대시보드에서 Open Graph에서 확인하실 수 있습니다. ***
-                                    // call 자체는 story를 참조하고,
-                                    // 첨부하는 json의 최상단은 action,
-                                    // 그리고 가장 하단의 jeegle object는 object를 참조합니다.
-                                    // *** jeegle object 설명 ***
-                                    // og:url | <hostname>/music/:_id | _id에는 Beat의 음악 id 6자리를 넣습니다.
-                                    // jeegle-web:music_info | String | Beat에서 제공하는 제목과 가수를 넣습니다. 예를 들어 "맛좋은 산 - San E"
-                                    // og:image | String | 포스팅할 이미지의 URL을 넣습니다. (페이스북에서 허용하는 다른 이미지 형식도 가능합니다.)
-
-                                    FB.api(
-                                        "/me/jeegle-web:create",
-                                        "POST", {
-                                            "access_token": accessToken,
-                                            "created_time": new Date().toISOString(),
-                                            "message": "신기하다.",
-                                            "fb:explicitly_shared": true,
-                                            "jeegle": {
-                                                "og:type": "jeegle-web:jeegle",
-                                                "og:url": "http://localhost:3000/music/123456",
-                                                "og:title": "Sample Jeegle",
-                                                "og:locale": "ko_KR",
-                                                "og:image": "http://placehold.it/640x640",
-                                                "og:image:width": "640",
-                                                "og:image:height": "640",
-                                                "fb:app_id": "575943959175026",
-                                                "jeegle-web:music_info": "music_info",
-                                                "al:web:url": "http://placehold.it/640x640",
-                                                "al:web:should_fallback": true,
-                                                "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
-                                                "al:ios:app_store_id": "853073541",
-                                                "al:ios:app_name": "BEAT",
-                                                "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
-                                                "al:iphone:app_store_id": "853073541",
-                                                "al:iphone:app_name": "BEAT",
-                                                "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
-                                                "al:android:package": "com.beatpacking.beat",
-                                                "al:android:app_name": "BEAT"
-                                            }
-                                        },
-                                        function(response) {
-                                            console.dir(response);
-                                            if (response && !response.error) {
-                                                computation.stop();
-                                                console.log('facebook upload complete');
-                                            }
+                                FB.api(
+                                    "/me/jeegle-web:create",
+                                    "POST", {
+                                        "access_token": accessToken,
+                                        "created_time": new Date().toISOString(),
+                                        "message": "신기하다.",
+                                        "fb:explicitly_shared": true,
+                                        "jeegle": {
+                                            "og:type": "jeegle-web:jeegle",
+                                            "og:url": "http://localhost:3000/music/123456",
+                                            "og:title": "Sample Jeegle",
+                                            "og:locale": "ko_KR",
+                                            "og:image": "http://placehold.it/640x640",
+                                            "og:image:width": "640",
+                                            "og:image:height": "640",
+                                            "fb:app_id": "575943959175026",
+                                            "jeegle-web:music_info": "music_info",
+                                            "al:web:url": "http://placehold.it/640x640",
+                                            "al:web:should_fallback": true,
+                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                            "al:ios:app_store_id": "853073541",
+                                            "al:ios:app_name": "BEAT",
+                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                            "al:iphone:app_store_id": "853073541",
+                                            "al:iphone:app_name": "BEAT",
+                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                            "al:android:package": "com.beatpacking.beat",
+                                            "al:android:app_name": "BEAT"
                                         }
-                                    );
+                                    },
+                                    function(response) {
+                                        console.dir(response);
+                                        if (response && !response.error) {
+                                            computation.stop();
+                                            console.log('facebook upload complete');
+                                        }
+                                    }
+                                );
 
-                                    // 향후 사용할 가능성이 있어서 남겨두었습니다. 페이스북 일반적인 포스트를 생성할 때 아래의 방식으로 api 콜을 날립니다.
-                                    // FB.api(
-                                    //     "/me/feed",
-                                    //     "POST", {
-                                    //         "access_token": accessToken,
-                                    //         message: "이미지",
-                                    //         url: "http://128.199.249.209:9990/images/activity-aviation-fly-2302-640.jpg"
-                                    //     },
-                                    //     function(response) {
-                                    //         if (!response || response.error) {
-                                    //             console.log(response.error);
-                                    //         } else {
-                                    //             console.log(response);
-                                    //             console.log(response.id);
-                                    //         }
-                                    //     }
-                                    // );
+                                // 향후 사용할 가능성이 있어서 남겨두었습니다. 페이스북 일반적인 포스트를 생성할 때 아래의 방식으로 api 콜을 날립니다.
+                                // FB.api(
+                                //     "/me/feed",
+                                //     "POST", {
+                                //         "access_token": accessToken,
+                                //         message: "이미지",
+                                //         url: "http://128.199.249.209:9990/images/activity-aviation-fly-2302-640.jpg"
+                                //     },
+                                //     function(response) {
+                                //         if (!response || response.error) {
+                                //             console.log(response.error);
+                                //         } else {
+                                //             console.log(response);
+                                //             console.log(response.id);
+                                //         }
+                                //     }
+                                // );
 
-                                    // 마찬가지로 향후 사용할 가능성이 있어서 남겨두었습니다.
-                                    // 먼저 페이스북에서 앨범을 만들고, 그 앨범 안에 사진을 넣는 방식으로 포스팅 할 때 이런 방식으로 api 콜을 날립니다.
-                                    // 나중에는 먼저 앨범이 있는지 확인하고, 날짜를 사진 이름으로 해서 올리는 방식으로 향후 개선해야 합니다.
-                                    // FB.api(
-                                    //     "/me/albums",
-                                    //     "POST", {
-                                    //         "name": "Jeegle(지글)",
-                                    //         "message": "지글 앱을 위한 앨범입니다."
-                                    //     },
-                                    //     function(response) {
-                                    //         if (!response || response.error) {
-                                    //             console.log(response.error);
-                                    //         } else {
-                                    //             var albumID = response.id;
-                                    //             FB.api(
-                                    //                 "/" + albumID + "/photos",
-                                    //                 "POST", {
-                                    //                     message: "지글 테스트 사진 업로드입니다.",
-                                    //                     url: "http://4de08c6af39c20343f39-fec7c301d7eca18188203e783b444e60.r36.cf1.rackcdn.com/2010/04/facebook-social.jpg"
-                                    //                 },
-                                    //                 function(response) {
-                                    //                     if (!response || response.error) {
-                                    //                         console.log(response.error);
-                                    //                     } else {
-                                    //                         console.log(response);
-                                    //                         console.log(response.id);
-                                    //                     }
-                                    //                 }
-                                    //             );
-                                    //         }
-                                    //     }
-                                    // );
+                                // 마찬가지로 향후 사용할 가능성이 있어서 남겨두었습니다.
+                                // 먼저 페이스북에서 앨범을 만들고, 그 앨범 안에 사진을 넣는 방식으로 포스팅 할 때 이런 방식으로 api 콜을 날립니다.
+                                // 나중에는 먼저 앨범이 있는지 확인하고, 날짜를 사진 이름으로 해서 올리는 방식으로 향후 개선해야 합니다.
+                                // FB.api(
+                                //     "/me/albums",
+                                //     "POST", {
+                                //         "name": "Jeegle(지글)",
+                                //         "message": "지글 앱을 위한 앨범입니다."
+                                //     },
+                                //     function(response) {
+                                //         if (!response || response.error) {
+                                //             console.log(response.error);
+                                //         } else {
+                                //             var albumID = response.id;
+                                //             FB.api(
+                                //                 "/" + albumID + "/photos",
+                                //                 "POST", {
+                                //                     message: "지글 테스트 사진 업로드입니다.",
+                                //                     url: "http://4de08c6af39c20343f39-fec7c301d7eca18188203e783b444e60.r36.cf1.rackcdn.com/2010/04/facebook-social.jpg"
+                                //                 },
+                                //                 function(response) {
+                                //                     if (!response || response.error) {
+                                //                         console.log(response.error);
+                                //                     } else {
+                                //                         console.log(response);
+                                //                         console.log(response.id);
+                                //                     }
+                                //                 }
+                                //             );
+                                //         }
+                                //     }
+                                // );
+                            }
+                        });
+
+                        function _ImageFiles(url, callback) {
+                            // client단에서 이미지를 넣어줍니다.
+                            // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
+                            // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
+                            // 권장하고 있습니다.
+
+                            ImageFiles.insert(url, function(err, fileObj) {
+                                // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
+                                // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
+                                // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
+                                // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
+                                // 에러 체크
+                                if (!err) {
+                                    // setInterval을 find에 넣어줍니다.
+                                    var find = setInterval(function() {
+                                        var url = fileObj.url();
+                                        if (!!url) {
+                                            // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
+                                            // setInterval을 멈춰줍니다.
+                                            clearInterval(find);
+                                            // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
+                                            return callback(url);
+                                        }
+                                    }, 100);
+                                } else {
+                                    console.log('file insert error: ', err);
+                                }
+                            });
+                        }
+
+                        // _ImageFiles를 callback과 함께 실행시켜줍니다.
+                        _ImageFiles(url, function(url) {
+                            // Workpieces collection에 정보를 넣어줍니다.
+                            // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
+                            var workpiece = {
+                                imageUrl: url,
+                                createdBy: Meteor.userId(),
+                                createdAt: new Date(),
+                                updatedAt: new Date()
+                            }
+
+                            Workpieces.insert(workpiece, function(err, result) {
+                                if (!err) {
+                                    // insert 시 반환되는 것은 inserted된 document의 _id값입니다.
+                                    var _id = result;
+
+                                } else {
+                                    console.log('workpiece insert error: ', err);
                                 }
                             });
 
-                            function _ImageFiles(url, callback) {
-                                // client단에서 이미지를 넣어줍니다.
-                                // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
-                                // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
-                                // 권장하고 있습니다.
-
-                                ImageFiles.insert(url, function(err, fileObj) {
-                                    // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
-                                    // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
-                                    // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
-                                    // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
-                                    // 에러 체크
-                                    if (!err) {
-                                        // setInterval을 find에 넣어줍니다.
-                                        var find = setInterval(function() {
-                                            var url = fileObj.url();
-                                            if (!!url) {
-                                                // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
-                                                // setInterval을 멈춰줍니다.
-                                                clearInterval(find);
-                                                // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
-                                                return callback(url);
-                                            }
-                                        }, 100);
-                                    } else {
-                                        console.log('file insert error: ', err);
-                                    }
-                                });
-                            }
-
-                            // _ImageFiles를 callback과 함께 실행시켜줍니다.
-                            _ImageFiles(url, function(url) {
-                                    // Workpieces collection에 정보를 넣어줍니다.
-                                    // (향후 local storage에 넣어진 object를 불러와 넣어주는 것으로 대체)
-                                    var workpiece = {
-                                        imageUrl: url,
-                                        createdBy: Meteor.userId(),
-                                        createdAt: new Date(),
-                                        updatedAt: new Date()
-                                    }
-                                    $('[data-main-text]').on('heightChange', function(e) {
-                                        var textHeight = $('[data-main-text]').height();
-                                        if (textHeight < 640) {
-                                            var textDivXPosition = (640 - textHeight) / 2;
-                                            $('[data-main-text]').css('top', textDivXPosition);
-                                        }
-                                    })
-                                },
-
-                                setRenderImage: function() {
-                                    $('[data-rasterizes]').on('click', function() {
-                                        imageApp.setCssInlineStylePropsForTextEditorDiv();
-                                    });
-                                },
-                                Workpieces.insert(workpiece, function(err, result) {
-                                    if (!err) {
-                                        // insert 시 반환되는 것은 inserted된 document의 _id값입니다.
-                                        var _id = result;
-
-                                    } else {
-                                        console.log('workpiece insert error: ', err);
-                                    }
-                                });
-                            });
-                    },
-                    function error(err) {
+                            $('[data-main-text]').on('heightChange', function(e) {
+                                var textHeight = $('[data-main-text]').height();
+                                if (textHeight < 640) {
+                                    var textDivXPosition = (640 - textHeight) / 2;
+                                    $('[data-main-text]').css('top', textDivXPosition);
+                                }
+                            })
+                        });
+                    }, function error(err) {
                         console.log('rasterization failed: ', err);
                     });
-        });
-},
-shareOnFacebook: function() {
-    var self = this;
-
-    var mainText = $('.main-text')[0].outerHTML;
-
-    var parent = $('#main-image').parent();
-    var parentClone = parent.clone();
-
-    parentClone.css('width', '640px');
-    parentClone.css('height', '640px');
-
-    var parentResult = parentClone[0].outerHTML;
-
-    var mainClone = $('#main-image').clone();
-    mainClone.css('left', '100px');
-    mainClone.css('width', '640px');
-    mainClone.css('height', '640px');
-
-    var mainCloneOuterHTML = mainClone[0].outerHTML;
-
-    var innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: " + imageApp.textConfig.fontfamily + "; src: url(/font/" + imageApp.textConfig.fontype + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} img { vertical-align: top; }</style></head><body>" + parentResult + mainText + '</body></html>';
-
-
-    rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
-            var url = getBase64Image(renderResult.image);
-
-            function _ImageFiles(url, callback) {
-                // client단에서 이미지를 넣어줍니다.
-                // server단에서 이미지를 넣어주려면 base64 encoded data uri가 websocket을 통해 서버까지 올라가야하므로
-                // 또 다른 작업 공수를 야기시킵니다. 라이브러리에서도 client단에서 이미지를 넣어주기를
-                // 권장하고 있습니다.
-                ImageFiles.insert(url, function(err, fileObj) {
-                    // 비동기 문제를 해결하기 위해 아래의 연산을 수행합니다.
-                    // 이는 .on("stored", callback) 이벤트 핸들러가 아직 client단에는 마련되지 않았다고
-                    // 공식적으로 저자가 밝히고 있는 비동기 문제를 해결하기 위함입니다.
-                    // (즉, 언제 실제로 파일이 저장되었는지를 이벤트로 보내주지 않음.)
-                    // 에러 체크
-                    if (!err) {
-                        // setInterval을 find에 넣어줍니다.
-                        var find = setInterval(function() {
-                            var url = fileObj.url();
-                            if (!!url) {
-                                // 만약 url이 null이 아닐 경우(비동기 문제가 해결 됬을 경우)
-                                // setInterval을 멈춰줍니다.
-                                clearInterval(find);
-                                // 처음에 _ImageFiles에서 받았던 callback을 불러줍니다.
-                                return callback(url);
-                            }
-                        }, 100);
-                    } else {
-                        console.log('file insert error: ', err);
-                    }
                 });
-            }
+            });
+
+
         },
+
+
         setImageFilterType: function() {
 
             var self = this;
@@ -1002,8 +911,6 @@ shareOnFacebook: function() {
     var imageApp = new imageApp();
     imageApp.init();
 
-
-
     /*****************************************************************************/
     /* Hunjae
      /*****************************************************************************/
@@ -1017,7 +924,6 @@ shareOnFacebook: function() {
         // delete tag element
         this.parentElement.removeChild(this);
 
-
         // decrease tag count
         tagCounter.decTagCount();
 
@@ -1027,7 +933,6 @@ shareOnFacebook: function() {
 
     // Auto focus when page is loaded
     $('#input-15').focus();
-
 
     // 이미지를 Neo4j database에서 받아옵니다. 최초의 중앙 이미지 번호를 저장합니다.
     slider.$CenterImageIndex = parseInt(slider.$MaximumImageNum / 2); // + 1; => heap index 0 to (MaximumImageNum-1)
@@ -1047,7 +952,6 @@ function getImagesForTag(tagWord, edgeScope, NodesLimit, type) {
 
             if (data.i.length != 0) {
                 // sentence 쿼리 결과가 너무 늦은 경우
-
                 if (type == 2 /*sentence*/ && slider.$currentKeyword.indexOf(data.t[0].word) == -1) {
                     return;
                 }
@@ -1219,13 +1123,6 @@ function setJeegleSlider() {
             bottom: (slider.$CenterLen - smallElemsDivLen) / 2
         }, 200, function() {});
 
-        var smallToBigLi = $('#slider li:nth-child(' + (smallToBig) + ')')
-        smallToBigLi.animate({
-            width: '640px',
-            height: '640px',
-            bottom: (slider.$CenterLen - smallElemsDivLen) / 2
-        }, 200, function() {});
-
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
         smallToBigImg.parent().attr('id', 'main-image-wrapper');
@@ -1253,22 +1150,6 @@ function setJeegleSlider() {
     function moveRight(cen) {
         var bigToSmall = cen + 1;
         var smallToBig = cen + 2;
-
-        $('#slider').animate({
-            left: leftPosition - smallElemsDivLen
-        }, 200, function() {
-            $('#slider li:first-child').appendTo('#slider');
-            $('#slider').css('left', leftPosition);
-        });
-
-        // 배경이미지 설정
-        backgroundStyle = "url('" + smallToBigImg[0].src + "')";
-        $('.body-background').css('background-image', backgroundStyle);
-    };
-
-    function moveRight(cen) {
-        var bigToSmall = cen;
-        var smallToBig = cen + 1;
 
         $('#slider').animate({
             left: leftPosition - smallElemsDivLen
