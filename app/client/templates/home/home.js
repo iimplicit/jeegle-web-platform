@@ -9,6 +9,8 @@ slider = {
     $currentKeyword: []
 };
 
+var musicNum = 0;
+
 // Tag 개수를 increase, decrease, get 하는 함수 객체입니다.
 tagCounter = new TagCounter();
 
@@ -137,8 +139,38 @@ Template.Home.events({
                 'content.0.url': url
             }
         });
+    },
+    "click #refresh-musicDeeplink": function(e, tmpl){
+      // random array를 만들어서
+      changeMusic();
+    },
+    "click #music-checkbox": function(e, tmpl){
+      var checkbox = $('#music-checkbox');
+      checkbox.toggleClass("btn-selected")
     }
 });
+
+function changeMusic(){
+  var deeplinkArray = Session.get('musicDeeplink');
+  if(musicNum==deeplinkArray.length-1){
+    musicNum = 0;
+  }else{
+    musicNum++
+  }
+  var currMusic = deeplinkArray[musicNum]._source;
+
+  if(!currMusic.trackId){
+    //when it is undefined
+    changeMusic(); //한개도 없는 경우만 아니면 괜찮음.
+  }
+
+  var html = '<span id="music-info" data-track-id='+currMusic.trackId+'>';
+  html += currMusic.title;
+  html += '-';
+  html += currMusic.artist;
+  html += '</span>';
+  $('#music-content').html(html);
+}
 
 /*****************************************************************************/
 /* Home: Helpers */
@@ -160,11 +192,21 @@ Template.Home.helpers({
         // }
 });
 
+
 /*****************************************************************************/
 /* Home: Lifecycle Hooks */
 /*****************************************************************************/
+Template.Home.created = function () {
+    //음악 먼저 10개 정도 받아옵시다. (개수 설정은 엘라스틱 서치에서 가능합니다.)
+    Meteor.call('getMusicDeeplink', "10cm", function(err, result){
+      if(result.length!=0){
+        Session.set('musicDeeplink', result);
+        changeMusic();
+      }else{
+        $('refresh-musicDeeplink').html('no value');
+      }
+    });
 
-Template.Home.created = function() {
     var firstSketch = {
         createdAt: new Date,
         updatedAt: new Date,
@@ -675,7 +717,8 @@ Template.Home.rendered = function() {
                                             // jeegle-web:music_info | String | Beat에서 제공하는 제목과 가수를 넣습니다. 예를 들어 "맛좋은 산 - San E"
                                             // og:image | String | 포스팅할 이미지의 URL을 넣습니다. (페이스북에서 허용하는 다른 이미지 형식도 가능합니다.)
 
-                                            var isSharingMusic = $('[data-share-music-type="beat"]').prop('checked');
+                                            var isSharingMusic = $('[data-share-music-type="beat"]').hasClass('btn-selected'); //prop('checked');
+                                            var trackId = $('#music-info').attr('data-track-id')
                                             if (isSharingMusic) {
                                                 FB.api(
                                                     "/me/jeegle-web:create",
@@ -696,13 +739,13 @@ Template.Home.rendered = function() {
                                                             "jeegle-web:music_info": "music_info",
                                                             "al:web:url": imageUrl,
                                                             "al:web:should_fallback": true,
-                                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000"+trackId,
                                                             "al:ios:app_store_id": "853073541",
                                                             "al:ios:app_name": "BEAT",
-                                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000"+trackId,
                                                             "al:iphone:app_store_id": "853073541",
                                                             "al:iphone:app_name": "BEAT",
-                                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=3000000000000000000000008094e1",
+                                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000"+trackId,
                                                             "al:android:package": "com.beatpacking.beat",
                                                             "al:android:app_name": "BEAT"
                                                         }

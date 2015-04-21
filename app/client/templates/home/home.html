@@ -33,9 +33,9 @@
           <div id="slider_box" class="slider_box">
             <ul id="slider">
               {{#each images}}
-              <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
-                <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
-              </li>
+                <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
+                  <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
+                </li>
               {{/each}}
             </ul>
 
@@ -130,13 +130,17 @@
             <div class="image-share" data-bottom-type="share">
               <div class="image-share-with-music">
                 <div class="image-share-with-music-title">
-                  음악 담기
+                  <img class="music-ic" src="./image/music_ic.png" alt="">
+                  <span>음악 담기</span>
+                  <span class="sp-line"></span>
                 </div>
-                <div class="image-share-with-music-content">
-                  수고했어 오늘도 - 옥상달빛
-                  <button> refresh </button>
+                <div id="image-share-with-music-content" class="image-share-with-music-content">
+                  <button id="refresh-musicDeeplink" class="refresh-musicDeeplink"></button>
+                  <div id="music-content" class="music-content"></div>
                 </div>
-                <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" checked>
+
+                <div id="music-checkbox" class="image-share-with-music-checkbox btn-selected" data-share-music-type="beat" name="share-music" value="beat" data-checked="true"></div>
+                <!-- <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" checked> -->
               </div>
 
               <hr>
