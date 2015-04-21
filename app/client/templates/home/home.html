@@ -18,18 +18,17 @@
         <div class="main-content-wrapper">
           <div class="main-content" data-content>
             <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
-            <div id="input-15" class="main-text" contenteditable="true" style="border: 5px solid green; font-family: Hanna;" data-main-text>
+            <div id="input-15" class="main-text" contenteditable="true" style="font-family: Hanna;" data-main-text>
               슈퍼파월
             </div>
           </div>
-
 
           <!--Jeegle image slider start-->
           <div id="slider_box" class="slider_box">
             <ul id="slider">
               {{#each images}}
-              <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none;">
-                <img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}" />
+              <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
+                <img name="images_in_belt" src="http://128.199.249.209:9990/images/{{data.imagePath}}" style="position:absolute;" />
               </li>
               {{/each}}
             </ul>
@@ -44,7 +43,7 @@
     <div class="row">
       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
         <div class="bottom-content-wrapper">
-          <div class="bottom-content" style="border: 5px solid orange;">
+          <div class="bottom-content">
             <div class="font-filters" data-bottom-type="fontFilter">
               <div class="font-filter">
                 <ul class="list-inline">
