@@ -39,3 +39,10 @@ Router.route('music/:_id', {
   action: 'action',
   where: 'client'
 });
+
+Router.route('policy', {
+  name: 'policy',
+  controller: 'PolicyController',
+  action: 'action',
+  where: 'client'
+});
