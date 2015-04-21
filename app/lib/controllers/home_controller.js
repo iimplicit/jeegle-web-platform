@@ -2,7 +2,10 @@ HomeController = RouteController.extend({
   layoutTemplate: 'MasterLayout',
 
   subscriptions: function() {
-  	return [Meteor.subscribe("Images"), Meteor.subscribe("ImageFiles"), Meteor.subscribe('facebook', Meteor.userId())];
+    this.subscribe("ImageFiles").wait();
+    this.subscribe("Workpieces", Meteor.userId()).wait();
+    this.subscribe("facebook", Meteor.userId()).wait();
+  	// return [Meteor.subscribe('Images'), Meteor.subscribe("ImageFiles"), Meteor.subscribe("Workpieces", Meteor.userId()), Meteor.subscribe('facebook', Meteor.userId())];
   },
 
   action: function() {
