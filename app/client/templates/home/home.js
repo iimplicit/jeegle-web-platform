@@ -398,6 +398,7 @@ Template.Home.rendered = function() {
             this.setEditorStyle();
             this.setTextDivPosition();
             this.facebookLoginAndRasterizeHTML();
+            this.setDownloadImage();
         },
         toggleBottomFilter: function() {
             // $('body').on('click', '.main-text', function (e) {
@@ -452,6 +453,7 @@ Template.Home.rendered = function() {
                     $('[data-header-right-content]').attr('data-header-right-content', 'home');
                     $('[data-bottom-type]').hide();
                     $('[data-bottom-type="share"]').show();
+                    $('[data-download-image]').show(200);
 
                     // #1 pointer-events를 통해 클릭을 막습니다.
                     $('#slider_box').css('pointer-events', 'none');
@@ -470,6 +472,7 @@ Template.Home.rendered = function() {
                     $('[data-header-right-content]').empty();
                     $('[data-header-right-content]').text("공유");
                     $('[data-header-right-content]').attr('data-header-right-content', 'share');
+                    $('[data-download-image]').hide(200);
 
                     imageApp.initializationByHomeBtn();
                 }
@@ -880,6 +883,39 @@ Template.Home.rendered = function() {
             //   top: offset.top,
             //   left: offset.left
             // })
+        },
+        setDownloadImage: function(){
+            var self = this;
+
+            $('[data-download-image]').on('click', function(e){
+                self.setCssInlineStylePropsForTextEditorDiv();
+
+                var mainText = $('.main-text')[0].outerHTML;
+
+                var parent = $('#main-image').parent();
+                var parentClone = parent.clone();
+                parentClone.css('width', '640px');
+                parentClone.css('height', '640px');
+                parentClone.css('bottom', '0');
+
+                var parentResult = parentClone[0].outerHTML;
+
+                var innerHtml = "<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style> @font-face{font-family: " + self.textConfig.fontfamily + "; src: url(/font/" + self.textConfig.fontype + ".woff);} body {padding: 0; margin: 0; overflow:hidden;} ul {margin: 0; padding: 0;} li {margin: 0; padding: 0} img { margin: 0; padding: 0; vertical-align: middle; }</style></head><body><ul id='slider'>" + parentResult + mainText + '</ul></body></html>';
+
+                rasterizeHTML.drawHTML(innerHtml).then(function success(renderResult) {
+                    var url = getBase64Image(renderResult.image);
+                    var a = $("<a>")
+                        .attr("href", url)
+                        .attr("download", "jeegle.png")
+                        .appendTo("body");
+
+                    a[0].click();
+
+                    a.remove();
+                }, function error(err) {
+                    console.log('rasterization failed: ', err);
+                });
+            });
         }
     }
 
