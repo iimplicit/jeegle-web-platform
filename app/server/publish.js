@@ -6,25 +6,29 @@
 
 
 Meteor.publish('Images', function( /* args */ ) {
-    return Images.find();
+  return Images.find();
 });
 
 Meteor.publish('ImageFiles', function( /* args */ ) {
-    return ImageFiles.find();
+  return ImageFiles.find();
 });
 
-Meteor.publish('workpiece', function(_id) {
-    return Workpieces.find({
-        _id: _id
-    });
+Meteor.publish('Workpieces', function(userId) {
+  return Workpieces.find({
+    createdBy: userId
+  }, {
+    sort: {
+      updatedAt: -1
+    }
+  });
 });
 
 Meteor.publish('facebook', function(userId) {
-    return Meteor.users.find({
-        _id: userId
-    }, {
-        fields: {
-        	"services.facebook.accessToken": 1
-        }
-    })
+  return Meteor.users.find({
+    _id: userId
+  }, {
+    fields: {
+      "services.facebook.accessToken": 1
+    }
+  })
 });
