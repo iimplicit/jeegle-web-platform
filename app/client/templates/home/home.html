@@ -15,6 +15,7 @@
         </div>
         <div>
           <button class="nav-button-complete" data-header-right-content="share">공유</button>
+          <div class="download-button" data-download-image></div>
         </div>
       </div>
     </div>
@@ -28,14 +29,13 @@
             </div>
           </div>
 
-
           <!--Jeegle image slider start-->
           <div id="slider_box" class="slider_box">
             <ul id="slider">
               {{#each images}}
-              <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none;">
-                <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" />
-              </li>
+                <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
+                  <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
+                </li>
               {{/each}}
             </ul>
 
@@ -139,8 +139,8 @@
                   <div id="music-content" class="music-content"></div>
                 </div>
 
-                <div id="music-checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" value="beat" data-checked="checked"></div>
-                <!-- <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" value="beat" checked> -->
+                <div id="music-checkbox" class="image-share-with-music-checkbox btn-selected" data-share-music-type="beat" name="share-music" value="beat" data-checked="true"></div>
+                <!-- <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" checked> -->
               </div>
 
               <hr>

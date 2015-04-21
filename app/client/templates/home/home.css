@@ -66,6 +66,28 @@ html, body {
   background-color: rgba(0,0,0,0.2);
 }
 
+.download-button {
+    display: none;
+    position: absolute;
+    cursor: pointer;
+    top: 20px;
+    right: 88px;
+
+    width: 60px;
+    height: 60px;
+    border: 1px solid #fff;
+    background-image: url('/image/download_ic.png');
+    background-repeat: no-repeat;
+    background-size: 22px 22px;
+    background-position: center center;
+
+    backgrond-color: rgba(0,0,0,0.1);
+}
+
+.download-button {
+    backgrond-color: rgba(0,0,0,0.2);
+}
+
 .main-input {
     display: block !important;
     margin: 0 auto !important;
@@ -589,7 +611,7 @@ a.control_next {
     right:9px;
 }
 
-.btn_selected{
+.btn-selected{
   background-image:url('./image/music_check_btn_selected.png');
 }
 
@@ -668,7 +690,7 @@ a.control_next {
   background-color: rgba(0,0,0,0.2);
 }
 
-:focus {
+.main-text:focus {
     outline:none;
     border:1px dashed #fff;
 }
