@@ -549,17 +549,26 @@ a.control_next {
     height: 100px;
 }
 
+.image-share{
+    margin-top:20px;
+}
+
 .image-share-with-music {
+    position:relative;
     width: 638px; height: 44px;
     border: 1px solid rgba(255,255,255,1);
+    background-color:rgba(0,0,0,0.1);
     font-size: 17px;
     color: #fff;
-    line-height: 44px;
+    box-sizing: border-box;
+    height:44px;
+    line-height: 40px;
 }
 
 .image-share-with-music-title {
+    vertical-align:top;
     display:inline-block;
-    width: 71px;
+    /*width: 140px;*/
 }
 
 .image-share-with-music-content {
@@ -567,7 +576,21 @@ a.control_next {
 }
 
 .image-share-with-music-checkbox {
-    display:inline-block;
+    cursor:pointer;
+    background-image:url('./image/music_check_btn_normal.png');
+    background-color: rgba(0,0,0,0);
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;    display:inline-block;
+    position:absolute;
+    width:26px;
+    height:26px;
+    top:9px;
+    right:9px;
+}
+
+.btn_selected{
+  background-image:url('./image/music_check_btn_selected.png');
 }
 
 .image-share-with-facebook {
@@ -575,9 +598,55 @@ a.control_next {
     width: 638px;
     height: 58px;
     border: 1px solid #fff;
-    font-sie: 18px;
+    font-size: 20px;
+    font-weight:regular;
     color: #fff;
     line-height: 58px;
+}
+
+/* deeplink div */
+.music-ic{
+  margin: 0 13px 0 22px;
+}
+
+.music-content{
+  display:inline-block;
+  max-width: 320px;
+  height:44px;
+  overflow:hidden;
+  vertical-align:middle;
+}
+
+.refresh-musicDeeplink{
+  vertical-align:top;
+  background-image:url('./image/random_btn_normal.png');
+  display: inline-block;
+  vertical-align: baseline;
+  background-color: rgba(0,0,0,0);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  width:24px;
+  height:24px;
+  margin-right:5px;
+}
+
+.refresh-musicDeeplink:hover{
+
+}
+
+.refresh-musicDeeplink .selected{
+
+}
+
+.sp-line{
+  width:1px;
+  height:22px;
+  margin-left: 20px;
+  margin-right: 20px;
+  border-left:1px solid #fff;
+  display:inline-block;
+  vertical-align:middle;
 }
 
 .button-apply-image-filter {

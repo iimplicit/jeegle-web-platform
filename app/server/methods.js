@@ -1,14 +1,15 @@
+/*MySQL*/
+var mysqlConnection = mysql.createConnection({
+  host: '128.199.76.251',
+  user: 'root',
+  password: 'xpgpfks!@',
+  database: 'curie_finish'
+});
+
 /*****************************************************************************/
 /* Server Only Methods */
 /*****************************************************************************/
 Meteor.methods({
-    /*
-     * Example:
-     *
-     * '/app/items/insert': function (item) {
-     * }
-     */
-
      // 주어진 문장을 가지고 ES, Neo4j 등에 질의해 이미지 배열을 얻어 리턴합니다.
      'getNounArrayBySentence': function(sentence) {
 
@@ -49,8 +50,39 @@ Meteor.methods({
     } finally {
       return result;
     }
+  },
+  'getMusicDeeplink': function(keyword){
+
+    var syncFunc = Meteor.wrapAsync(function(callback){
+
+      var encodedKeyword = encodeURIComponent('*'+keyword+'*');
+      var url = 'http://tehranslippers.com:9200/jdbc/jdbc/_search?q='+encodedKeyword;
+      HTTP.call("GET", url, {}, function(err, result){
+
+        var musicInfo = JSON.parse(result.content).hits.hits;
+
+        for(var i=0;i<musicInfo.length;i++){
+          var mySqlSyncFunc = Meteor.wrapAsync(function(callback){
+              mysqlConnection.query('SELECT link_id from curie_finish.link_ids WHERE app_id=1 AND song_id='+musicInfo[i]._source.id, function(err, rows, fields) {
+                if(!!rows[0]){
+                  musicInfo[i]._source.trackId = rows[0].link_id;
+                }
+
+                callback(null)
+              });
+          });
+
+          mySqlSyncFunc();
+        }
+
+        callback(null, musicInfo);
+      })
+    });
+
+    return syncFunc();
   }
 });
+
 
 /*****************************************************************************/
 /* Server Only Methods for Neo4j*/
@@ -69,7 +101,7 @@ Meteor.neo4j.methods({
       ].join(' ');
 
       return query;
-    },
+  },
   'getImagesForTag': function(){
       // Neo4j 쿼리 튜닝 필요.
       var query = [
@@ -80,5 +112,5 @@ Meteor.neo4j.methods({
       ].join(' ');
 
       return query;
-    }
-  });
+  }
+});

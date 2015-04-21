@@ -9,6 +9,8 @@ slider = {
     $currentKeyword: []
 };
 
+var musicNum = 0;
+
 // Tag 개수를 increase, decrease, get 하는 함수 객체입니다.
 tagCounter = new TagCounter();
 
@@ -257,8 +259,38 @@ Template.Home.events({
                 'content.0.url': url
             }
         });
+    },
+    "click #refresh-musicDeeplink": function(e, tmpl){
+      // random array를 만들어서
+      changeMusic();
+    },
+    "click #music-checkbox": function(e, tmpl){
+      var checkbox = $('#music-checkbox');
+      checkbox.toggleClass("btn_selected")
     }
 });
+
+function changeMusic(){
+  var deeplinkArray = Session.get('musicDeeplink');
+  if(musicNum==deeplinkArray.length-1){
+    musicNum = 0;
+  }else{
+    musicNum++
+  }
+  var currMusic = deeplinkArray[musicNum]._source;
+
+  if(!currMusic.trackId){
+    //when it is undefined
+    changeMusic(); //한개도 없는 경우만 아니면 괜찮음.
+  }
+
+  var html = '<span id="music-info" data-track-id='+currMusic.trackId+'>';
+  html += currMusic.title;
+  html += '-';
+  html += currMusic.artist;
+  html += '</span>';
+  $('#music-content').html(html);
+}
 
 /*****************************************************************************/
 /* Home: Helpers */
@@ -280,11 +312,21 @@ Template.Home.helpers({
     // }
 });
 
+
 /*****************************************************************************/
 /* Home: Lifecycle Hooks */
 /*****************************************************************************/
-
 Template.Home.created = function () {
+    //음악 먼저 10개 정도 받아옵시다. (개수 설정은 엘라스틱 서치에서 가능합니다.)
+    Meteor.call('getMusicDeeplink', "10cm", function(err, result){
+      if(result.length!=0){
+        Session.set('musicDeeplink', result);
+        changeMusic();
+      }else{
+        $('refresh-musicDeeplink').html('no value');
+      }
+    });
+
     var firstSketch = {
         createdAt: new Date,
         updatedAt: new Date,
