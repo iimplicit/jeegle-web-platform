@@ -1,4 +1,9 @@
 <template name="Home">
+  <div class="before-load">
+    <div class="spinner">
+      {{> spinner}}
+    </div>
+  </div>
   <div class="body-background-wrapper"></div>
   <div class="body-background"></div>
   <div class="main-image-wrapper" data-main-image-wrapper></div>
@@ -19,7 +24,7 @@
           <div class="main-content" data-content>
             <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
             <div id="input-15" class="main-text" contenteditable="true" style="font-family: Hanna;" data-main-text>
-              슈퍼파월
+                무슨 생각을 하고 계신가요?
             </div>
           </div>
 
@@ -59,7 +64,7 @@
                   </li>
 
                   <li>
-                    <input type="range" class="font-size-filter" data-change-font-size-filter="font-size" value="40" min="22" max="140" step="2" />
+                    <input type="range" class="font-size-filter" data-change-font-size-filter="font-size" value="40" min="22" max="80" step="2" />
                   </li>
 
                   <li>
@@ -145,80 +150,76 @@
                 <ul class="list-inline">
                   <li>
                     <a data-preset="default">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
+                      <img class="preset-thumbnail" src="./image/imagefilter/default.png" alt="">
                     </a>
                   </li>
 
                   <li>
                     <a data-preset="vintage">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
+                      <img class="preset-thumbnail" src="./image/imagefilter/vintage.png" alt="">
+                    </a>
+                  </li>
+
+                    <li>
+                        <a data-preset="conSetuSepia">
+                            <img class="preset-thumbnail" src="./image/imagefilter/conSetuSepia.png" alt="">
+                        </a>
+                    </li>
+
+                    <li>
+                        <a data-preset="old">
+                            <img class="preset-thumbnail" src="./image/imagefilter/old.png" alt="">
+                        </a>
+                    </li>
+
+                    <li>
+                        <a data-preset="toaster">
+                            <img class="preset-thumbnail" src="./image/imagefilter/toaster.png" alt="">
+                        </a>
+                    </li>
+
+                  <li>
+                    <a data-preset="saturation">
+                      <img class="preset-thumbnail" src="./image/imagefilter/saturation.png" alt="">
                     </a>
                   </li>
 
                   <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
+                    <a data-preset="hue_rotate">
+                      <img class="preset-thumbnail" src="./image/imagefilter/hue_rotate.png" alt="">
                     </a>
                   </li>
 
                   <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
+                    <a data-preset="invert">
+                      <img class="preset-thumbnail" src="./image/imagefilter/invert.png" alt="">
                     </a>
                   </li>
 
-                  <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="clarity">
-                      <img class="preset-thumbnail" src="test.jpg" alt="">
-                    </a>
-                  </li>
+                    <li>
+                        <a data-preset="clarity">
+                            <img class="preset-thumbnail" src="./image/imagefilter/clarity.png" alt="">
+                        </a>
+                    </li>
                 </ul>
               </div>
+
+              <hr />
 
               <div id="SlideFilters" data-event-slide-filter>
                 <ul class="list-inline slider-list-inline">
                   <li>
-                    <img class="slide-thumbnail" src="test.jpg" alt="">
+                    <img class="slide-thumbnail slide-thumbnail-brightness" src="./image/brightness_ic.png" alt="">
                     <input type="range" class="slide-filter" data-filter="brightness" value="100" min="0" max="200" step="1" />
                   </li>
 
                   <li>
-                    <img class="slide-thumbnail" src="test.jpg" alt="">
+                    <img class="slide-thumbnail slide-thumbnail-contrast" src="./image/contrast_ic.png" alt="">
                     <input type="range" class="slide-filter" data-filter="contrast" value="100" min="0" max="200" step="1" />
                   </li>
 
-									<li>
-                    <img class="slide-thumbnail" src="test.jpg" alt="">
+                  <li>
+                    <img class="slide-thumbnail slide-thumbnail-blur" src="./image/blur_ic.png" alt="">
                     <input type="range" class="slide-filter" data-filter="blur" value="0" min="0" max="10" step="1" />
                   </li>
                 </ul>

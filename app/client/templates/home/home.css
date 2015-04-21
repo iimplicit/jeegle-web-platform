@@ -287,8 +287,14 @@ html, body {
 
 .preset-thumbnail {
     padding: 0;
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
+}
+
+.selected-preset-thumbnail {
+    width: 56px;
+    height: 56px;
+    border: 2px #fff;
 }
 
 .slider-list-inline > li {
@@ -297,13 +303,35 @@ html, body {
 }
 
 .slide-filter {
-    width: 90px;
+    width: 104px;
+    heigth: 1px;
 }
 
 .slide-thumbnail {
+    margin-top: -3px;
     padding: 0;
     width: 50px;
     height: 50px;
+}
+
+.slide-thumbnail-brightness {
+    width: 22px;
+    height: 20px;
+    margin-right: 6px;
+}
+
+.slide-thumbnail-contrast {
+    width: 18px;
+    height: 18px;
+    margin-left: 37px;
+    margin-right: 9px;
+}
+
+.slide-thumbnail-blur {
+    width: 13px;
+    height: 17px;
+    margin-left: 37px;
+    margin-right: 9px;
 }
 
 /*****************************************************************************/
@@ -371,7 +399,6 @@ html, body {
     z-index: 10;
     margin: 0 auto;
 
-
     font-family: Hanna;
 
     width: 500px;
@@ -380,6 +407,8 @@ html, body {
     color: #fff;
     font-size: 40px;
     text-align: center;
+
+    /*border: 1px dashed #fff;*/
 }
 
 .bottom-content {
@@ -389,6 +418,7 @@ html, body {
 }
 
 .ImageFilters {
+    color: #fff;
     text-align: center;
 }
 
@@ -567,4 +597,26 @@ a.control_next {
 
 .button-apply-image-filter:hover {
   background-color: rgba(0,0,0,0.2);
+}
+
+:focus {
+    outline:none;
+    border:1px dashed #fff;
+}
+
+/*spinner*/
+.before-load{
+  z-index:10000;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top:0;
+  left:0;
+  background: #0e0e0e;
+}
+
+.spinner{
+  position: relative;
+  top:50%;
+  left:50%;
 }
