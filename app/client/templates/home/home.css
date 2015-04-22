@@ -914,3 +914,42 @@ input[type="range"]::-webkit-slider-thumb {
     background-image: url('/image/align_right_btn_selected.png') !important;
 }
 
+.preload-1 {
+    background: url('/image/bold_btn_hover.png') no-repeat -9999px -9999px;
+}
+.preload-2 {
+    background: url('/image/shadow_btn_hover.png') no-repeat -9999px -9999px;
+}
+.preload-3 {
+    background: url('/image/italic_btn_hover.png') no-repeat -9999px -9999px;
+}
+.preload-4 {
+    background: url('/image/align_left_btn_hover.png') no-repeat -9999px -9999px;
+}
+.preload-5 {
+    background: url('/image/align_center_btn_hover.png') no-repeat -9999px -9999px;
+}
+.preload-6 {
+    background: url('/image/align_right_btn_hover.png') no-repeat -9999px -9999px;
+}
+.preload-7 {
+    background: url('/image/bold_btn_selected.png') no-repeat -9999px -9999px;
+}
+.preload-8 {
+    background: url('/image/shadow_btn_selected.png') no-repeat -9999px -9999px;
+}
+.preload-9 {
+    background: url('/image/italic_btn_selected.png') no-repeat -9999px -9999px;
+}
+.preload-10 {
+    background: url('/image/align_left_btn_selected.png') no-repeat -9999px -9999px;
+}
+.preload-11 {
+    background: url('/image/align_center_btn_selected.png') no-repeat -9999px -9999px;
+}
+.preload-12 {
+    background: url('/image/align_right_btn_selected.png') no-repeat -9999px -9999px;
+}
+.preload-13 {
+    background: url('/image/music_check_btn_normal.png') no-repeat -9999px -9999px;
+}
