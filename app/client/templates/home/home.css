@@ -599,12 +599,13 @@ html, body {
   padding: 0;
   width: 50px;
   height: 50px;
+  margin: 0 auto;
   background: #ccc;
   overflow:hidden;
 }
 
 #slider li img{
-  position: absolute;
+  /*position: absolute;*/
 }
 
 a.control_prev{

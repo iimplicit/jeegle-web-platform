@@ -1264,17 +1264,19 @@ function setJeegleSlider() {
         smallToBigImg.parent().attr('id', 'main-image-wrapper');
 
         if (smallToBigImg[0].naturalWidth > smallToBigImg[0].naturalHeight) {
-          // var bigWidth = smallToBigImg[0].offsetWidth * (slider.$CenterLen / smallElemsDivLen)
-          var bigWidth = parseInt(smallToBigImg[0].style.left.split('p')[0]) * (slider.$CenterLen / smallElemsDivLen)
+          var bigWidth = Math.round(smallToBigImg[0].width * (slider.$CenterLen / smallElemsDivLen));
+          // var bigWidth = parseInt(smallToBigImg[0].style.left.split('p')[0]) * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                left: bigWidth+"px"
-            }, 200, function(e) {})
+              left: -(bigWidth-slider.$CenterLen)/2+"px"
+            }, 200, function(e) {
+            })
         } else {
           // var bigHeight = smallToBigImg[0].offsetHeight  * (slider.$CenterLen / smallElemsDivLen)
-          var bigHeight = parseInt(smallToBigImg[0].style.top.split('p')[0])  * (slider.$CenterLen / smallElemsDivLen)
+          var bigHeight = Math.round(smallToBigImg[0].height * (slider.$CenterLen / smallElemsDivLen));
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                top: bigHeight+"px"
-            }, 200, function(e) {})
+              top: -(bigHeight-slider.$CenterLen)/2+"px"
+            }, 200, function(e) {
+            })
         }
 
         // 배경이미지 설정
