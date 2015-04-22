@@ -35,7 +35,16 @@ html, body {
     font-family: "Nanum Gothic";
     margin: 0;
     padding: 0;
+    min-width: 400px;
 }
+.mobile-announcement {
+    font-family: Hanna;
+    color: #fff;
+    text-align: center;
+    font-size: 7vw;
+    text-shadow: 3px 3px #000;
+}
+
 .body-background-wrapper {
     position: fixed;
     top: 0;
