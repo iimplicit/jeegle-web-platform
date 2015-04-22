@@ -557,6 +557,7 @@ html, body {
     left: 0;
     overflow-x: hidden;
 }
+
 #slider {
     position: relative;
     margin: 0;
@@ -567,8 +568,23 @@ html, body {
     text-align: center;
     /*overflow: hidden;*/
 }
+
 #slider li {
-    position: relative;
+  position: relative;
+  display: inline-block;
+  float:left;
+  margin: 0;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  background: #ccc;
+  overflow:hidden;
+}
+
+#slider li img{
+    position: absolute;
+    /*position: relative;*/
     display: inline-block;
     float: left;
     margin: 0;
@@ -577,9 +593,6 @@ html, body {
     height: 50px;
     background: #ccc;
     overflow: hidden;
-}
-#slider li img {
-    position: absolute;
 }
 
 a.control_prev{
