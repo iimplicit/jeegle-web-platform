@@ -601,9 +601,9 @@ Template.Home.rendered = function() {
             $('[data-change-font-type]').on('click', function(e) {
                 // this를 선택하고 있는 제이쿼리 객체를 부여합니다. (캐싱)
                 var $targetElement = $(this);
-
-                if($targetElement.data('checked') === 'true'){
-                    $targetElement.data('checked', 'false');
+                if($targetElement.data('checked') === true){
+                    $targetElement.data('checked', false);
+                    //$targetElement.attr('data-checked', 'false');
                     var fontType = $(e.currentTarget).data('change-font-type');
                     if(fontType === 'bold'){
                         $('[data-main-text]').css('font-weight', '');
@@ -612,11 +612,12 @@ Template.Home.rendered = function() {
                         $('[data-main-text]').css('font-style', '');
                         $targetElement.removeClass('button-selected');
                     } else if (fontType === 'shadow') {
+                        console.log('checked shadow')
                         $('[data-main-text]').css('text-shadow', '');
                         $targetElement.removeClass('button-selected');
                     }
                 } else {
-                    $targetElement.data('checked', 'true');
+                    $targetElement.data('checked', true);
                     var fontType = $(e.currentTarget).data('change-font-type');
                     if(fontType === 'bold'){
                         $('[data-main-text]').css('font-weight', 'bold');
@@ -876,6 +877,9 @@ Template.Home.rendered = function() {
             $('body').on('click', '[data-preset]', function() {
                 var selectedFilterType = $(this).attr('data-preset');
                 self.imageFilterConfig.type = selectedFilterType;
+
+                $('.selected-preset-thumbnail').removeClass('selected-preset-thumbnail');
+                $(this).children().addClass('selected-preset-thumbnail');
 
                 if (selectedFilterType == 'default') {
                     self.initSliderSetting();

@@ -1,8 +1,38 @@
 /*****************************************************************************/
+/* Import Local WebFont
+/*****************************************************************************/
+
+@font-face {
+    font-family: Jua;
+    src: url('/font/Jua.woff') format('woff');
+}
+@font-face {
+    font-family: Hanna;
+    src: url('/font/Hanna.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Brush Script;
+    src: url('/font/BrushScript.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Gothic;
+    src: url('/font/Gothic.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Myeongjo;
+    src: url('/font/Myeongjo.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Pen Script;
+    src: url('/font/PenScript.woff') format('woff');
+}
+
+/*****************************************************************************/
 /* Home: Style */
 /*****************************************************************************/
 
 html, body {
+    font-family: "Nanum Gothic";
     margin: 0;
     padding: 0;
 }
@@ -244,43 +274,15 @@ html, body {
 /*****************************************************************************/
 /* Write: Dooseong, Eom */
 /*****************************************************************************/
-/*****************************************************************************/
-/* Import Local WebFont
-/*****************************************************************************/
-
-@font-face {
-    font-family: Jua;
-    src: url('/font/Jua.woff') format('woff');
-}
-@font-face {
-    font-family: Hanna;
-    src: url('/font/Hanna.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Brush Script;
-    src: url('/font/BrushScript.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Gothic;
-    src: url('/font/Gothic.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Myeongjo;
-    src: url('/font/Myeongjo.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Pen Script;
-    src: url('/font/PenScript.woff') format('woff');
-}
 .preset-thumbnail {
     padding: 0;
     width: 60px;
     height: 60px;
+    margin: 0px 2px;
 }
 .selected-preset-thumbnail {
-    width: 56px;
-    height: 56px;
-    border: 2px #fff;
+    box-sizing: border-box;
+    border: 2px solid #fff;
 }
 .slider-list-inline > li {
     margin-left: 10px;
@@ -315,16 +317,19 @@ html, body {
 /*****************************************************************************/
 /* select box */
 /*****************************************************************************/
+.mobile-image-wrapper {
+    box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.5);
+}
 .select-wrapper {
     width: 129px;
-display: block;
-height: 26px;
-position: relative;
+    display: block;
+    height: 26px;
+    position: relative;
 }
 .select-style {
     padding: 0;
     float: right;
-position: absolute;
+    position: absolute;
     overflow: hidden;
     width: 129px;
     height: 26px;
@@ -470,6 +475,7 @@ position: absolute;
     left: -160px;
 }
 .tag-input {
+    margin-bottom: 20px;
     font-family: Nanum Gothic;
     height: 36px;
     width: 160px;
@@ -691,6 +697,7 @@ a.control_next:hover {
     font-weight: regular;
     color: #fff;
     line-height: 58px;
+    margin-bottom: 20px;
 }
 /* deeplink div */
 
@@ -708,7 +715,7 @@ a.control_next:hover {
     vertical-align: top;
     background-image: url('./image/random_btn_normal.png');
     display: inline-block;
-    vertical-align: text-top;
+    vertical-align: middle;
     background-color: rgba(0, 0, 0, 0);
     background-size: cover;
     background-position: center center;
@@ -897,3 +904,4 @@ input[type="range"]::-webkit-slider-thumb {
 .editor-button-right-normal.button-selected {
     background-image: url('/image/align_right_btn_selected.png') !important;
 }
+
