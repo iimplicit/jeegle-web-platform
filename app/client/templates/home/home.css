@@ -287,14 +287,13 @@ html, body {
     margin-right: 10px;
 }
 .slide-filter {
-    width: 104px;
-    heigth: 1px;
+    /*width: 104px;*/
+    /*heigth: 1px;*/
 }
 .slide-thumbnail {
-    margin-top: -3px;
-    padding: 0;
-    width: 50px;
-    height: 50px;
+    /*padding: 0;*/
+    /*width: 50px;*/
+    /*height: 50px;*/
 }
 .slide-thumbnail-brightness {
     width: 22px;
@@ -354,7 +353,7 @@ html, body {
     border: 1px solid rgba(0, 0, 0, 0.3);
 }
 .main-image-wrapper {
-    position: fixed;
+    position: absolute;
     display: none;
     width: 640px;
     height: 640px;
@@ -386,8 +385,17 @@ html, body {
 .ImageFilters {
     color: #fff;
     text-align: center;
+    margin-top: 20px;
 }
 
+.ImageFilters > hr {
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
+
+.SlideFilters {
+    margin-bottom: 30px;
+}
 
 .font-filters {
     margin: 20px 0 0 0;
@@ -479,9 +487,29 @@ html, body {
   list-style: none;
   display: inline-block;
   vertical-align: top;
+  margin-bottom: 20px;
 }
 .list-inline > li {
     display: inline-block;
+}
+
+.list-inline-front {
+    margin-left: 6px;
+}
+
+.list-inline-rear {
+    margin-left: 6px;
+}
+
+.font-size-img {
+    width: 20px !important;
+    height: 13px !important;
+    margin-left: 30px;
+    margin-right: 7px;
+}
+
+.font-size-filter {
+    margin-right: 12px;
 }
 
 .tag-filter{
@@ -765,4 +793,58 @@ input[type="range"]::-webkit-slider-thumb {
     -o-border-radius: 9px;
     border-radius: 9px;
     background-color: #fff;
+}
+
+.select-style {
+    font-family: Nanum Gothic;
+    margin-left: 6px;
+    padding: 0;
+    margin: 0;
+    width: 120px;
+    border-radius: 3px;
+    overflow: hidden;
+    color: #fff;
+
+    background: transparent url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
+}
+
+.select-style select {
+    padding-left: 10px;
+    padding-top: 5px;
+    height: 26px;
+    width: 129px;
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.select-style select:focus {
+    outline: none;
+}
+
+.bold-btn-checkbox {
+    cursor: pointer;
+    background-image: url('./image/bold_btn_normal.png');
+    background-color: rgba(0, 0, 0, 0);
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+    display:inline-block;
+    position:absolute;
+    width:26px;
+    height:26px;
+    top:9px;
+    right:9px;
+}
+.bold-btn-selected {
+    background-image: url('./image/bold_btn_selected.png');
+}
+
+
+.input-range-slider {
+  vertical-align: middle;
 }
