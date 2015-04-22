@@ -52,65 +52,71 @@
           <div class="bottom-content">
             <div class="font-filters" data-bottom-type="fontFilter">
               <div class="font-filter">
-                <ul class="list-inline">
+                <ul class="list-inline list-inline-front">
                   <li>
-                    <select name="fontType" data-main-text-typography>
-                      <option value="Hanna" data-event-change-typography="Hanna" data-font-family="Hanna">한나</option>
-                      <option value="Jua" data-event-change-typography="Jua" data-font-family="Jua">주아</option>
-                      <option value="BrushScript" data-event-change-typography="BrushScript" data-font-family="Nanum Brush Script">나눔 브러쉬</option>
-                      <option value="Gothic" data-event-change-typography="Gothic" data-font-family="Nanum Gothic">나눔 고딕</option>
-                      <option value="Myeongjo" data-event-change-typography="Myeongjo" data-font-family="Nanum Myeongjo">나눔 명조</option>
-                      <option value="PenScript" data-event-change-typography="PenScript" data-font-family="Nanum Pen Script">나눔 펜글씨</option>
-                    </select>
-                  </li>
-
-                  <li>
-                    <input type="range" class="font-size-filter" data-change-font-size-filter="font-size" value="40" min="22" max="80" step="2" />
-                  </li>
-
-                  <li>
-                    <div class="btn-group" data-toggle="buttons" data-change-font-types>
-                      <label class="btn btn-default">
-                        <input type="checkbox" data-change-font-type="bold" name="data-change-font-type" value="bold">B
-                      </label>
-
-                      <label class="btn btn-default">
-                        <input type="checkbox" data-change-font-type="italic" name="data-change-font-type" value="italic">I
-                      </label>
-
-                      <label class="btn btn-default">
-                        <input type="checkbox" data-change-font-type="shadow" name="data-change-font-type" value="shadow">T
-                      </label>
-                    </div>
-                  </li>
-
-                  <li>
-                    <div class="btn-group" data-toggle="buttons" data-change-font-justifys>
-                      <label class="btn btn-default">
-                        <input type="radio" data-change-font-justify name="data-change-font-justify" value="left">Left
-                      </label>
-
-                      <label class="btn btn-default active">
-                        <input type="radio" data-change-font-justify name="data-change-font-justify" value="center" checked>Center
-                      </label>
-                      <label class="btn btn-default">
-                        <input type="radio" data-change-font-justify name="data-change-font-justify" value="right">Right
-                      </label>
-                    </div>
-                  </li>
-
-                  <li>
-                    <div class="btn-group" data-toggle="buttons" data-change-font-backgrounds>
-                      <label class="btn btn-default active">
-                        <input type="radio" data-change-font-background name="data-change-font-background" value="A" checked>A
-                      </label>
-
-                      <label class="btn btn-default">
-                        <input type="radio" data-change-font-background name="data-change-font-background" value="B">B
-                      </label>
-                    </div>
+                      <div class="select-style">
+                          <select name="fontType" data-main-text-typography>
+                              <option value="Hanna" data-event-change-typography="Hanna" data-font-family="Hanna">한나</option>
+                              <option value="Jua" data-event-change-typography="Jua" data-font-family="Jua">주아</option>
+                              <option value="BrushScript" data-event-change-typography="BrushScript" data-font-family="Nanum Brush Script">나눔 브러쉬</option>
+                              <option value="Gothic" data-event-change-typography="Gothic" data-font-family="Nanum Gothic">나눔 고딕</option>
+                              <option value="Myeongjo" data-event-change-typography="Myeongjo" data-font-family="Nanum Myeongjo">나눔 명조</option>
+                              <option value="PenScript" data-event-change-typography="PenScript" data-font-family="Nanum Pen Script">나눔 펜글씨</option>
+                          </select>
+                      </div>
                   </li>
                 </ul>
+
+                  <ul class="list-inline list-inline-rear">
+
+                      <li>
+                          <img class="font-size-img" src="image/font_size.png" />
+                          <input type="range" class="font-size-filter input-range-slider" data-change-font-size-filter="font-size" value="40" min="22" max="80" step="2" />
+                      </li>
+
+                      <li>
+                          <div class="btn-group" data-toggle="buttons" data-change-font-types>
+                              <label class="btn btn-default">
+                                  <input type="checkbox" data-change-font-type="bold" name="data-change-font-type" value="bold">B
+                              </label>
+
+                              <label class="btn btn-default">
+                                  <input type="checkbox" data-change-font-type="italic" name="data-change-font-type" value="italic">I
+                              </label>
+
+                              <label class="btn btn-default">
+                                  <input type="checkbox" data-change-font-type="shadow" name="data-change-font-type" value="shadow">T
+                              </label>
+                          </div>
+                      </li>
+
+                      <li>
+                          <div class="btn-group" data-toggle="buttons" data-change-font-justifys>
+                              <label class="btn btn-default">
+                                  <input type="radio" data-change-font-justify name="data-change-font-justify" value="left">Left
+                              </label>
+
+                              <label class="btn btn-default active">
+                                  <input type="radio" data-change-font-justify name="data-change-font-justify" value="center" checked>Center
+                              </label>
+                              <label class="btn btn-default">
+                                  <input type="radio" data-change-font-justify name="data-change-font-justify" value="right">Right
+                              </label>
+                          </div>
+                      </li>
+
+                      <li>
+                          <div class="btn-group" data-toggle="buttons" data-change-font-backgrounds>
+                              <label class="btn btn-default active">
+                                  <input type="checkbox" data-change-font-background name="data-change-font-background" value="A">A
+                              </label>
+
+                              <label class="btn btn-default">
+                                  <input type="checkbox" data-change-font-background name="data-change-font-background" value="B">B
+                              </label>
+                          </div>
+                      </li>
+                  </ul>
               </div>
               <div class="div-line">
               </div>
@@ -208,21 +214,21 @@
 
               <hr />
 
-              <div id="SlideFilters" data-event-slide-filter>
-                <ul class="list-inline slider-list-inline">
+              <div id="SlideFilters" class="SlideFilters" data-event-slide-filter>
+                <ul class="list-inline">
                   <li>
                     <img class="slide-thumbnail slide-thumbnail-brightness" src="./image/brightness_ic.png" alt="">
-                    <input type="range" class="slide-filter" data-filter="brightness" value="100" min="0" max="200" step="1" />
+                    <input type="range" class="slide-filter input-range-slider" data-filter="brightness" value="100" min="0" max="200" step="1" />
                   </li>
 
                   <li>
                     <img class="slide-thumbnail slide-thumbnail-contrast" src="./image/contrast_ic.png" alt="">
-                    <input type="range" class="slide-filter" data-filter="contrast" value="100" min="0" max="200" step="1" />
+                    <input type="range" class="slide-filter input-range-slider" data-filter="contrast" value="100" min="0" max="200" step="1" />
                   </li>
 
                   <li>
                     <img class="slide-thumbnail slide-thumbnail-blur" src="./image/blur_ic.png" alt="">
-                    <input type="range" class="slide-filter" data-filter="blur" value="0" min="0" max="10" step="1" />
+                    <input type="range" class="slide-filter input-range-slider" data-filter="blur" value="0" min="0" max="10" step="1" />
                   </li>
                 </ul>
               </div>
