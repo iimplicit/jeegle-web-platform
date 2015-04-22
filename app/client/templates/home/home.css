@@ -396,45 +396,121 @@ html, body {
 /* Write: Hunjae, Jung */
 /*****************************************************************************/
 /*div line*/
+.div-line{
+  width:640px;
+  height:1px;
+  background-color: #ccc; /*rgba(0,0,0,0.5);*/
+  opacity:0.5;
+}
 
-.div-line {
-    width: 640px;
-    height: 1px;
-    background-color: rgba(0, 0, 0, 0.5);
+/*Tag input button*/
+.tag-btn{
+  width:36px;
+  height:36px;
+}
+
+.tag-btn{
+  display:inline-block;
+  cursor:pointer;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.tag-btn.toggle{
+  background-image: url('./image/add_tag_btn_normal.png');
+  background-color: none;
+}
+
+.tag-btn.toggle.close{
+  background-image: url("./image/close_btn.png");
+  background-color: #5844ea;
+}
+
+.tag-btn.toggle.close:hover{
+  background-color:#4d3ad9;
 }
 /*Tag input button*/
 
-.tag-btn {
-    width: 36px;
-    height: 36px;
+.tag-input-box{
+  width:196px;
+  font-family: Nanum Gothic;
+  display:none;
+  position: absolute;
+  top:36px;
+  left:-160px;
 }
-.tag-input-box {
-    display: none;
+
+.tag-input{
+  font-family: Nanum Gothic;
+  height: 36px;
+  width:160px;
+  overflow:hidden;
+  cursor:text;
+  background-color: #5844ea;
+  float:left;
+  line-height: 36px;
+  text-align: center;
+  font-weight:normal;
+  font-size:18px;
+  color:#fff;
 }
-.tag-input {
-    height: 36px;
-    min-width: 73px;
-    backgrund-color: #5844ea;
-    float: left;
+
+.tag-btn.submit{
+  color:#fff;
+  font-size:12px;
+  font-weight:bold;
+  float:left;
+  text-align:center;
+  background-color: #5844ea;
+  line-height:36px;
+  height:36px;
 }
-.tag-btn .submit {
-    float: left;
+
+.list-inline.taglist{
+  position: absolute;
+  left:38px;
+  line-height:42px;
 }
 /*tag*/
 
 .list-inline {
-    padding: 0;
-    margin: 0;
-    list-style: none;
+  margin:0;
+  padding:0;
+  list-style: none;
+  display: inline-block;
+  vertical-align: top;
 }
 .list-inline > li {
     display: inline-block;
 }
+
+.tag-filter{
+  width: 640px;
+  margin-top:20px;
+  position:relative;
+}
+
 .tag-filter-item {
-    border: 1px solid #fff;
+    border: 1px solid rgba(255,255,255,0.2);
     display: inline-block;
     min-width: 36px;
     height: 36px;
+    line-height: 36px;
+    padding-left:12px;
+    padding-right:12px;
+    margin: 0 2px;
+    font-size:16px;
+    color:#fff;
+}
+
+.tag-filter-item:hover{
+  background-image:url('./image/close_btn.png');
+  color:transparent;
+  display:inline-block;
+  cursor:pointer;
+  background-position: center center;
+  background-repeat: no-repeat;
+  content:none;
 }
 /*jeegle image slider design*/
 
@@ -473,29 +549,42 @@ html, body {
 #slider li img {
     position: absolute;
 }
-a.control_prev, a.control_next {
-    position: absolute;
-    z-index: 999;
-    display: block;
-    width: 30px;
-    height: 30px;
-    background: #2a2a2a;
-    color: #fff;
-    opacity: 0.8;
-    cursor: pointer;
+
+a.control_prev{
+  background-color: rgba(0,0,0,0.4);
+  background-image: url('./image/prev_btn_normal.png');
+  left:15px;
 }
-a.control_prev:hover, a.control_next:hover {
-    opacity: 1;
-    -webkit-transition: all 0.2s ease;
-}
-a.control_prev {
-    border-radius: 0 2px 2px 0;
-    left: 15px;
-}
+
 a.control_next {
-    right: 0;
-    border-radius: 2px 0 0 2px;
-    right: 15px;
+  background-color: rgba(0,0,0,0.4);
+  background-image: url('./image/next_btn_normal.png');
+  right:15px;
+}
+
+a.control_prev, a.control_next {
+  position: absolute;
+  z-index: 999;
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  border-radius: 0 2px 2px 0;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+a.control_prev:hover
+{
+  background-color: rgba(0,0,0,0.7);
+  background-image: url('./image/prev_btn_hover.png');
+}
+
+a.control_next:hover
+{
+  background-color: rgba(0,0,0,0.7);
+  background-image: url('./image/next_btn_hover.png');
 }
 .slider_option {
     position: relative;
@@ -536,12 +625,12 @@ a.control_next {
     background-size: contain;
     background-position: center center;
     background-repeat: no-repeat;
-    display: inline-block;
-    position: absolute;
-    width: 26px;
-    height: 26px;
-    top: 9px;
-    right: 9px;
+    display:inline-block;
+    position:absolute;
+    width:26px;
+    height:26px;
+    top:9px;
+    right:9px;
 }
 .btn-selected {
     background-image: url('./image/music_check_btn_selected.png');

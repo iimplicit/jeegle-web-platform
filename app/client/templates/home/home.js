@@ -1,5 +1,5 @@
 slider = {
-    $ArrowHeight: 30, // 화살표 높이입니다.
+    $ArrowHeight: 36, // 화살표 높이입니다.
     $CenterLen: 640, // 가운데 올 가장 큰 이미지의 한변의 길이입니다.
     $DisplayPieces: 9, // [홀수] 하나의 화면에 얼마나 보여줄지 결정하게 됩니다.
     $MaximumImageNum: 21, // [홀수] 로드하는 최대 이미지 개수입니다.
@@ -10,6 +10,7 @@ slider = {
 };
 
 var musicNum = 0;
+var tagFirstFlag = true;
 
 // Tag 개수를 increase, decrease, get 하는 함수 객체입니다.
 tagCounter = new TagCounter();
@@ -32,20 +33,27 @@ Template.Home.events({
     "click #tag-toggle-btn": function(e, tmpl) {
         inputBox = $("#tag-input-box");
         toggleBtn = $('#tag-toggle-btn');
+
         if (inputBox.css('display') == 'none') {
-            toggleBtn.val('+');
+          inputBox.css('display','inline-block')
+          toggleBtn.addClass('close');
+          tagFirstFlag = true;
+          $('#tag-input').text('태그입력');
+          $('#tag-input').focus();
         } else {
-            toggleBtn.val('x');
+          inputBox.css('display','none')
+          toggleBtn.removeClass('close');
         }
     },
     "click #tag-submit": function(e, tmpl) {
         //if tag is not exist, tag will be undefined
         var inputBox = $('#tag-input');
-        var tagWord = inputBox.val();
-        inputBox.val('');
+        var tagWord = inputBox.text();
+        inputBox.text('');
+        console.log(tagWord);
 
         // return if there is no tag word
-        var spaceRemovedTag = tagWord.replace(/\s+/g, '');
+        var spaceRemovedTag = tagWord.replace(/\s+|\n+/g, '');
         if (spaceRemovedTag == "") return;
 
         // create tag div and delete
@@ -58,10 +66,17 @@ Template.Home.events({
         var NodesLimit = parseInt(slider.$MaximumImageNum / 2)
 
         getImagesForTag(tagWord, 3, NodesLimit, 1);
+
+        $('#tag-input').focus();
     },
     "keypress #tag-input": function(e, tmpl) {
-        if (e.which == 13) {
-            $('#tag-submit').trigger('click');
+        if(tagFirstFlag == true){
+            tagFirstFlag = false;
+            e.currentTarget.innerText = '';
+        }else{
+          if (e.which == 13) {
+              $('#tag-submit').trigger('click');
+          }
         }
     },
     "keypress #input-15": _.debounce(function(e, tmpl) {
@@ -99,29 +114,6 @@ Template.Home.events({
                         // 다만 순서는 첫번째로 연결 노드 개수 낮은것들 우선, 그 중에서는 weight 점수 높은 녀석들 우선,
                         // 그 다음부터는 edge weight 합으로 정렬합니다.
                         getImagesForTag(result[i], 3, NodesLimit, 2);
-                        // Meteor.neo4j.call('getImagesForTag', {tagWord: result[i], edgeScope: 3, NodesLimit: NodesLimit}, function (err, data) {
-                        //     // callCnt++;
-                        //     Images = data.i;
-                        //     if (Images.length == 0) return; //no image
-                        //
-                        //     if (result.indexOf(data.t[0].word) == -1) {
-                        //         // 만약 현재 구해야하는 result가 아닌 결과를 받아왔으면 과감하게 빠이를 외치자.
-                        //         // 넌 늦었어.
-                        //         return;
-                        //     } else {
-                        //         // 이들은 모두 현재 구해야하는 result들이다.
-                        //         console.log(Images.length+'개의 결과를 가져왔습니다.')
-                        //         pushImages(Images, result.length /*나중에 Image 점수로 바꿔야해*/ , data.t, 2);
-                        //
-                        //         restoreCenterImage(2);
-                        //
-                        //         Session.set("images", ImageQueue.heap);
-                        //         Tracker.flush();
-                        //         Tracker.afterFlush(function(){
-                        //               setImagePosition(slider);
-                        //         })
-                        //     }
-                        // })
                     }
                 }
             });
@@ -466,6 +458,9 @@ Template.Home.rendered = function() {
                 $('#main-image-wrapper').siblings().css('visibility', 'hidden');
                 $('#main-image-wrapper').css('border', '2px solid rgba(255,255,255,1)');
                 // $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+
+                // Hunjae
+                $('.slider-btn').css('visibility','hidden');
             })
 
             $('body').on('click', '[data-apply-image-filter]', function() {
@@ -481,6 +476,9 @@ Template.Home.rendered = function() {
                 $('[data-bottom-type="fontFilter"]').show();
                 $('#main-image-wrapper').siblings().css('visibility', '');
                 $('#main-image-wrapper').css('border', '1px solid rgba(0,0,0,0.3)');
+
+                // Hunjae
+                $('.slider-btn').css('visibility','');
             });
 
             $('body').on('click', '[data-header-right-content]', function() {
@@ -504,6 +502,8 @@ Template.Home.rendered = function() {
                     // #2 메인이미지를 제외한 다른 이미지들을 숨겨줍니다. (hide를 사용하지 않는 이유는 hide 사용 시 이미지들의 위치가 왜곡되기 때문입니다.)
                     $('#main-image-wrapper').siblings().css('visibility', 'hidden');
 
+                    // Hunjae
+                    $('.slider-btn').css('visibility','hidden');
 
                 } else if ($('[data-header-right-content]').attr('data-header-right-content') == 'home') {
                     // #1 pointer-events 클릭을 막은 것은 풀어줍니다.
@@ -516,6 +516,9 @@ Template.Home.rendered = function() {
                     $('[data-header-right-content]').text("공유");
                     $('[data-header-right-content]').attr('data-header-right-content', 'share');
                     $('[data-download-image]').hide(200);
+
+                    // Hunjae
+                    $('.slider-btn').css('visibility','');
 
                     imageApp.initializationByHomeBtn();
                 }
@@ -1379,9 +1382,9 @@ function getBase64Image(img) {
 function createTagDiv(tagNum, tagWord) {
     var html = '';
     // 보통 다른 id줄때 id? name? val? 뭐로 줌?
-    html += '<li><a href="#" id="tagNum-' + tagNum + '" class="tag-filter-item" data-tag=' + tagWord + '>';
+    html += '<li><span id="tagNum-' + tagNum + '" class="tag-filter-item" data-tag=' + tagWord + '>';
     html += tagWord;
-    html += '</a></li>';
+    html += '</span></li>';
 
     $('#tagBox').append(html);
 }
