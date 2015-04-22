@@ -23,35 +23,37 @@
             </div>
         </div>
         <div class="row" style="margin: 68px 0 0 0;">
-            <div class="main-content-wrapper">
-                <div class="main-content" data-content>
-                    <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
-                    <div id="input-15" class="main-text hidden-xs" contenteditable="true" style="font-family: Hanna; text-shadow: 3px 3px #000;" data-main-text>
-                        무슨 생각을 하고 계신가요?
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
+                <div class="main-content-wrapper">
+                    <div class="main-content" data-content>
+                        <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
+                        <div id="input-15" class="main-text hidden-xs" contenteditable="true" style="font-family: Hanna; text-shadow: 3px 3px #000;" data-main-text>
+                            무슨 생각을 하고 계신가요?
+                        </div>
+
+                        <div class="main-text col-xs-12 hidden-sm hidden-md hidden-lg" style="font-family: Hanna; top: 40%;" >
+                            Jeegle은 데스크탑 화면에 <br/>
+                            최적화 되어있습니다. <br/>
+                            (모바일 서비스 준비중)
+                        </div>
+
                     </div>
 
-                    <div class="main-text col-xs-12 hidden-sm hidden-md hidden-lg" style="font-family: Hanna; top: 40%;" >
-                        Jeegle은 데스크탑 화면에 <br/>
-                        최적화 되어있습니다. <br/>
-                        (모바일 서비스 준비중)
+                    <!--Jeegle image slider start-->
+                    <div id="slider_box" class="slider_box hidden-xs">
+                        <ul id="slider">
+                          {{#each images}}
+                              <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
+                                  <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
+                              </li>
+                          {{/each}}
+                        </ul>
+
+                        <a href="#" class="slider-btn control_next"></a>
+                        <a href="#" class="slider-btn control_prev"></a>
                     </div>
-
+                    <!--Jeegle image slider end-->
                 </div>
-
-                <!--Jeegle image slider start-->
-                <div id="slider_box" class="slider_box hidden-xs">
-                    <ul id="slider">
-                      {{#each images}}
-                          <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
-                              <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
-                          </li>
-                      {{/each}}
-                    </ul>
-
-                    <a href="#" class="slider-btn control_next"></a>
-                    <a href="#" class="slider-btn control_prev"></a>
-                </div>
-                <!--Jeegle image slider end-->
             </div>
         </div>
         <div class="row">
