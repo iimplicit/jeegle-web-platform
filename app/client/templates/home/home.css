@@ -278,6 +278,7 @@ html, body {
     padding: 0;
     width: 60px;
     height: 60px;
+    margin: 0px 2px;
 }
 .selected-preset-thumbnail {
     box-sizing: border-box;
@@ -319,19 +320,22 @@ html, body {
 .mobile-image-wrapper {
     box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.5);
 }
+.select-wrapper {
+    width: 129px;
+    display: block;
+    height: 26px;
+    position: relative;
+}
 .select-style {
     padding: 0;
-    margin: 0;
-    border: 1px solid #ccc;
-    width: 120px;
-    border-radius: 3px;
+    float: right;
+    position: absolute;
     overflow: hidden;
-    background-color: #fff;
-    background: #fff url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
-}
-.select-style select {
-    padding: 5px 8px;
-    width: 130%;
+    width: 129px;
+    height: 26px;
+    color: #fff;
+    text-indent: 6px;
+    vertical-align: text-bottom;
     border: none;
     box-shadow: none;
     background-color: transparent;
@@ -339,9 +343,28 @@ html, body {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+    border-radius: 0;
 }
+/* .select-style:focus {
+    background-color: #fff;
+    color: #000;
+} */
 .select-style select:focus {
     outline: none;
+}
+.select-style-button {
+    width: 26px;
+    height: 26px;
+    float: right;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-image: url('/image/font_down_btn_normal.png')
+}
+/* .select-style-button:focus {
+    background-image: url('/image/font_check_ic.png')
+} */
+.select-style-button:hover {
+    background-image: url('/image/font_down_btn_hover.png')
 }
 .main-content {
     /*background-image: url(test.jpg);*/
@@ -378,7 +401,12 @@ html, body {
     color: #fff;
     font-size: 40px;
     text-align: center;
-    /*border: 1px dashed #fff;*/
+    padding: 16px;
+}
+.main-text:focus {
+    outline: none;
+    border:1px dashed #fff;
+    z-index:10
 }
 .bottom-content {
     width: 640px;
@@ -390,16 +418,13 @@ html, body {
     text-align: center;
     margin-top: 20px;
 }
-
 .ImageFilters > hr {
     margin-top: 0px;
     margin-bottom: 20px;
 }
-
 .SlideFilters {
     margin-bottom: 30px;
 }
-
 .font-filters {
     margin: 20px 0 0 0;
 }
@@ -407,145 +432,132 @@ html, body {
 /* Write: Hunjae, Jung */
 /*****************************************************************************/
 /*div line*/
-.div-line{
-  width:640px;
-  height:1px;
-  background-color: #ccc; /*rgba(0,0,0,0.5);*/
-  opacity:0.5;
-}
 
-/*Tag input button*/
-.tag-btn{
-  width:36px;
-  height:36px;
-}
+.div-line {
+    width: 640px;
+    height: 1px;
+    background-color: #ccc;
+    /*rgba(0,0,0,0.5);*/
 
-.tag-btn{
-  display:inline-block;
-  cursor:pointer;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-
-.tag-btn.toggle{
-  background-image: url('./image/add_tag_btn_normal.png');
-  background-color: none;
-}
-
-.tag-btn.toggle.close{
-  background-image: url("./image/close_btn.png");
-  background-color: #5844ea;
-}
-
-.tag-btn.toggle.close:hover{
-  background-color:#4d3ad9;
+    opacity: 0.5;
 }
 /*Tag input button*/
 
-.tag-input-box{
-  width:196px;
-  font-family: Nanum Gothic;
-  visibility: hidden;
-  position: absolute;
-  top:36px;
-  left:-160px;
+.tag-btn {
+    width: 36px;
+    height: 36px;
 }
-
-.tag-input{
-  font-family: Nanum Gothic;
-  height: 36px;
-  width:160px;
-  overflow:hidden;
-  cursor:text;
-  background-color: #5844ea;
-  float:left;
-  line-height: 36px;
-  text-align: center;
-  font-weight:normal;
-  font-size:18px;
-  color:#fff;
+.tag-btn {
+    display: inline-block;
+    cursor: pointer;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
-
-.tag-input:focus{
-  outline: none;
+.tag-btn.toggle {
+    background-image: url('./image/add_tag_btn_normal.png');
+    background-color: none;
 }
-
-.tag-btn.submit{
-  color:#fff;
-  font-size:12px;
-  font-weight:bold;
-  float:left;
-  text-align:center;
-  background-color: #5844ea;
-  line-height:36px;
-  height:36px;
+.tag-btn.toggle.close {
+    background-image: url("./image/close_btn.png");
+    background-color: #5844ea;
 }
+.tag-btn.toggle.close:hover {
+    background-color: #4d3ad9;
+}
+/*Tag input button*/
 
-.list-inline.taglist{
-  position: absolute;
-  left:38px;
-  line-height:42px;
+.tag-input-box {
+    width: 196px;
+    font-family: Nanum Gothic;
+    visibility: hidden;
+    position: absolute;
+    top: 36px;
+    left: -160px;
+}
+.tag-input {
+    margin-bottom: 20px;
+    font-family: Nanum Gothic;
+    height: 36px;
+    width: 160px;
+    overflow: hidden;
+    cursor: text;
+    background-color: #5844ea;
+    float: left;
+    line-height: 36px;
+    text-align: center;
+    font-weight: normal;
+    font-size: 18px;
+    color: #fff;
+}
+.tag-input:focus {
+    outline: none;
+}
+.tag-btn.submit {
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    float: left;
+    text-align: center;
+    background-color: #5844ea;
+    line-height: 36px;
+    height: 36px;
+}
+.list-inline.taglist {
+    position: absolute;
+    left: 38px;
+    line-height: 42px;
 }
 /*tag*/
 
 .list-inline {
-  margin:0;
-  padding:0;
-  list-style: none;
-  display: inline-block;
-  vertical-align: top;
-  margin-bottom: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 20px;
 }
 .list-inline > li {
-    display: inline-block;
+    float: left;
 }
-
 .list-inline-front {
     margin-left: 6px;
 }
-
 .list-inline-rear {
     margin-left: 6px;
 }
-
 .font-size-img {
     width: 20px !important;
     height: 13px !important;
-    margin-left: 30px;
-    margin-right: 7px;
 }
-
 .font-size-filter {
     margin-right: 12px;
 }
-
-.tag-filter{
-  width: 640px;
-  margin-top:20px;
-  position:relative;
+.tag-filter {
+    width: 640px;
+    margin-top: 20px;
+    position: relative;
 }
-
 .tag-filter-item {
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     display: inline-block;
     min-width: 36px;
     height: 36px;
     line-height: 36px;
-    padding-left:12px;
-    padding-right:12px;
+    padding-left: 12px;
+    padding-right: 12px;
     margin: 0 2px;
-    font-size:16px;
-    color:#fff;
+    font-size: 16px;
+    color: #fff;
 }
-
-.tag-filter-item:hover{
-  background-image:url('./image/close_btn.png');
-  color:transparent;
-  display:inline-block;
-  cursor:pointer;
-  background-position: center center;
-  background-repeat: no-repeat;
-  content:none;
+.tag-filter-item:hover {
+    background-image: url('./image/close_btn.png');
+    color: transparent;
+    display: inline-block;
+    cursor: pointer;
+    background-position: center center;
+    background-repeat: no-repeat;
+    content: none;
 }
 /*jeegle image slider design*/
 
@@ -560,6 +572,7 @@ html, body {
     left: 0;
     overflow-x: hidden;
 }
+
 #slider {
     position: relative;
     margin: 0;
@@ -570,8 +583,23 @@ html, body {
     text-align: center;
     /*overflow: hidden;*/
 }
+
 #slider li {
-    position: relative;
+  position: relative;
+  display: inline-block;
+  float:left;
+  margin: 0;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  background: #ccc;
+  overflow:hidden;
+}
+
+#slider li img{
+    position: absolute;
+    /*position: relative;*/
     display: inline-block;
     float: left;
     margin: 0;
@@ -581,45 +609,35 @@ html, body {
     background: #ccc;
     overflow: hidden;
 }
-#slider li img {
-    position: absolute;
-}
-
 a.control_prev{
   background-color: rgba(0,0,0,0.4);
   background-image: url('./image/prev_btn_normal.png');
   left:15px;
 }
-
 a.control_next {
-  background-color: rgba(0,0,0,0.4);
-  background-image: url('./image/next_btn_normal.png');
-  right:15px;
+    background-color: rgba(0, 0, 0, 0.4);
+    background-image: url('./image/next_btn_normal.png');
+    right: 15px;
 }
-
 a.control_prev, a.control_next {
-  position: absolute;
-  z-index: 999;
-  display: inline-block;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-  border-radius: 0 2px 2px 0;
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
+    position: absolute;
+    z-index: 999;
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    border-radius: 0 2px 2px 0;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
-
-a.control_prev:hover
-{
-  background-color: rgba(0,0,0,0.7);
-  background-image: url('./image/prev_btn_hover.png');
+a.control_prev:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    background-image: url('./image/prev_btn_hover.png');
 }
-
-a.control_next:hover
-{
-  background-color: rgba(0,0,0,0.7);
-  background-image: url('./image/next_btn_hover.png');
+a.control_next:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    background-image: url('./image/next_btn_hover.png');
 }
 .slider_option {
     position: relative;
@@ -660,12 +678,12 @@ a.control_next:hover
     background-size: contain;
     background-position: center center;
     background-repeat: no-repeat;
-    display:inline-block;
-    position:absolute;
-    width:26px;
-    height:26px;
-    top:9px;
-    right:9px;
+    display: inline-block;
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    top: 9px;
+    right: 9px;
 }
 .btn-selected {
     background-image: url('./image/music_check_btn_selected.png');
@@ -679,6 +697,7 @@ a.control_next:hover
     font-weight: regular;
     color: #fff;
     line-height: 58px;
+    margin-bottom: 20px;
 }
 /* deeplink div */
 
@@ -696,7 +715,7 @@ a.control_next:hover
     vertical-align: top;
     background-image: url('./image/random_btn_normal.png');
     display: inline-block;
-    vertical-align: text-top;
+    vertical-align: middle;
     background-color: rgba(0, 0, 0, 0);
     background-size: cover;
     background-position: center center;
@@ -732,10 +751,7 @@ a.control_next:hover
 .button-apply-image-filter:hover {
     background-color: rgba(0, 0, 0, 0.2);
 }
-.main-text:focus {
-    outline: none;
-    border: 1px dashed #fff;
-}
+
 /*spinner*/
 
 .before-load {
@@ -787,7 +803,7 @@ input[type="range"] {
     height: 2px;
     padding: 0;
     background: rgba(255, 255, 255, 0.3);
-    background-image: -webkit-gradient( linear, left top, right top, color-stop(0.2, rgba(255,255,255,1)), color-stop(0.2, rgba(255,255,255,0.3)));
+    background-image: -webkit-gradient( linear, left top, right top, color-stop(0.2, rgba(255, 255, 255, 1)), color-stop(0.2, rgba(255, 255, 255, 0.3)));
 }
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -802,63 +818,90 @@ input[type="range"]::-webkit-slider-thumb {
     background-color: #fff;
 }
 
-.select-style {
-    font-family: Nanum Gothic;
-    margin-left: 6px;
-    padding: 0;
-    margin: 0;
-    width: 120px;
-    border-radius: 3px;
-    overflow: hidden;
-    color: #fff;
-
-    background: transparent url("http://www.scottgood.com/jsg/blog.nsf/images/arrowdown.gif") no-repeat 90% 50%;
-}
-
-.select-style select {
-    padding-left: 10px;
-    padding-top: 5px;
-    height: 26px;
-    width: 129px;
-    border: none;
-    box-shadow: none;
-    background-color: transparent;
-    background-image: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-}
-
-.select-style select:focus {
-    outline: none;
-}
-
-.bold-btn-checkbox {
-    cursor: pointer;
-    background-image: url('./image/bold_btn_normal.png');
-    background-color: rgba(0, 0, 0, 0);
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
-    display:inline-block;
-    position:absolute;
-    width:26px;
-    height:26px;
-    top:9px;
-    right:9px;
-}
 .bold-btn-selected {
     background-image: url('./image/bold_btn_selected.png');
 }
-
-
 .input-range-slider {
-  vertical-align: middle;
+    vertical-align: middle;
+}
+
+/* editor button */
+.editor-button {
+    cursor: pointer;
+    float: left;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+    width: 26px;
+    height: 26px;
+    top: 9px;
+    right: 9px;
+}
+
+.editor-button-bold {
+    margin-left: 16px;
+    background-image: url('/image/bold_btn_normal.png');
+}
+.editor-button-bold:hover {
+    background-image: url('/image/bold_btn_hover.png');
+}
+.editor-button-shadow {
+    margin-left: 4px;
+    background-image: url('/image/shadow_btn_normal.png');
+}
+.editor-button-shadow:hover {
+    background-image: url('/image/shadow_btn_hover.png');
+}
+.editor-button-italic {
+    margin-left: 4px;
+    background-image: url('/image/italic_btn_normal.png');
+}
+.editor-button-italic:hover {
+    background-image: url('/image/italic_btn_hover.png');
+}
+.editor-button-bold.button-selected {
+    background-image: url('/image/bold_btn_selected.png') !important;
+}
+.editor-button-italic.button-selected {
+    background-image: url('/image/italic_btn_selected.png') !important;
+}
+.editor-button-shadow.button-selected {
+    background-image: url('/image/shadow_btn_selected.png') !important;
 }
 
 
-@media (max-width: 768px) {
-    #main-image-wrapper {
-        visibility: hidden;
-    }
+
+
+
+
+.editor-button-left-normal {
+    margin-left: 16px;
+    background-image: url('/image/align_left_btn_normal.png');
 }
+.editor-button-left-normal:hover {
+    background-image: url('/image/align_left_btn_hover.png');
+}
+.editor-button-center-normal {
+    margin-left: 4px;
+    background-image: url('/image/align_center_btn_normal.png');
+}
+.editor-button-center-normal:hover {
+    background-image: url('/image/align_center_btn_hover.png');
+}
+.editor-button-right-normal {
+    margin-left: 4px;
+    background-image: url('/image/align_right_btn_normal.png');
+}
+.editor-button-right-normal:hover {
+    background-image: url('/image/align_right_btn_hover.png');
+}
+.editor-button-left-normal.button-selected {
+    background-image: url('/image/align_left_btn_selected.png') !important;
+}
+.editor-button-center-normal.button-selected {
+    background-image: url('/image/align_center_btn_selected.png') !important;
+}
+.editor-button-right-normal.button-selected {
+    background-image: url('/image/align_right_btn_selected.png') !important;
+}
+

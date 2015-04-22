@@ -1,118 +1,104 @@
 <template name="Home">
-  <div class="before-load">
-    <div class="spinner">
-      {{> spinner}}
-    </div>
-  </div>
-  <div class="body-background-wrapper"></div>
-  <div class="body-background"></div>
-  <div class="mobile-image-wrapper hidden-sm hidden-md hidden-lg" data-main-image-wrapper></div>
-  <div class="main-image-wrapper hidden-xs" data-main-image-wrapper></div>
-  <div class="container" style="padding: 0;">
-    <div class="row">
-      <div class="nav-wrapper" data-nav-top>
-        <div>
-          <a href="/policy"><img src="/images/logo.png" alt="" class="nav-logo"></a>
+    <div class="before-load">
+        <div class="spinner">
+          {{> spinner}}
         </div>
-        <div class="hidden-xs">
-          <button class="nav-button-complete" data-header-right-content="share">공유</button>
-          <div class="download-button" data-download-image></div>
-        </div>
-      </div>
     </div>
-    <div class="row" style="margin: 68px 0 0 0;">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
-        <div class="main-content-wrapper">
-          <div class="main-content" data-content>
-            <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
-            <div id="input-15" class="main-text hidden-xs" contenteditable="true" style="font-family: Hanna;" data-main-text>
-                무슨 생각을 하고 계신가요?
+    <div class="body-background-wrapper"></div>
+    <div class="body-background"></div>
+    <div class="mobile-image-wrapper hidden-sm hidden-md hidden-lg" data-main-image-wrapper></div>
+    <div class="main-image-wrapper hidden-xs" data-main-image-wrapper></div>
+    <div class="container" style="padding: 0;">
+        <div class="row">
+            <div class="nav-wrapper" data-nav-top>
+                <div>
+                    <a href="/policy">
+                        <img src="/image/logo.png" alt="" class="nav-logo">
+                    </a>
+                </div>
+                <div class="hidden-xs">
+                    <button class="nav-button-complete" data-header-right-content="share">공유</button>
+                    <div class="download-button" data-download-image></div>
+                </div>
             </div>
-
-            <div class="main-text col-xs-12 hidden-sm hidden-md hidden-lg" style="font-family: Hanna; top: 40%;" >
-                Jeegle은 데스크탑 화면에 <br/>
-                최적화 되어있습니다. <br/>
-                (모바일 서비스 준비중)
-            </div>
-          </div>
-
-          <!--Jeegle image slider start-->
-          <div id="slider_box" class="slider_box hidden-xs">
-            <ul id="slider">
-              {{#each images}}
-                <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
-                  <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
-                </li>
-              {{/each}}
-            </ul>
-
-            <a href="#" class="slider-btn control_next"></a>
-            <a href="#" class="slider-btn control_prev"></a>
-          </div>
-          <!--Jeegle image slider end-->
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="hidden-xs col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
-        <div class="bottom-content-wrapper">
-          <div class="bottom-content">
-            <div class="font-filters" data-bottom-type="fontFilter">
-              <div class="font-filter">
-                <ul class="list-inline list-inline-front">
-                  <li>
-                      <div class="select-style">
-                          <select name="fontType" data-main-text-typography>
-                              <option value="Hanna" data-event-change-typography="Hanna" data-font-family="Hanna">한나</option>
-                              <option value="Jua" data-event-change-typography="Jua" data-font-family="Jua">주아</option>
-                              <option value="BrushScript" data-event-change-typography="BrushScript" data-font-family="Nanum Brush Script">나눔 브러쉬</option>
-                              <option value="Gothic" data-event-change-typography="Gothic" data-font-family="Nanum Gothic">나눔 고딕</option>
-                              <option value="Myeongjo" data-event-change-typography="Myeongjo" data-font-family="Nanum Myeongjo">나눔 명조</option>
-                              <option value="PenScript" data-event-change-typography="PenScript" data-font-family="Nanum Pen Script">나눔 펜글씨</option>
-                          </select>
-                      </div>
-                  </li>
-                </ul>
+        <div class="row" style="margin: 68px 0 0 0;">
+            <div class="main-content-wrapper">
+                <div class="main-content" data-content>
+                    <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
+                    <div id="input-15" class="main-text hidden-xs" contenteditable="true" style="font-family: Hanna; text-shadow: 3px 3px #000;" data-main-text>
+                        무슨 생각을 하고 계신가요?
+                    </div>
 
-                  <ul class="list-inline list-inline-rear">
+                    <div class="main-text col-xs-12 hidden-sm hidden-md hidden-lg" style="font-family: Hanna; top: 40%;" >
+                        Jeegle은 데스크탑 화면에 <br/>
+                        최적화 되어있습니다. <br/>
+                        (모바일 서비스 준비중)
+                    </div>
 
-                      <li>
-                          <img class="font-size-img" src="image/font_size.png" />
-                          <input type="range" class="font-size-filter input-range-slider" data-change-font-size-filter="font-size" value="40" min="22" max="80" step="2" />
-                      </li>
+                </div>
 
-                      <li>
-                          <div class="btn-group" data-toggle="buttons" data-change-font-types>
-                              <label class="btn btn-default">
-                                  <input type="checkbox" data-change-font-type="bold" name="data-change-font-type" value="bold">B
-                              </label>
+                <!--Jeegle image slider start-->
+                <div id="slider_box" class="slider_box hidden-xs">
+                    <ul id="slider">
+                      {{#each images}}
+                          <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
+                              <img name="images_in_belt" src="http://image.jeegle.io/{{data.imagePath}}" style="position:absolute;" />
+                          </li>
+                      {{/each}}
+                    </ul>
 
-                              <label class="btn btn-default">
-                                  <input type="checkbox" data-change-font-type="italic" name="data-change-font-type" value="italic">I
-                              </label>
+                    <a href="#" class="slider-btn control_next"></a>
+                    <a href="#" class="slider-btn control_prev"></a>
+                </div>
+                <!--Jeegle image slider end-->
+            </div>
+        </div>
+        <div class="row">
+              <div class="hidden-xs col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
+                <div class="bottom-content-wrapper">
+                    <div class="bottom-content">
+                        <div class="font-filters" data-bottom-type="fontFilter">
+                            <div class="font-filter">
+                                <ul class="list-inline list-inline-front">
+                                    <li>
+                                        <div class="select-wrapper">
+                                            <div class="select-style-button"></div>
+                                            <select class="select-style" name="fontType" data-main-text-typography>
+                                                <option value="Hanna" data-event-change-typography="Hanna" data-font-family="Hanna">한나</option>
+                                                <option value="Jua" data-event-change-typography="Jua" data-font-family="Jua">주아</option>
+                                                <option value="BrushScript" data-event-change-typography="BrushScript" data-font-family="Nanum Brush Script">나눔 브러쉬</option>
+                                                <option value="Gothic" data-event-change-typography="Gothic" data-font-family="Nanum Gothic">나눔 고딕</option>
+                                                <option value="Myeongjo" data-event-change-typography="Myeongjo" data-font-family="Nanum Myeongjo">나눔 명조</option>
+                                                <option value="PenScript" data-event-change-typography="PenScript" data-font-family="Nanum Pen Script">나눔 펜글씨</option>
+                                            </select>
+                                        </div>
+                                    </li>
+                                </ul>
 
-                              <label class="btn btn-default">
-                                  <input type="checkbox" data-change-font-type="shadow" name="data-change-font-type" value="shadow">T
-                              </label>
-                          </div>
-                      </li>
+                                <ul class="list-inline list-inline-rear">
 
-                      <li>
-                          <div class="btn-group" data-toggle="buttons" data-change-font-justifys>
-                              <label class="btn btn-default">
-                                  <input type="radio" data-change-font-justify name="data-change-font-justify" value="left">Left
-                              </label>
+                                    <li>
+                                        <img class="font-size-img" src="image/font_size.png" />
+                                        <input type="range" class="font-size-filter input-range-slider" data-change-font-size-filter="font-size" value="40" min="22" max="80" step="2" />
+                                    </li>
 
-                              <label class="btn btn-default active">
-                                  <input type="radio" data-change-font-justify name="data-change-font-justify" value="center" checked>Center
-                              </label>
-                              <label class="btn btn-default">
-                                  <input type="radio" data-change-font-justify name="data-change-font-justify" value="right">Right
-                              </label>
-                          </div>
-                      </li>
+                                    <li>
+                                        <div class="btn-group" data-toggle="buttons">
+                                            <div data-change-font-type="bold" name="data-change-font-type" value="bold" class="editor-button editor-button-bold" data-checked="false"></div>
+                                            <div data-change-font-type="italic" name="data-change-font-type" value="italic" class="editor-button editor-button-italic" data-checked="false"></div>
+                                            <div data-change-font-type="shadow" name="data-change-font-type" value="shadow" class="editor-button editor-button-shadow button-selected" data-checked="true"></div>
+                                        </div>
+                                    </li>
 
-                      <li>
+                                    <li>
+                                        <div class="btn-group" data-toggle="buttons" data-current-text-align="center">
+                                            <div data-text-align="left" name="data-change-font-justify" class="editor-button editor-button-left-normal"></div>
+                                            <div data-text-align="center" name="data-change-font-justify" class="editor-button editor-button-center-normal button-selected"></div>
+                                            <div data-text-align="right" name="data-change-font-justify" class="editor-button editor-button-right-normal"></div>
+                                        </div>
+                                    </li>
+                                    <!-- <li>
                           <div class="btn-group" data-toggle="buttons" data-change-font-backgrounds>
                               <label class="btn btn-default active">
                                   <input type="checkbox" data-change-font-background name="data-change-font-background" value="A">A
@@ -122,127 +108,127 @@
                                   <input type="checkbox" data-change-font-background name="data-change-font-background" value="B">B
                               </label>
                           </div>
-                      </li>
-                  </ul>
-              </div>
-              <div class="div-line">
-              </div>
-              <div class="tag-filter">
-                <div id="tag-toggle-btn" class="tag-btn toggle"></div>
-                <div id="tag-input-box" class="tag-input-box">
-                    <div id="tag-input" class="tag-input" contenteditable="true"></div>
-                    <div id="tag-submit" class="tag-btn submit">OK</div>
+                      </li> -->
+                                </ul>
+                            </div>
+                            <div class="div-line">
+                            </div>
+                            <div class="tag-filter">
+                                <div id="tag-toggle-btn" class="tag-btn toggle"></div>
+                                <div id="tag-input-box" class="tag-input-box">
+                                    <div id="tag-input" class="tag-input" contenteditable="true"></div>
+                                    <div id="tag-submit" class="tag-btn submit">OK</div>
+                                </div>
+                                <ul id="tagBox" class="list-inline taglist">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="image-share" data-bottom-type="share">
+                            <div class="image-share-with-music">
+                                <div class="image-share-with-music-title">
+                                    <img class="music-ic" src="./image/music_ic.png" alt="">
+                                    <span>음악 담기</span>
+                                    <span class="sp-line"></span>
+                                </div>
+                                <div id="image-share-with-music-content" class="image-share-with-music-content">
+                                    <button id="refresh-musicDeeplink" class="refresh-musicDeeplink"></button>
+                                    <div id="music-content" class="music-content"></div>
+                                </div>
+
+                                <div id="music-checkbox" class="image-share-with-music-checkbox btn-selected" data-share-music-type="beat" name="share-music" value="beat" data-checked="true"></div>
+                                <!-- <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" checked> -->
+                            </div>
+
+                            <hr>
+
+                            <div class="image-share-with-facebook" data-share-facebook>
+                                페이스북 공유하기
+                            </div>
+                        </div>
+
+                        <div class="ImageFilters" data-bottom-type="imageFilter">
+                            <div id="PresetFilters">
+                                <ul class="list-inline">
+                                    <li>
+                                        <a data-preset="default">
+                                            <img class="preset-thumbnail selected-preset-thumbnail" src="./image/imagefilter/default.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="vintage">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/vintage.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="conSetuSepia">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/conSetuSepia.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="old">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/old.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="toaster">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/toaster.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="saturation">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/saturation.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="hue_rotate">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/hue_rotate.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="invert">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/invert.png" alt="">
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a data-preset="clarity">
+                                            <img class="preset-thumbnail" src="./image/imagefilter/clarity.png" alt="">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <hr />
+
+                            <div id="SlideFilters" class="SlideFilters" data-event-slide-filter>
+                                <ul class="list-inline">
+                                    <li>
+                                        <img class="slide-thumbnail slide-thumbnail-brightness" src="./image/brightness_ic.png" alt="">
+                                        <input type="range" class="slide-filter input-range-slider" data-filter="brightness" value="100" min="0" max="200" step="1" />
+                                    </li>
+
+                                    <li>
+                                        <img class="slide-thumbnail slide-thumbnail-contrast" src="./image/contrast_ic.png" alt="">
+                                        <input type="range" class="slide-filter input-range-slider" data-filter="contrast" value="100" min="0" max="200" step="1" />
+                                    </li>
+
+                                    <li>
+                                        <img class="slide-thumbnail slide-thumbnail-blur" src="./image/blur_ic.png" alt="">
+                                        <input type="range" class="slide-filter input-range-slider" data-filter="blur" value="0" min="0" max="10" step="1" />
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <ul id="tagBox" class="list-inline taglist">
-                </ul>
-              </div>
             </div>
-            <div class="image-share" data-bottom-type="share">
-              <div class="image-share-with-music">
-                <div class="image-share-with-music-title">
-                  <img class="music-ic" src="./image/music_ic.png" alt="">
-                  <span>음악 담기</span>
-                  <span class="sp-line"></span>
-                </div>
-                <div id="image-share-with-music-content" class="image-share-with-music-content">
-                  <button id="refresh-musicDeeplink" class="refresh-musicDeeplink"></button>
-                  <div id="music-content" class="music-content"></div>
-                </div>
-
-                <div id="music-checkbox" class="image-share-with-music-checkbox btn-selected" data-share-music-type="beat" name="share-music" value="beat" data-checked="true"></div>
-                <!-- <input type="checkbox" class="image-share-with-music-checkbox" data-share-music-type="beat" name="share-music" checked> -->
-              </div>
-
-              <hr>
-
-              <div class="image-share-with-facebook" data-share-facebook>
-                페이스북 공유하기
-              </div>
-            </div>
-
-            <div class="ImageFilters" data-bottom-type="imageFilter">
-              <div id="PresetFilters">
-                <ul class="list-inline">
-                  <li>
-                    <a data-preset="default">
-                      <img class="preset-thumbnail selected-preset-thumbnail" src="./image/imagefilter/default.png" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="vintage">
-                      <img class="preset-thumbnail" src="./image/imagefilter/vintage.png" alt="">
-                    </a>
-                  </li>
-
-                    <li>
-                        <a data-preset="conSetuSepia">
-                            <img class="preset-thumbnail" src="./image/imagefilter/conSetuSepia.png" alt="">
-                        </a>
-                    </li>
-
-                    <li>
-                        <a data-preset="old">
-                            <img class="preset-thumbnail" src="./image/imagefilter/old.png" alt="">
-                        </a>
-                    </li>
-
-                    <li>
-                        <a data-preset="toaster">
-                            <img class="preset-thumbnail" src="./image/imagefilter/toaster.png" alt="">
-                        </a>
-                    </li>
-
-                  <li>
-                    <a data-preset="saturation">
-                      <img class="preset-thumbnail" src="./image/imagefilter/saturation.png" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="hue_rotate">
-                      <img class="preset-thumbnail" src="./image/imagefilter/hue_rotate.png" alt="">
-                    </a>
-                  </li>
-
-                  <li>
-                    <a data-preset="invert">
-                      <img class="preset-thumbnail" src="./image/imagefilter/invert.png" alt="">
-                    </a>
-                  </li>
-
-                    <li>
-                        <a data-preset="clarity">
-                            <img class="preset-thumbnail" src="./image/imagefilter/clarity.png" alt="">
-                        </a>
-                    </li>
-                </ul>
-              </div>
-
-              <hr />
-
-              <div id="SlideFilters" class="SlideFilters" data-event-slide-filter>
-                <ul class="list-inline">
-                  <li>
-                    <img class="slide-thumbnail slide-thumbnail-brightness" src="./image/brightness_ic.png" alt="">
-                    <input type="range" class="slide-filter input-range-slider" data-filter="brightness" value="100" min="0" max="200" step="1" />
-                  </li>
-
-                  <li>
-                    <img class="slide-thumbnail slide-thumbnail-contrast" src="./image/contrast_ic.png" alt="">
-                    <input type="range" class="slide-filter input-range-slider" data-filter="contrast" value="100" min="0" max="200" step="1" />
-                  </li>
-
-                  <li>
-                    <img class="slide-thumbnail slide-thumbnail-blur" src="./image/blur_ic.png" alt="">
-                    <input type="range" class="slide-filter input-range-slider" data-filter="blur" value="0" min="0" max="10" step="1" />
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
