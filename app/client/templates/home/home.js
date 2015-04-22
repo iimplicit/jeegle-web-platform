@@ -10,7 +10,7 @@ slider = {
 };
 
 var musicNum = 0;
-var tagFirstFlag = true;
+tagFirstFlag = true;
 
 // Tag 개수를 increase, decrease, get 하는 함수 객체입니다.
 tagCounter = new TagCounter();
@@ -46,6 +46,10 @@ Template.Home.events({
         }
     },
     "click #tag-submit": function(e, tmpl) {
+        if(tagFirstFlag==true){
+          return;
+        }
+
         //if tag is not exist, tag will be undefined
         var inputBox = $('#tag-input');
         var tagWord = inputBox.text();
@@ -69,7 +73,7 @@ Template.Home.events({
 
         $('#tag-input').focus();
     },
-    "keypress #tag-input": function(e, tmpl) {
+    "keydown #tag-input": function(e, tmpl) {
         if(tagFirstFlag == true){
             tagFirstFlag = false;
             e.currentTarget.innerText = '';
@@ -79,7 +83,7 @@ Template.Home.events({
           }
         }
     },
-    "keypress #input-15": _.debounce(function(e, tmpl) {
+    "keydown #input-15": _.debounce(function(e, tmpl) {
         // 사용자 입력이 들어오면 Neo4j에 쿼리를 날립니다. debounce 함수로 적절하게 쿼리양을 조절합니다.
         e.preventDefault();
 
@@ -733,7 +737,7 @@ Template.Home.rendered = function() {
                                                         "jeegle": {
                                                             "og:type": "jeegle-web:jeegle",
                                                             "og:url": "http://jeegle.io/music/123456",
-                                                            "og:title": '♪'+$('#music-info').text(),
+                                                            "og:title": '♪ '+$('#music-info').text(),
                                                             "og:locale": "ko_KR",
                                                             "og:image": imageUrl,
                                                             "og:image:width": "640",
@@ -1164,15 +1168,16 @@ function setJeegleSlider() {
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
         bigToSmallImg.parent().attr('id', '');
-        if (bigToSmallImg.width() > bigToSmallImg.height()) {
-            var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
+
+        if (bigToSmallImg[0].naturalWidth > bigToSmallImg[0].naturalHeight) {
+            var smallWidth = parseInt(bigToSmallImg[0].style.left.split('p')[0]) * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
-                left: -(smallWidth - smallElemsDivLen) / 2 + "px"
+                left: smallWidth+"px"
             }, 200, function() {})
         } else {
-            var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider.$CenterLen)
+            var smallHeight = parseInt(bigToSmallImg[0].style.top.split('p')[0]) * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
-                top: -(smallHeight - smallElemsDivLen) / 2 + "px"
+                top: smallHeight+"px"
             }, 200, function() {})
         }
 
@@ -1186,16 +1191,19 @@ function setJeegleSlider() {
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
         smallToBigImg.parent().attr('id', 'main-image-wrapper');
-        if (smallToBigImg.width() > smallToBigImg.height()) {
-            var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
+
+        if (smallToBigImg[0].naturalWidth > smallToBigImg[0].naturalHeight) {
+          // var bigWidth = smallToBigImg[0].offsetWidth * (slider.$CenterLen / smallElemsDivLen)
+          var bigWidth = parseInt(smallToBigImg[0].style.left.split('p')[0]) * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                left: -(bigWidth - slider.$CenterLen) / 2 + "px"
-            }, 200, function() {})
+                left: bigWidth+"px"
+            }, 200, function(e) {})
         } else {
-            var bigHeight = smallToBigImg.height() * (slider.$CenterLen / smallElemsDivLen)
+          // var bigHeight = smallToBigImg[0].offsetHeight  * (slider.$CenterLen / smallElemsDivLen)
+          var bigHeight = parseInt(smallToBigImg[0].style.top.split('p')[0])  * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                top: -(bigHeight - slider.$CenterLen) / 2 + "px"
-            }, 200, function() {})
+                top: bigHeight+"px"
+            }, 200, function(e) {})
         }
 
         // 가운데 이미지 번호를 가지고 있습니다.
@@ -1228,15 +1236,16 @@ function setJeegleSlider() {
         var bigToSmallImg = $('#slider li:nth-child(' + (bigToSmall) + ') img');
         bigToSmallImg.attr('id', '');
         bigToSmallImg.parent().attr('id', '');
-        if (bigToSmallImg.width() > bigToSmallImg.height()) {
-            var smallWidth = bigToSmallImg.width() * (smallElemsDivLen / slider.$CenterLen)
+
+        if (bigToSmallImg[0].naturalWidth > bigToSmallImg[0].naturalHeight) {
+            var smallWidth = parseInt(bigToSmallImg[0].style.left.split('p')[0]) * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
-                left: -(smallWidth - smallElemsDivLen) / 2 + "px"
+                left: smallWidth+"px"
             }, 200, function() {})
         } else {
-            var smallHeight = bigToSmallImg.height() * (smallElemsDivLen / slider.$CenterLen)
+            var smallHeight = parseInt(bigToSmallImg[0].style.top.split('p')[0]) * (smallElemsDivLen / slider.$CenterLen)
             $('#slider li:nth-child(' + (bigToSmall) + ') img').animate({
-                top: -(smallHeight - smallElemsDivLen) / 2 + "px"
+                top: smallHeight+"px"
             }, 200, function() {})
         }
 
@@ -1253,15 +1262,18 @@ function setJeegleSlider() {
         var smallToBigImg = $('#slider li:nth-child(' + (smallToBig) + ') img');
         smallToBigImg.attr('id', 'main-image');
         smallToBigImg.parent().attr('id', 'main-image-wrapper');
-        if (smallToBigImg.width() > smallToBigImg.height()) {
-            var bigWidth = smallToBigImg.width() * (slider.$CenterLen / smallElemsDivLen)
+
+        if (smallToBigImg[0].naturalWidth > smallToBigImg[0].naturalHeight) {
+          // var bigWidth = smallToBigImg[0].offsetWidth * (slider.$CenterLen / smallElemsDivLen)
+          var bigWidth = parseInt(smallToBigImg[0].style.left.split('p')[0]) * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                left: -(bigWidth - slider.$CenterLen) / 2 + "px"
+                left: bigWidth+"px"
             }, 200, function(e) {})
         } else {
-            var bigHeight = smallToBigImg.height() * (slider.$CenterLen / smallElemsDivLen)
+          // var bigHeight = smallToBigImg[0].offsetHeight  * (slider.$CenterLen / smallElemsDivLen)
+          var bigHeight = parseInt(smallToBigImg[0].style.top.split('p')[0])  * (slider.$CenterLen / smallElemsDivLen)
             $('#slider li:nth-child(' + (smallToBig) + ') img').animate({
-                top: -(bigHeight - slider.$CenterLen) / 2 + "px"
+                top: bigHeight+"px"
             }, 200, function(e) {})
         }
 
@@ -1299,18 +1311,21 @@ function setImagePosition(slider) {
             img = this;
         }
 
-        imgWidth = img.width;
-        imgHeight = img.height;
+        var naturalWidth = img.naturalWidth;
+        var naturalHeight = img.naturalHeight; //real image size
 
-        if (imgWidth > imgHeight) {
+        var imgWidth = img.width;
+        var imgHeight = img.height;
+
+        if (naturalWidth > naturalHeight) {
             // 가로가 더 긴 경우
             img.style.height = "100%";
             img.style.width = 'auto';
             img.style.top = 0;
             if (img.id == 'main-image') {
-                img.style.left = -(img.width - slider.$CenterLen) / 2 + "px";
+                img.style.left = -(img.offsetWidth - slider.$CenterLen) / 2 + "px";
             } else {
-                img.style.left = -(img.width - slider.$smallElemsDivLen) / 2 + "px";
+                img.style.left = -(img.offsetWidth - slider.$smallElemsDivLen) / 2 + "px";
             }
         } else {
             // 세로가 더 긴 경우
@@ -1320,7 +1335,8 @@ function setImagePosition(slider) {
             if (img.id == 'main-image') {
                 img.style.top = -(img.offsetHeight - slider.$CenterLen) / 2 + "px";
             } else {
-                img.style.top = 0;
+                img.style.top = -(img.offsetHeight - slider.$smallElemsDivLen) / 2 + "px";
+                // img.style.top = 0;
             }
         }
     }
