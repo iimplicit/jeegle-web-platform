@@ -119,36 +119,49 @@ Template.Home.events({
             });
         }
     }, 300),
-    "click #refresh-musicDeeplink": function(e, tmpl){
-      // random array를 만들어서
-      changeMusic();
+    "click [data-image-item]": function(e, tmpl) {
+        var background = e.target.style.background;
+        var url = background.slice(4, background.length - 1);
+
+        TempWorkpieces.update({
+            _id: Session.get("currentId")
+        }, {
+            $set: {
+                updatedAt: new Date,
+                'content.0.url': url
+            }
+        });
     },
-    "click #music-checkbox": function(e, tmpl){
-      var checkbox = $('#music-checkbox');
-      checkbox.toggleClass("btn-selected")
+    "click #refresh-musicDeeplink": function(e, tmpl) {
+        // random array를 만들어서
+        changeMusic();
+    },
+    "click #music-checkbox": function(e, tmpl) {
+        var checkbox = $('#music-checkbox');
+        checkbox.toggleClass("btn-selected")
     }
 });
 
-function changeMusic(){
-  var deeplinkArray = Session.get('musicDeeplink');
-  if(musicNum==deeplinkArray.length-1){
-    musicNum = 0;
-  }else{
-    musicNum++
-  }
-  var currMusic = deeplinkArray[musicNum]._source;
+function changeMusic() {
+    var deeplinkArray = Session.get('musicDeeplink');
+    if (musicNum == deeplinkArray.length - 1) {
+        musicNum = 0;
+    } else {
+        musicNum++
+    }
+    var currMusic = deeplinkArray[musicNum]._source;
 
-  if(!currMusic.trackId){
-    //when it is undefined
-    changeMusic(); //한개도 없는 경우만 아니면 괜찮음.
-  }
+    if (!currMusic.trackId) {
+        //when it is undefined
+        changeMusic(); //한개도 없는 경우만 아니면 괜찮음.
+    }
 
-  var html = '<span id="music-info" data-track-id='+currMusic.trackId+'>';
-  html += currMusic.title;
-  html += '-';
-  html += currMusic.artist;
-  html += '</span>';
-  $('#music-content').html(html);
+    var html = '<span id="music-info" data-track-id=' + currMusic.trackId + '>';
+    html += currMusic.title;
+    html += '-';
+    html += currMusic.artist;
+    html += '</span>';
+    $('#music-content').html(html);
 }
 
 /*****************************************************************************/
@@ -180,6 +193,7 @@ window.mobilecheck = function() {
 /*****************************************************************************/
 /* Home: Lifecycle Hooks */
 /*****************************************************************************/
+
 Template.Home.created = function () {
 
     if(mobilecheck()){
@@ -190,13 +204,13 @@ Template.Home.created = function () {
     }
 
     //음악 먼저 10개 정도 받아옵시다. (개수 설정은 엘라스틱 서치에서 가능합니다.)
-    Meteor.call('getMusicDeeplink', "10cm", function(err, result){
-      if(result.length!=0){
-        Session.set('musicDeeplink', result);
-        changeMusic();
-      }else{
-        $('refresh-musicDeeplink').html('no value');
-      }
+    Meteor.call('getMusicDeeplink', "10cm", function(err, result) {
+        if (result.length != 0) {
+            Session.set('musicDeeplink', result);
+            changeMusic();
+        } else {
+            $('refresh-musicDeeplink').html('no value');
+        }
     });
 
     var firstSketch = {
@@ -433,6 +447,7 @@ Template.Home.rendered = function() {
             this.setTextDivPosition();
             this.facebookLoginAndRasterizeHTML();
             this.setDownloadImage();
+            this.setInputRange();
         },
         toggleBottomFilter: function() {
             // $('body').on('click', '.main-text', function (e) {
@@ -742,13 +757,13 @@ Template.Home.rendered = function() {
                                                             "jeegle-web:music_info": "",
                                                             "al:web:url": imageUrl,
                                                             "al:web:should_fallback": true,
-                                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000"+trackId,
+                                                            "al:ios:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000" + trackId,
                                                             "al:ios:app_store_id": "853073541",
                                                             "al:ios:app_name": "BEAT",
-                                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000"+trackId,
+                                                            "al:iphone:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000" + trackId,
                                                             "al:iphone:app_store_id": "853073541",
                                                             "al:iphone:app_name": "BEAT",
-                                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000"+trackId,
+                                                            "al:android:url": "bpc://landing?type=play_radio&channel_id=60&track_id=300000000000000000000000" + trackId,
                                                             "al:android:package": "com.beatpacking.beat",
                                                             "al:android:app_name": "BEAT"
                                                         }
@@ -930,10 +945,10 @@ Template.Home.rendered = function() {
             //   left: offset.left
             // })
         },
-        setDownloadImage: function(){
+        setDownloadImage: function() {
             var self = this;
 
-            $('[data-download-image]').on('click', function(e){
+            $('[data-download-image]').on('click', function(e) {
                 self.setCssInlineStylePropsForTextEditorDiv();
 
                 var mainText = $('.main-text')[0].outerHTML;
@@ -960,6 +975,35 @@ Template.Home.rendered = function() {
                     a.remove();
                 }, function error(err) {
                     console.log('rasterization failed: ', err);
+                });
+            });
+        },
+        setInputRange: function(){
+            var input = $('[data-change-font-size-filter]')['0'];
+
+            $('.input-range-slider').each(function(index, inputRange){
+                var value = (inputRange.value - inputRange.min) / (inputRange.max - inputRange.min);
+                inputRange.style.backgroundImage = [
+                    '-webkit-gradient(',
+                    'linear, ',
+                    'left top, ',
+                    'right top, ',
+                    'color-stop(' + value + ', rgba(255,255,255,1)), ',
+                    'color-stop(' + value + ', rgba(255,255,255,0.3))',
+                    ')'
+                ].join('');
+
+                $(inputRange).on('change', function(e) {
+                    var value = (e.target.value - e.target.min) / (e.target.max - e.target.min);
+                    e.target.style.backgroundImage = [
+                        '-webkit-gradient(',
+                        'linear, ',
+                        'left top, ',
+                        'right top, ',
+                        'color-stop(' + value + ', rgba(255,255,255,1)), ',
+                        'color-stop(' + value + ', rgba(255,255,255,0.3))',
+                        ')'
+                    ].join('');
                 });
             });
         }
@@ -997,6 +1041,7 @@ Template.Home.rendered = function() {
     // 이미지를 Neo4j database에서 받아옵니다. 최초의 중앙 이미지 번호를 저장합니다.
     slider.$CenterImageIndex = parseInt(slider.$MaximumImageNum / 2); // + 1; => heap index 0 to (MaximumImageNum-1)
     getRandomImages(slider.$MaximumImageNum);
+
 };
 
 function getImagesForTag(tagWord, edgeScope, NodesLimit, type) {
