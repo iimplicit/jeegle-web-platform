@@ -32,6 +32,9 @@ Template.Home.events({
     "click #tag-toggle-btn": function(e, tmpl) {
         inputBox = $("#tag-input-box");
         toggleBtn = $('#tag-toggle-btn');
+
+        inputBox.toggle();
+
         if (inputBox.css('display') == 'none') {
             toggleBtn.val('+');
         } else {
@@ -127,19 +130,19 @@ Template.Home.events({
             });
         }
     }, 300),
-    "click [data-image-item]": function(e, tmpl) {
-        var background = e.target.style.background;
-        var url = background.slice(4, background.length - 1);
-
-        TempWorkpieces.update({
-            _id: Session.get("currentId")
-        }, {
-            $set: {
-                updatedAt: new Date,
-                'content.0.url': url
-            }
-        });
-    },
+    // "click [data-image-item]": function(e, tmpl) {
+    //     var background = e.target.style.background;
+    //     var url = background.slice(4, background.length - 1);
+    //
+    //     TempWorkpieces.update({
+    //         _id: Session.get("currentId")
+    //     }, {
+    //         $set: {
+    //             updatedAt: new Date,
+    //             'content.0.url': url
+    //         }
+    //     });
+    // },
     "click #refresh-musicDeeplink": function(e, tmpl){
       // random array를 만들어서
       changeMusic();
@@ -465,6 +468,9 @@ Template.Home.rendered = function() {
                 $('#main-image-wrapper').siblings().css('visibility', 'hidden');
                 $('#main-image-wrapper').css('border', '2px solid rgba(255,255,255,1)');
                 // $('[data-header-right-content]').attr('data-header-right-content', 'confirm');
+
+                // Hunjae
+                $('.slider-btn').css('display','none');
             })
 
             $('body').on('click', '[data-apply-image-filter]', function() {
@@ -480,6 +486,9 @@ Template.Home.rendered = function() {
                 $('[data-bottom-type="fontFilter"]').show();
                 $('#main-image-wrapper').siblings().css('visibility', '');
                 $('#main-image-wrapper').css('border', '1px solid rgba(0,0,0,0.3)');
+
+                // Hunjae
+                $('.slider-btn').css('display','inline-block');
             });
 
             $('body').on('click', '[data-header-right-content]', function() {
