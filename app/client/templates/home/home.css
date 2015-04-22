@@ -463,6 +463,10 @@ html, body {
   color:#fff;
 }
 
+.tag-input:focus{
+  outline: none;
+}
+
 .tag-btn.submit{
   color:#fff;
   font-size:12px;
