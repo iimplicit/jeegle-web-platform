@@ -434,7 +434,7 @@ html, body {
 .tag-input-box{
   width:196px;
   font-family: Nanum Gothic;
-  display:none;
+  visibility: hidden;
   position: absolute;
   top:36px;
   left:-160px;

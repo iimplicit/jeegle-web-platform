@@ -12,7 +12,7 @@ iron-cli 설치 이후에는 directory root에서 `$ iron`으로 실행시키시
 
 #### 3. Neo4j password
 
-./app/lib/neo4j.js 파일 안에 neo4j 비밀번호([PASSWORD])를 입력해야 정보에 접근할 수 있습니다.
+./server/methods.js 파일 안에 neo4j 비밀번호([PASSWORD])를 입력해야 정보에 접근할 수 있습니다.
 
 ```
 Meteor.neo4j.connectionURL = "http://neo4j:[PASSWORD]@jeegle.io:7474";
