@@ -1,8 +1,38 @@
 /*****************************************************************************/
+/* Import Local WebFont
+/*****************************************************************************/
+
+@font-face {
+    font-family: Jua;
+    src: url('/font/Jua.woff') format('woff');
+}
+@font-face {
+    font-family: Hanna;
+    src: url('/font/Hanna.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Brush Script;
+    src: url('/font/BrushScript.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Gothic;
+    src: url('/font/Gothic.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Myeongjo;
+    src: url('/font/Myeongjo.woff') format('woff');
+}
+@font-face {
+    font-family: Nanum Pen Script;
+    src: url('/font/PenScript.woff') format('woff');
+}
+
+/*****************************************************************************/
 /* Home: Style */
 /*****************************************************************************/
 
 html, body {
+    font-family: "Nanum Gothic";
     margin: 0;
     padding: 0;
 }
@@ -244,43 +274,14 @@ html, body {
 /*****************************************************************************/
 /* Write: Dooseong, Eom */
 /*****************************************************************************/
-/*****************************************************************************/
-/* Import Local WebFont
-/*****************************************************************************/
-
-@font-face {
-    font-family: Jua;
-    src: url('/font/Jua.woff') format('woff');
-}
-@font-face {
-    font-family: Hanna;
-    src: url('/font/Hanna.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Brush Script;
-    src: url('/font/BrushScript.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Gothic;
-    src: url('/font/Gothic.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Myeongjo;
-    src: url('/font/Myeongjo.woff') format('woff');
-}
-@font-face {
-    font-family: Nanum Pen Script;
-    src: url('/font/PenScript.woff') format('woff');
-}
 .preset-thumbnail {
     padding: 0;
     width: 60px;
     height: 60px;
 }
 .selected-preset-thumbnail {
-    width: 56px;
-    height: 56px;
-    border: 2px #fff;
+    box-sizing: border-box;
+    border: 2px solid #fff;
 }
 .slider-list-inline > li {
     margin-left: 10px;
@@ -315,7 +316,9 @@ html, body {
 /*****************************************************************************/
 /* select box */
 /*****************************************************************************/
-
+.mobile-image-wrapper {
+    box-shadow: 0px 0px 100px rgba(0, 0, 0, 0.5);
+}
 .select-style {
     padding: 0;
     margin: 0;
@@ -851,4 +854,11 @@ input[type="range"]::-webkit-slider-thumb {
 
 .input-range-slider {
   vertical-align: middle;
+}
+
+
+@media (max-width: 768px) {
+    #main-image-wrapper {
+        visibility: hidden;
+    }
 }

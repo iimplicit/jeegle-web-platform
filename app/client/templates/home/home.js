@@ -866,6 +866,9 @@ Template.Home.rendered = function() {
                 var selectedFilterType = $(this).attr('data-preset');
                 self.imageFilterConfig.type = selectedFilterType;
 
+                $('.selected-preset-thumbnail').removeClass('selected-preset-thumbnail');
+                $(this).children().addClass('selected-preset-thumbnail');
+
                 if (selectedFilterType == 'default') {
                     self.initSliderSetting();
                     self.initImageFilterConfig();

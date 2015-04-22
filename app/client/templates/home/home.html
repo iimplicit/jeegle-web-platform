@@ -6,14 +6,15 @@
   </div>
   <div class="body-background-wrapper"></div>
   <div class="body-background"></div>
-  <div class="main-image-wrapper" data-main-image-wrapper></div>
+  <div class="mobile-image-wrapper hidden-sm hidden-md hidden-lg" data-main-image-wrapper></div>
+  <div class="main-image-wrapper hidden-xs" data-main-image-wrapper></div>
   <div class="container" style="padding: 0;">
     <div class="row">
       <div class="nav-wrapper" data-nav-top>
         <div>
           <a href="/policy"><img src="/images/logo.png" alt="" class="nav-logo"></a>
         </div>
-        <div>
+        <div class="hidden-xs">
           <button class="nav-button-complete" data-header-right-content="share">공유</button>
           <div class="download-button" data-download-image></div>
         </div>
@@ -24,13 +25,19 @@
         <div class="main-content-wrapper">
           <div class="main-content" data-content>
             <button class="button-apply-image-filter" data-apply-image-filter>적용하기</button>
-            <div id="input-15" class="main-text" contenteditable="true" style="font-family: Hanna;" data-main-text>
+            <div id="input-15" class="main-text hidden-xs" contenteditable="true" style="font-family: Hanna;" data-main-text>
                 무슨 생각을 하고 계신가요?
+            </div>
+
+            <div class="main-text col-xs-12 hidden-sm hidden-md hidden-lg" style="font-family: Hanna; top: 40%;" >
+                Jeegle은 데스크탑 화면에 <br/>
+                최적화 되어있습니다. <br/>
+                (모바일 서비스 준비중)
             </div>
           </div>
 
           <!--Jeegle image slider start-->
-          <div id="slider_box" class="slider_box">
+          <div id="slider_box" class="slider_box hidden-xs">
             <ul id="slider">
               {{#each images}}
                 <li name="image-div" data-num="{{index}}" class="image-div" style="overflow: hidden; height: 640px; width: 640px; list-style: none; position: relative;">
@@ -47,7 +54,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
+      <div class="hidden-xs col-sm-12 col-md-12 col-lg-12" style="padding: 0;">
         <div class="bottom-content-wrapper">
           <div class="bottom-content">
             <div class="font-filters" data-bottom-type="fontFilter">
@@ -158,7 +165,7 @@
                 <ul class="list-inline">
                   <li>
                     <a data-preset="default">
-                      <img class="preset-thumbnail" src="./image/imagefilter/default.png" alt="">
+                      <img class="preset-thumbnail selected-preset-thumbnail" src="./image/imagefilter/default.png" alt="">
                     </a>
                   </li>
 
