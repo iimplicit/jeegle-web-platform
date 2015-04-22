@@ -612,31 +612,56 @@ Template.Home.rendered = function() {
                 }
             });
 
-            $('[data-change-font-types]').on('change', function() {
-                var isCheckBold = $("input:checkbox[data-change-font-type='bold']").is(":checked");
-                var isCheckItalic = $("input:checkbox[data-change-font-type='italic']").is(":checked");
-                var isCheckShadow = $("input:checkbox[data-change-font-type='shadow']").is(":checked");
+            $('[data-change-font-type]').on('click', function(e) {
+                // this를 선택하고 있는 제이쿼리 객체를 부여합니다. (캐싱)
+                var $targetElement = $(this);
 
-                $('[data-main-text]').css('font-weight', '');
-                $('[data-main-text]').css('font-style', '');
-                $('[data-main-text]').css('text-shadow', '');
-
-                if (isCheckBold) {
-                    $('[data-main-text]').css('font-weight', 'bold');
-                }
-
-                if (isCheckItalic) {
-                    $('[data-main-text]').css('font-style', 'italic');
-                }
-
-                if (isCheckShadow) {
-                    $('[data-main-text]').css('text-shadow', '3px 3px #000');
+                if($targetElement.data('checked') === 'true'){
+                    $targetElement.data('checked', 'false');
+                    var fontType = $(e.currentTarget).data('change-font-type');
+                    if(fontType === 'bold'){
+                        $('[data-main-text]').css('font-weight', '');
+                        $targetElement.removeClass('button-selected');
+                    } else if (fontType === 'italic') {
+                        $('[data-main-text]').css('font-style', '');
+                        $targetElement.removeClass('button-selected');
+                    } else if (fontType === 'shadow') {
+                        $('[data-main-text]').css('text-shadow', '');
+                        $targetElement.removeClass('button-selected');
+                    }
+                } else {
+                    $targetElement.data('checked', 'true');
+                    var fontType = $(e.currentTarget).data('change-font-type');
+                    if(fontType === 'bold'){
+                        $('[data-main-text]').css('font-weight', 'bold');
+                        $targetElement.addClass('button-selected');
+                    } else if (fontType === 'italic') {
+                        $('[data-main-text]').css('font-style', 'italic');
+                        $targetElement.addClass('button-selected');
+                    } else if (fontType === 'shadow') {
+                        $('[data-main-text]').css('text-shadow', '3px 3px #000');
+                        $targetElement.addClass('button-selected');
+                    }
                 }
             });
 
-            $('[data-change-font-justify]').on('click', function() {
-                var selectedValue = $(this).val();
-                $('[data-main-text]').css('text-align', selectedValue);
+            $('[data-text-align]').on('click', function(e) {
+                // 현재 클릭하여 선택된 값입니다. (left, center, right 중)
+                var selectedValue = $(this).data('text-align')
+                // 바뀌기 전 현재의 값입니다. (left, center, right 중)
+                var beforeTextAlign = $('[data-current-text-align]').data('current-text-align');
+                // 만약 다르면
+                if(beforeTextAlign !== selectedValue){
+                    // 일단 현재 선택된 값을 저장합니다.
+                    $('[data-current-text-align]').data('current-text-align', selectedValue);
+                    // 이후 실제 텍스트 박스에 해당 효과를 적용시킵니다.
+                    $('[data-main-text]').css('text-align', selectedValue);
+                    // 새롭게 선택된 버튼에 해당 클래스를 적용시킵니다.
+                    $(this).addClass('button-selected');
+                    // 예전 버튼을 가져올 선택자를 만들고, 거기서는 해당 클래스를 제거합니다.
+                    var selector = '[data-text-align="' + beforeTextAlign + '"]';
+                    $(selector).removeClass('button-selected');
+                }
             });
 
 
