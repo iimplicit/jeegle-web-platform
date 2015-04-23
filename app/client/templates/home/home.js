@@ -764,7 +764,6 @@ Template.Home.rendered = function() {
                                                     "POST", {
                                                         "access_token": accessToken,
                                                         "created_time": new Date().toISOString(),
-                                                        "message": "Made in http://jeegle.io",
                                                         "fb:explicitly_shared": true,
                                                         "jeegle": {
                                                             "og:type": "jeegle-web:jeegle",
@@ -807,7 +806,6 @@ Template.Home.rendered = function() {
                                                     "/me/photos",
                                                     "POST", {
                                                         "access_token": accessToken,
-                                                        "message": "Made in http://jeegle.io",
                                                         "url": imageUrl
                                                     },
                                                     function(response) {
