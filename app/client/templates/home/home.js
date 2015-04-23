@@ -191,17 +191,22 @@ Template.Home.helpers({
 /*****************************************************************************/
 /* Home: Lifecycle Hooks */
 /*****************************************************************************/
+function getMusicDeeplink(keyword){
+  //음악 먼저 10개 정도 받아옵시다. (개수 설정은 엘라스틱 서치에서 가능합니다.)
+  Meteor.call('getMusicDeeplink', keyword, function(err, result) {
+      if (result.length != 0) {
+          Session.set('musicDeeplink', result);
+          changeMusic();
+      } else {
+          $('refresh-musicDeeplink').html('no value');
+      }
+  });
+}
+
+window.getMusicDeeplink = getMusicDeeplink;
 
 Template.Home.created = function () {
-    //음악 먼저 10개 정도 받아옵시다. (개수 설정은 엘라스틱 서치에서 가능합니다.)
-    Meteor.call('getMusicDeeplink', "10cm", function(err, result) {
-        if (result.length != 0) {
-            Session.set('musicDeeplink', result);
-            changeMusic();
-        } else {
-            $('refresh-musicDeeplink').html('no value');
-        }
-    });
+    getMusicDeeplink("봄");
 
     var firstSketch = {
         createdAt: new Date,
