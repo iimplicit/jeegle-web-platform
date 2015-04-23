@@ -206,7 +206,7 @@ function getMusicDeeplink(keyword){
 window.getMusicDeeplink = getMusicDeeplink;
 
 Template.Home.created = function () {
-    getMusicDeeplink("봄");
+    getMusicDeeplink("버스커 버스커");
 
     var firstSketch = {
         createdAt: new Date,
