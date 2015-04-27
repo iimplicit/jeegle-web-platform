@@ -206,7 +206,7 @@ function getMusicDeeplink(keyword){
 window.getMusicDeeplink = getMusicDeeplink;
 
 Template.Home.created = function () {
-    getMusicDeeplink("버스커 버스커");
+    getMusicDeeplink("벚꽃 엔딩 버스커 버스커");
 
     var firstSketch = {
         createdAt: new Date,
@@ -973,7 +973,7 @@ Template.Home.rendered = function() {
             $('[data-download-image]').on('click', function(e) {
                 self.setCssInlineStylePropsForTextEditorDiv();
 
-                var mainText = $('.main-text')[0].outerHTML;
+                var mainText = $('[data-main-text]')[0].outerHTML;
 
                 var parent = $('#main-image').parent();
                 var parentClone = parent.clone();
@@ -995,6 +995,7 @@ Template.Home.rendered = function() {
                     a[0].click();
 
                     a.remove();
+                    $('[data-main-text]').css('height', 'auto');
                 }, function error(err) {
                     console.log('rasterization failed: ', err);
                 });
